@@ -103,3 +103,11 @@ Here are some draft stories
 - can users edit/delete their ratings or comments?
 >> sure- but we want to keep record if possible
 ```
+
+## General flow of idea generation (from 2019 course)
+1. Students all submit idea(s) for a project to work on for the quarter
+2. Students rate and provide feedback for other students' projects; they are graded on quality of feedback and somewhat on number of ratings/comments provided. IIRC, students are not able to see who submitted an idea when they rate/comment
+3. Faculty and TAs select the top 20 ideas (partly but not entirely driven by student interest, measured by average rating and # of ratings/comments)
+4. Students who submitted the top 20 ideas pitch their idea to the remainder of their class during a class session
+5. Students who did not submit one of the top 20 ideas rank their top preferences (IIRC we rated our top 5)
+6. Faculty and TAs use these student ratings to assign groups to each idea, which are then their teams for the remainder of the course
