@@ -57,7 +57,7 @@ Here are some draft stories
 - As a user with Yale CAS credentials I can log in using
   the Yale CAS system.
 - As a logged in user
-  - my Yale status is recognized: faculty,
+  - my Yale status is recognized: faculty, TA,
     student, staff, or other.
     - This comes from Yale LDAP.
     - My status is persisted in my user model upon
@@ -69,6 +69,7 @@ Here are some draft stories
   - I can make a user "administrator" for a course.
   - I can "freeze" a course, preventing read.
   - I can "archive" a course, preventing both read and write.
+  - I can "preserve" a course, preventing write. `Thinking this will be useful if they wish to view old courses but prevent any edits`
 - As an authenticated administrator for a course
   - I can add users to a course
     - I can set a user's role for a course: student, guest.
@@ -80,9 +81,25 @@ Here are some draft stories
     sections to which this topic is assigned. (Topics
     assigned to a course but not a particular section
     will be assigned to all sections of that course.)
+    `What does a "topic" map to? Is a topic an idea (e.g., bring healthcare to rural poor)? Or more like an assignment (e.g., submit an idea)? Or something else?` 
   - I can toggle the status of a topic:
+    - Open: Allow submission of new sub-topics
+      - Students can see only their own sub-topics
+    - Review: Allow voting/rating and commenting on subtopics; prevent submission of new sub-topics
+      - Students can see all sub-topics in their section but cannot see submitter information (only sub-topic content)
+    - Selection: Allow ranking subtopics; prevent submission of new sub-topics or voting/rating
+      - Students can see all sub-topics marked as "Pitched", including submitter name
+      - Students can only see their own rankings
+    - Assigned: Prevent voting/rating/ranking
+  - I can toggle the status of a sub-topic
+    - Submitted: default status applied when students submit; open for evaluation
+    - Pitched: selected for pitching in class
 - As an authenticated user
   - I can see the courses to which I have read access.
+  - I can submit sub-topics to topics with status Open
+  - I can vote/rate and comment on sub-topics in topics with status Review
+  - I can rank sub-topics in topics with status Selection
+  - I can see my assigned sub-topic and team members in topics with status Assigned
 - To be continued...
 
 ## Q&A with Rodrigo
