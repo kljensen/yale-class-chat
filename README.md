@@ -67,9 +67,8 @@ Here are some draft stories
   - I can create a "course".
   - I can create sections of a course.
   - I can make a user "administrator" for a course.
-  - I can "freeze" a course, preventing read.
+  - I can "freeze" a course, preventing write.
   - I can "archive" a course, preventing both read and write.
-  - I can "preserve" a course, preventing write. `Thinking this will be useful if they wish to view old courses but prevent any edits`
 - As an authenticated administrator for a course
   - I can add users to a course
     - I can set a user's role for a course: student, guest.
@@ -81,19 +80,26 @@ Here are some draft stories
     sections to which this topic is assigned. (Topics
     assigned to a course but not a particular section
     will be assigned to all sections of that course.)
-    `What does a "topic" map to? Is a topic an idea (e.g., bring healthcare to rural poor)? Or more like an assignment (e.g., submit an idea)? Or something else?` 
-  - I can toggle the status of a topic:
-    - Open: Allow submission of new sub-topics
-      - Students can see only their own sub-topics
-    - Review: Allow voting/rating and commenting on subtopics; prevent submission of new sub-topics
-      - Students can see all sub-topics in their section but cannot see submitter information (only sub-topic content)
-    - Selection: Allow ranking subtopics; prevent submission of new sub-topics or voting/rating
-      - Students can see all sub-topics marked as "Pitched", including submitter name
-      - Students can only see their own rankings
-    - Assigned: Prevent voting/rating/ranking
+  - I can set attributes of a topic:
+    - title: the title that appears in the UI
+    - slug: the string in the URL
+    - opened_at: the date after which the topic is "writeable"
+      as long as the `open` (or similar) flag is true.
+    - closed_at: the date after which the topic is not "writeable"
+    - allow_submissions: boolean indicating that new submissions
+      are allowed
+    - allow_submission_voting: boolean indicating that submissions
+      can be voted upon by authorized users. If `allow_submission_voting`
+      is true and `allow_submissions` is false, then the topic is 
+      effectively in "reviewing" mode: people are voting on submissions.
+    - submission_limit: integer representing maximum number of submissions
+      per authorized user
+    - allow_comments: boolean indicating that comments on submissions
+      are allowed.
+    - sort_order: controls the sort order of submissions. Can be
+      by date, votes (ascending, descending), random.
   - I can toggle the status of a sub-topic
-    - Submitted: default status applied when students submit; open for evaluation
-    - Pitched: selected for pitching in class
+    - viewable/hidden
 - As an authenticated user
   - I can see the courses to which I have read access.
   - I can submit sub-topics to topics with status Open
