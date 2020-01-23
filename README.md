@@ -23,9 +23,14 @@ We will be using
   - Unclear of the best option. A few include
   - [Überauth](https://github.com/ueberauth/ueberauth)
     - [Überauth CAS](https://github.com/marceldegraaf/ueberauth_cas)
+    - See [this blog
+      post](http://brandonvergara.me/post/ueberauth_cas_with_phoenix/)
   - [Pow](https://github.com/danschultzer/pow)
     - This seems most actively maintained
-  -
+  - Seems like Überauth is the only option with an existing
+    CAS library. Not sure I feel like rolling our own right
+    now. Maybe we can use dependency injection or something
+    to make this swappable later?
 - Session storage
   - Cookie is the Phoenix default
   - ETS is a common alternative with good performance
