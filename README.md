@@ -11,6 +11,37 @@ We will focus on the first scenario at first because this is the
 scenario for which the app will
 be used in the Innovator in Spring 2020.
 
+## Starting the app
+
+First, you'll need a `.env` file with the required environment
+variables. You'll want something like
+
+```
+PORTGRES_PORT=5432
+POSTGRES_USER=said_upon_playoff
+POSTGRES_PASSWORD=glitter-thing-tamale-flatfoot
+POSTGRES_DB=appdevdb
+PORT=9001
+MIX_ENV=dev
+```
+
+Run `docker-compose up` to bring up the app. The app will
+then be available at [http://localhost:9001](http://localhost:9001)
+or on whatever you set `$PORT` as.
+
+To get a shell in the running docker container, do
+
+```
+docker exec -it yale-class-chat_app_1 /bin/bash
+```
+
+To get a shell in an app container that is _not_ already
+running, do
+
+```
+docker-compose run -it app /bin/bash
+```
+
 ## Tech stack
 
 We will be using
@@ -90,7 +121,7 @@ Here are some draft stories
       are allowed
     - allow_submission_voting: boolean indicating that submissions
       can be voted upon by authorized users. If `allow_submission_voting`
-      is true and `allow_submissions` is false, then the topic is 
+      is true and `allow_submissions` is false, then the topic is
       effectively in "reviewing" mode: people are voting on submissions.
     - submission_limit: integer representing maximum number of submissions
       per authorized user
@@ -128,6 +159,7 @@ Here are some draft stories
 ```
 
 ## General flow of idea generation (from 2019 course)
+
 1. Students all submit idea(s) for a project to work on for the quarter
 2. Students rate and provide feedback for other students' projects; they are graded on quality of feedback and somewhat on number of ratings/comments provided. IIRC, students are not able to see who submitted an idea when they rate/comment
 3. Faculty and TAs select the top 20 ideas (partly but not entirely driven by student interest, measured by average rating and # of ratings/comments)
