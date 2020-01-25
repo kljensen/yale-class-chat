@@ -11,9 +11,9 @@ defmodule App.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-        dialyzer: [
-          plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
-          ignore_warnings: ".dialyzer_ignore.exs"
+      dialyzer: [
+        plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
+        ignore_warnings: ".dialyzer_ignore.exs"
       ]
     ]
   end
@@ -48,11 +48,13 @@ defmodule App.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       # Use Dialyxir for static analysis
-      {:dialyxir, "~> 1.0.0-rc.7", only: [:test], runtime: false},
+      {:dialyxir, "~> 1.0.0-rc.7", only: [:dev, :test], runtime: false},
       # Use mix-test.watch to run tests on code change
-      {:mix_test_watch, "~> 1.0", only: :test, runtime: false},
+      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
       # Enforce code style and identify bad code
-      {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false},
+      # Static analaysis for Phoenix security
+      {:sobelow, "~> 0.8", only: [:dev, :test]}
     ]
   end
 
