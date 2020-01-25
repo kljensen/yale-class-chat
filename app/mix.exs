@@ -42,7 +42,11 @@ defmodule App.MixProject do
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.0"}
+      {:plug_cowboy, "~> 2.0"},
+      # Use Dialyxir for static analysis
+      {:dialyxir, "~> 1.0.0-rc.7", only: [:test], runtime: false},
+      # Use mix-test.watch to run tests on code change
+      {:mix_test_watch, "~> 1.0", only: :test, runtime: false}
     ]
   end
 

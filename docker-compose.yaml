@@ -6,6 +6,12 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+  testdb:
+    image: postgres:12.1-alpine
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
   app:
     build: app
     environment:
@@ -14,7 +20,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_HOST=db
       - PORT=4000
-      - MIX_ENV=${MIX_ENV}
+      - MIX_ENV=dev # Our Phoenix app is in dev mode
     volumes:
       - type: bind
         source: ./app
@@ -23,5 +29,24 @@ services:
       - "127.0.0.1:${PORT}:4000"
     depends_on:
       - db
-    command:
+    entrypoint:
       - ./run.sh
+      - server
+  tests:
+    build: app
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=testdb
+      - PORT=4000
+      - MIX_ENV=test # Our Phoenix app is in test mode
+    volumes:
+      - type: bind
+        source: ./app
+        target: /app
+    depends_on:
+      - testdb
+    entrypoint:
+      - ./run.sh
+      - watch-tests
