@@ -53,7 +53,7 @@ run_tests (){
 }
 
 run_tests_with_watch (){
-  mix test.watch --stale
+  mix test.watch
 }
 
 setup(){
