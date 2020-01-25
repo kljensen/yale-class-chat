@@ -5,12 +5,12 @@
 set -e
 
 
-# echo "\nTesting the installation..."
+# echo "Testing the installation..."
 # # "Prove" that install was successful by running the tests
 # mix test
 
 run_server (){
-  echo "\n Launching Phoenix web server..."
+  echo " Launching Phoenix web server..."
   # Start the phoenix web server
   mix phx.server
 }
@@ -22,11 +22,22 @@ run_migrations(){
     sleep 1
   done
 
-  echo "\nPostgres is available: continuing with database setup..."
+  echo "Postgres is available: continuing with database setup..."
 
   # Potentially Set up the database
   mix ecto.create
   mix ecto.migrate
+}
+
+setup_dialyzer (){
+  # Prepare Dialyzer if the project has Dialyxer set up
+  if mix help dialyzer >/dev/null 2>&1
+  then
+    echo "Found Dialyxer: Setting up PLT..."
+    mix do deps.compile, dialyzer --plt
+  else
+    echo "No Dialyxer config: Skipping setup..."
+  fi
 }
 
 # Install dependencies
@@ -34,17 +45,8 @@ install_dependencies (){
   # Ensure the app's dependencies are installed
   mix deps.get
 
-  # Prepare Dialyzer if the project has Dialyxer set up
-  if mix help dialyzer >/dev/null 2>&1
-  then
-    echo "\nFound Dialyxer: Setting up PLT..."
-    mix do deps.compile, dialyzer --plt
-  else
-    echo "\nNo Dialyxer config: Skipping setup..."
-  fi
-
   # Install JS libraries
-  echo "\nInstalling JS..."
+  echo "Installing JS..."
   yarn install --cwd assets --link-duplicates --non-interactive
 }
 
