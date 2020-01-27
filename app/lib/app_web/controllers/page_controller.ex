@@ -2,6 +2,8 @@ defmodule AppWeb.PageController do
   use AppWeb, :controller
 
   def index(conn, _params) do
-    render(conn, "index.html")
+    uid = get_session(conn, :uid)
+    IO.inspect uid
+    render(conn, "index.html", current_user: uid)
   end
 end

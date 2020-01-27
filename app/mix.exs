@@ -54,7 +54,10 @@ defmodule App.MixProject do
       # Enforce code style and identify bad code
       {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false},
       # Static analaysis for Phoenix security
-      {:sobelow, "~> 0.8", only: [:dev, :test]}
+      {:sobelow, "~> 0.8", only: [:dev, :test]},
+      # Using uberauth for CAS authentication
+      {:ueberauth_cas, git: "https://github.com/kljensen/ueberauth_cas.git", tag: "v0.2"},
+      {:ueberauth, "~> 0.6"},
     ]
   end
 

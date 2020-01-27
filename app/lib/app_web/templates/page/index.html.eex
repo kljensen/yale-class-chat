@@ -1,6 +1,13 @@
 <section class="phx-hero">
-  <h1><%= gettext "Welcome to %{name}!", name: "Phoenix" %></h1>
-  <p>A productive web framework that<br/>does not compromise speed or maintainability.</p>
+  <h1><%= gettext "Welcome to %{name}!", name: "Yale class chat" %></h1>
+  <p>Current user = <%= @current_user %></p>
+  <p>
+    <a href="/secret">View secret page</a>
+  </p>
+</section>
+<section class="row">
+  <article class="column">
+  </article>
 </section>
 
 <section class="row">
