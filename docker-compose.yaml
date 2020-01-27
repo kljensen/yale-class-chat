@@ -1,4 +1,7 @@
 version: "3.4"
+volumes:
+  dev_deps:
+  test_deps:
 services:
   db:
     image: postgres:12.1-alpine
@@ -25,6 +28,10 @@ services:
       - type: bind
         source: ./app
         target: /app
+      # Use a volume in the container for our
+      # dependencies to keep the separate from
+      # the testapp deps.
+      - dev_deps:/app/deps/
     ports:
       - "127.0.0.1:${PORT}:4000"
     depends_on:
@@ -45,8 +52,18 @@ services:
       - type: bind
         source: ./app
         target: /app
+      # Use a volume in the container for our
+      # dependencies to keep the separate from
+      # the app/dev deps.
+      - test_deps:/app/deps/
     depends_on:
       - testdb
     entrypoint:
       - ./run.sh
       - watch-tests
+  mockcas:
+    image: yellowtrex/mockcas
+    environment:
+      - PORT=4000
+    ports:
+      - "127.0.0.1:${MOCKCAS_PORT}:4000"
