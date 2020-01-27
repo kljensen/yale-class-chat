@@ -25,21 +25,20 @@ PORT=9001
 MIX_ENV=dev
 ```
 
-Run `docker-compose up` to bring up the app. The app will
+Run `./admin.sh up` to bring up the app. The app will
 then be available at [http://localhost:9001](http://localhost:9001)
 or on whatever you set `$PORT` as.
 
 To get a shell in the running docker container, do
 
 ```
-docker exec -it yale-class-chat_app_1 /bin/bash
+./admin.sh shell
 ```
 
-To get a shell in an app container that is _not_ already
-running, do
+To restart all Elixir processes in the test and app containers, do
 
 ```
-docker-compose run -it app /bin/bash
+./admin.sh restart
 ```
 
 ## Tech stack

@@ -38,6 +38,7 @@ services:
       - db
     entrypoint:
       - ./run.sh
+    command:
       - server
   tests:
     build: app
@@ -60,6 +61,7 @@ services:
       - testdb
     entrypoint:
       - ./run.sh
+    command:
       - watch-tests
   mockcas:
     image: yellowtrex/mockcas

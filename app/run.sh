@@ -10,9 +10,17 @@ set -e
 # mix test
 
 run_server (){
-  echo " Launching Phoenix web server..."
   # Start the phoenix web server
-  mix phx.server
+  # Infinitely start and wait. This allows us to kill
+  # the Erlang process without having this shell script
+  # exit.
+  while true
+  do
+    echo "Launching Phoenix web server..."
+    mix phx.server &
+    wait
+    echo "...server exited, restarting..."
+  done
 }
 
 run_migrations(){
@@ -55,12 +63,27 @@ run_tests (){
 }
 
 run_tests_with_watch (){
-  mix test.watch
+  # Infinitely start and wait. This allows us to kill
+  # the Erlang process without having this shell script
+  # exit.
+  while true
+  do
+    echo "Watching tests..."
+    mix test.watch &
+    wait
+  done
 }
 
 setup(){
   install_dependencies
   run_migrations
+}
+
+sighup_beam(){
+  # Sends SIGHUP to all beam processes
+  # in the container. Useful for restarting
+  # the server without running `setup`.
+  pkill -f beam --signal HUP
 }
 
 ACTION=$1
@@ -76,6 +99,9 @@ case $ACTION in
     watch-tests)
         setup
         run_tests_with_watch
+        ;;
+    sighup-beam)
+        sighup_beam
         ;;
     *)
         echo "Invalid action!"
