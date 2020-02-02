@@ -27,9 +27,9 @@ config :phoenix, :json_library, Jason
 
 config :ueberauth, Ueberauth,
   providers: [cas: {Ueberauth.Strategy.CAS, [
-    service_validate_base_url: "http://mockcas:4000/cas",
-    base_url: "http://localhost:9002/cas",
-    callback: "http://localhost:9001/auth/cas/callback",
+    service_validate_base_url: System.get_env("CAS_SERVICE_VALIDATE_BASE_URL"),
+    base_url: System.get_env("CAS_BASE_URL"),
+    callback: System.get_env("CAS_CALLBACK_URL"),
   ]}]
 
 # Import environment specific config. This must remain at the bottom
