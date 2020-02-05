@@ -24,6 +24,9 @@ services:
       - POSTGRES_HOST=db
       - PORT=4000
       - MIX_ENV=dev # Our Phoenix app is in dev mode
+      - CAS_BASE_URL=${CAS_BASE_URL}
+      - CAS_SERVICE_VALIDATE_BASE_URL=${CAS_SERVICE_VALIDATE_BASE_URL}
+      - CAS_CALLBACK_URL=${CAS_CALLBACK_URL}
     volumes:
       - type: bind
         source: ./app
@@ -49,6 +52,9 @@ services:
       - POSTGRES_HOST=testdb
       - PORT=4000
       - MIX_ENV=test # Our Phoenix app is in test mode
+      - CAS_BASE_URL=${CAS_BASE_URL}
+      - CAS_SERVICE_VALIDATE_BASE_URL=${CAS_SERVICE_VALIDATE_BASE_URL}
+      - CAS_CALLBACK_URL=${CAS_CALLBACK_URL}
     volumes:
       - type: bind
         source: ./app
