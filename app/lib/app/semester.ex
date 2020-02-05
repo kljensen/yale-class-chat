@@ -8,7 +8,7 @@ defmodule App.Semester do
 
   def changeset(semester, params \\ %{}) do
     semester
-    |> Ecto.Changeset.cast(params, [:net_id])
+    |> Ecto.Changeset.cast(params, [:name])
     |> Ecto.Changeset.validate_required([:name])
   end
 end

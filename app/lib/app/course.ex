@@ -10,7 +10,7 @@ defmodule App.Course do
 
   def changeset(course, params \\ %{}) do
     course
-    |> Ecto.Changeset.cast(params, [:net_id])
+    |> Ecto.Changeset.cast(params, [:name])
     |> Ecto.Changeset.validate_required([:name])
   end
 end
