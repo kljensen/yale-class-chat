@@ -9,10 +9,11 @@ defmodule App.User do
 
   def changeset(user, params \\ %{}) do
     user
-    |> Ecto.Changeset.cast(params, [:net_id])
+    |> Ecto.Changeset.cast(params, [:net_id, :email])
     |> Ecto.Changeset.validate_required([:net_id])
     |> Ecto.Changeset.unsafe_validate_unique([:net_id], App.Repo, message: "net id is already in use")
     |> Ecto.Changeset.unique_constraint(:net_id)
+    |> Ecto.Changeset.validate_format(:email, ~r/@/)
     # do we need to ensure emails are also unique?
   end
 end
