@@ -5,9 +5,8 @@
 set -e
 
 
-# echo "Testing the installation..."
-# # "Prove" that install was successful by running the tests
-# mix test
+COOKIE=dev
+SERVER_NAME=dev@127.0.0.1
 
 run_server (){
   # Start the phoenix web server
@@ -17,7 +16,7 @@ run_server (){
   while true
   do
     echo "Launching Phoenix web server..."
-    mix phx.server &
+    elixir --name $SERVER_NAME --cookie $COOKIE -S mix phx.server &
     wait
     echo "...server exited, restarting..."
   done
@@ -74,6 +73,10 @@ run_tests_with_watch (){
   done
 }
 
+run_iex (){
+  iex --name shell@127.0.0.1 --cookie $COOKIE --remsh $SERVER_NAME
+}
+
 setup(){
   install_dependencies
   run_migrations
@@ -95,6 +98,9 @@ case $ACTION in
     tests)
         setup
         run_tests
+        ;;
+    iex)
+        run_iex
         ;;
     watch-tests)
         setup
