@@ -30,6 +30,15 @@ defmodule AppWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    resources "/comments", CommentController
+    resources "/courses", CourseController
+    resources "/ratings", RatingController
+    resources "/sections", SectionController
+    resources "/semesters", SemesterController
+    resources "/submissions", SubmissionController
+    resources "/topics", TopicController
+    resources "/users", UserController
+    resources "/user_roles", User_RoleController
   end
 
   scope "/secret", AppWeb do

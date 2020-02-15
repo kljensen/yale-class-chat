@@ -3,8 +3,8 @@ defmodule AppWeb.UserControllerTest do
 
   alias App.Accounts
 
-  @create_attrs %{display_name: "some display_name", email: "some email", net_id: "some net_id"}
-  @update_attrs %{display_name: "some updated display_name", email: "some updated email", net_id: "some updated net_id"}
+  @create_attrs %{display_name: "some display_name", email: "some_email@yale.edu", net_id: "some net_id"}
+  @update_attrs %{display_name: "some updated display_name", email: "some_updated_email@yale.edu", net_id: "some updated net_id"}
   @invalid_attrs %{display_name: nil, email: nil, net_id: nil}
 
   def fixture(:user) do
