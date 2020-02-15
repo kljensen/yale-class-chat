@@ -1,0 +1,26 @@
+<h1>Listing Ratings</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Score</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for rating <- @ratings do %>
+    <tr>
+      <td><%= rating.score %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.rating_path(@conn, :show, rating) %></span>
+        <span><%= link "Edit", to: Routes.rating_path(@conn, :edit, rating) %></span>
+        <span><%= link "Delete", to: Routes.rating_path(@conn, :delete, rating), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Rating", to: Routes.rating_path(@conn, :new) %></span>
