@@ -11,9 +11,9 @@ defmodule App.Section do
   end
 
   @doc false
-  def changeset(section, params \\ %{}) do
+  def changeset(section, attrs) do
     section
-    |> cast(params, [:title])
+    |> cast(attrs, [:title])
     |> validate_required([:title])
     |> unique_constraint(:crn)
   end

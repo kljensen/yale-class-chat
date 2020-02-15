@@ -13,9 +13,9 @@ defmodule App.User_role do
   end
 
   @doc false
-  def changeset(user_role, params \\ %{}) do
+  def changeset(user_role, attrs) do
     user_role
-    |> cast(params, [:role, :valid_from])
+    |> cast(attrs, [:role, :valid_from])
     |> validate_required([:role, :valid_from])
   end
 end

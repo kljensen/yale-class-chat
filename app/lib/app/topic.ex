@@ -19,9 +19,9 @@ defmodule App.Topic do
     timestamps()
   end
 
-  def changeset(topic, params \\ %{}) do
+  def changeset(topic, attrs) do
     topic
-    |> cast(params, [:title, :description, :slug, :opened_at, :closed_at, :allow_submissions, :allow_submission_voting, :anonymous, :allow_submission_comments, :sort])
+    |> cast(attrs, [:title, :description, :slug, :opened_at, :closed_at, :allow_submissions, :allow_submission_voting, :anonymous, :allow_submission_comments, :sort])
     |> validate_required([:title, :slug, :opened_at, :allow_submissions, :allow_submission_voting, :anonymous, :allow_submission_comments, :sort])
     |> unique_constraint(:slug)
   end

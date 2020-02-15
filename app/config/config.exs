@@ -33,7 +33,7 @@ config :ueberauth, Ueberauth,
   ]}]
 
 # Use UTC for timestamps
-timestamps(): config :app, App.Repo, migration_timestamps: [type: :utc_datetime_usec]
+config :app, App.Repo, migration_timestamps: [type: :utc_datetime_usec]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

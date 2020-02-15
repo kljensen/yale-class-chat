@@ -7,13 +7,13 @@ defmodule App.Rating do
     belongs_to :submission, App.Submission
     belongs_to :user, App.User
 
-    timestemps()
+    timestamps()
   end
 
   @doc false
-  def changeset(rating, params \\ %{}) do
+  def changeset(rating, attrs) do
     rating
-    |> cast(params, [:score])
+    |> cast(attrs, [:score])
     |> validate_required([:score])
   end
 end

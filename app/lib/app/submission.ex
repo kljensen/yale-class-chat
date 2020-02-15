@@ -12,9 +12,9 @@ defmodule App.Submission do
     timestamps()
   end
 
-  def changeset(user, params \\ %{}) do
+  def changeset(user, attrs) do
     user
-    |> cast(params, [:title, :description, :slug])
+    |> cast(attrs, [:title, :description, :slug])
     |> validate_required([:title, :description, :slug])
     |> unique_constraint(:slug)
   end
