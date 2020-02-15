@@ -101,4 +101,100 @@ defmodule App.Accounts do
   def change_user(%User{} = user) do
     User.changeset(user, %{})
   end
+
+  alias App.Accounts.User_Role
+
+  @doc """
+  Returns the list of user_roles.
+
+  ## Examples
+
+      iex> list_user_roles()
+      [%User_Role{}, ...]
+
+  """
+  def list_user_roles do
+    Repo.all(User_Role)
+  end
+
+  @doc """
+  Gets a single user__role.
+
+  Raises `Ecto.NoResultsError` if the User  role does not exist.
+
+  ## Examples
+
+      iex> get_user__role!(123)
+      %User_Role{}
+
+      iex> get_user__role!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_user__role!(id), do: Repo.get!(User_Role, id)
+
+  @doc """
+  Creates a user__role.
+
+  ## Examples
+
+      iex> create_user__role(%{field: value})
+      {:ok, %User_Role{}}
+
+      iex> create_user__role(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_user__role(attrs \\ %{}) do
+    %User_Role{}
+    |> User_Role.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a user__role.
+
+  ## Examples
+
+      iex> update_user__role(user__role, %{field: new_value})
+      {:ok, %User_Role{}}
+
+      iex> update_user__role(user__role, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_user__role(%User_Role{} = user__role, attrs) do
+    user__role
+    |> User_Role.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a user__role.
+
+  ## Examples
+
+      iex> delete_user__role(user__role)
+      {:ok, %User_Role{}}
+
+      iex> delete_user__role(user__role)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_user__role(%User_Role{} = user__role) do
+    Repo.delete(user__role)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking user__role changes.
+
+  ## Examples
+
+      iex> change_user__role(user__role)
+      %Ecto.Changeset{source: %User_Role{}}
+
+  """
+  def change_user__role(%User_Role{} = user__role) do
+    User_Role.changeset(user__role, %{})
+  end
 end
