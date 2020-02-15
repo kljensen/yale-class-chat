@@ -1,0 +1,18 @@
+<h1>Show Section</h1>
+
+<ul>
+
+  <li>
+    <strong>Title:</strong>
+    <%= @section.title %>
+  </li>
+
+  <li>
+    <strong>Crn:</strong>
+    <%= @section.crn %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.section_path(@conn, :edit, @section) %></span>
+<span><%= link "Back", to: Routes.section_path(@conn, :index) %></span>

@@ -124,4 +124,65 @@ defmodule App.CoursesTest do
       assert %Ecto.Changeset{} = Courses.change_course(course)
     end
   end
+
+  describe "sections" do
+    alias App.Courses.Section
+
+    @valid_attrs %{crn: "some crn", title: "some title"}
+    @update_attrs %{crn: "some updated crn", title: "some updated title"}
+    @invalid_attrs %{crn: nil, title: nil}
+
+    def section_fixture(attrs \\ %{}) do
+      {:ok, section} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Courses.create_section()
+
+      section
+    end
+
+    test "list_sections/0 returns all sections" do
+      section = section_fixture()
+      assert Courses.list_sections() == [section]
+    end
+
+    test "get_section!/1 returns the section with given id" do
+      section = section_fixture()
+      assert Courses.get_section!(section.id) == section
+    end
+
+    test "create_section/1 with valid data creates a section" do
+      assert {:ok, %Section{} = section} = Courses.create_section(@valid_attrs)
+      assert section.crn == "some crn"
+      assert section.title == "some title"
+    end
+
+    test "create_section/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Courses.create_section(@invalid_attrs)
+    end
+
+    test "update_section/2 with valid data updates the section" do
+      section = section_fixture()
+      assert {:ok, %Section{} = section} = Courses.update_section(section, @update_attrs)
+      assert section.crn == "some updated crn"
+      assert section.title == "some updated title"
+    end
+
+    test "update_section/2 with invalid data returns error changeset" do
+      section = section_fixture()
+      assert {:error, %Ecto.Changeset{}} = Courses.update_section(section, @invalid_attrs)
+      assert section == Courses.get_section!(section.id)
+    end
+
+    test "delete_section/1 deletes the section" do
+      section = section_fixture()
+      assert {:ok, %Section{}} = Courses.delete_section(section)
+      assert_raise Ecto.NoResultsError, fn -> Courses.get_section!(section.id) end
+    end
+
+    test "change_section/1 returns a section changeset" do
+      section = section_fixture()
+      assert %Ecto.Changeset{} = Courses.change_section(section)
+    end
+  end
 end

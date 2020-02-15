@@ -1,11 +1,10 @@
-defmodule App.Section do
+defmodule App.Courses.Section do
   use Ecto.Schema
   import Ecto.Changeset
 
   schema "sections" do
-    field :title, :string
     field :crn, :string
-    belongs_to :course, App.Course
+    field :title, :string
 
     timestamps()
   end
@@ -13,8 +12,8 @@ defmodule App.Section do
   @doc false
   def changeset(section, attrs) do
     section
-    |> cast(attrs, [:title])
-    |> validate_required([:title])
+    |> cast(attrs, [:title, :crn])
+    |> validate_required([:title, :crn])
     |> unique_constraint(:crn)
   end
 end

@@ -5,7 +5,6 @@ defmodule App.Repo.Migrations.CreateSections do
     create table(:sections) do
       add :title, :string
       add :crn, :string
-      add :course_id, references(:courses)
 
       timestamps()
     end
