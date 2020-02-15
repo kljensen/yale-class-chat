@@ -1,0 +1,13 @@
+<h1>Show Semester</h1>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @semester.name %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.semester_path(@conn, :edit, @semester) %></span>
+<span><%= link "Back", to: Routes.semester_path(@conn, :index) %></span>

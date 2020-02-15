@@ -1,10 +1,9 @@
-defmodule App.Semester do
+defmodule App.Courses.Semester do
   use Ecto.Schema
   import Ecto.Changeset
 
   schema "semesters" do
     field :name, :string
-    has_many :courses, App.Course
 
     timestamps()
   end
