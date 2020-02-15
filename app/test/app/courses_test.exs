@@ -32,10 +32,13 @@ defmodule App.CoursesTest do
     test "create_semester/1 with valid data creates a semester" do
       assert {:ok, %Semester{} = semester} = Courses.create_semester(@valid_attrs)
       assert semester.name == "some name"
+      assert {:error, changeset = semester} = Courses.create_semester(@valid_attrs)
+      assert %{name: ["has already been taken"]} = errors_on(changeset)
     end
 
     test "create_semester/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Courses.create_semester(@invalid_attrs)
+      assert {:error, changeset = semester} = Courses.create_semester(@invalid_attrs)
+      assert %{name: ["can't be blank"]} = errors_on(changeset)
     end
 
     test "update_semester/2 with valid data updates the semester" do
@@ -155,6 +158,8 @@ defmodule App.CoursesTest do
       assert {:ok, %Section{} = section} = Courses.create_section(@valid_attrs)
       assert section.crn == "some crn"
       assert section.title == "some title"
+      assert {:error, changeset = section} = Courses.create_section(@valid_attrs)
+      assert %{crn: ["has already been taken"]} = errors_on(changeset)
     end
 
     test "create_section/1 with invalid data returns error changeset" do

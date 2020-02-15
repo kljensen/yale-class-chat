@@ -15,7 +15,7 @@ defmodule App.Submissions.Submission do
   def changeset(submission, attrs) do
     submission
     |> cast(attrs, [:title, :description, :slug, :image_url])
-    |> validate_required([:title, :description, :slug, :image_url])
+    |> validate_required([:title, :description, :slug])
     |> unique_constraint(:slug)
   end
 end

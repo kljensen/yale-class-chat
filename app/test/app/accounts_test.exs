@@ -29,15 +29,20 @@ defmodule App.AccountsTest do
       assert Accounts.get_user!(user.id) == user
     end
 
-    test "create_user/1 with valid data creates a user" do
+    test "create_user/1 with valid data creates a user unless duplicate net_id" do
       assert {:ok, %User{} = user} = Accounts.create_user(@valid_attrs)
       assert user.display_name == "some display_name"
       assert user.email == "some_email@yale.edu"
       assert user.net_id == "some net_id"
+      assert {:error, changeset = user} = Accounts.create_user(@valid_attrs)
+      assert %{net_id: ["has already been taken"]} = errors_on(changeset)
     end
 
     test "create_user/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_user(@invalid_attrs)
+      assert {:error, changeset = user} = Accounts.create_user(@invalid_attrs)
+      assert %{net_id: ["can't be blank"]} = errors_on(changeset)
+      assert %{display_name: ["can't be blank"]} = errors_on(changeset)
+      assert %{email: ["can't be blank"]} = errors_on(changeset)
     end
 
     test "update_user/2 with valid data updates the user" do

@@ -45,7 +45,17 @@ defmodule App.TopicsTest do
     end
 
     test "create_topic/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Topics.create_topic(@invalid_attrs)
+      assert {:error, changeset = topic} = Topics.create_topic(@invalid_attrs)
+      assert %{allow_submission_comments: ["can't be blank"]} = errors_on(changeset)
+      assert %{allow_submission_voting: ["can't be blank"]} = errors_on(changeset)
+      assert %{allow_submissions: ["can't be blank"]} = errors_on(changeset)
+      assert %{anonymous: ["can't be blank"]} = errors_on(changeset)
+      assert %{description: ["can't be blank"]} = errors_on(changeset)
+      assert %{opened_at: ["can't be blank"]} = errors_on(changeset)
+      assert %{slug: ["can't be blank"]} = errors_on(changeset)
+      assert %{sort: ["can't be blank"]} = errors_on(changeset)
+      assert %{title: ["can't be blank"]} = errors_on(changeset)
+      assert %{user_submission_limit: ["can't be blank"]} = errors_on(changeset)
     end
 
     test "update_topic/2 with valid data updates the topic" do

@@ -38,7 +38,10 @@ defmodule App.SubmissionsTest do
     end
 
     test "create_submission/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Submissions.create_submission(@invalid_attrs)
+      assert {:error, changeset = submission} = Submissions.create_submission(@invalid_attrs)
+      assert %{title: ["can't be blank"]} = errors_on(changeset)
+      assert %{description: ["can't be blank"]} = errors_on(changeset)
+      assert %{slug: ["can't be blank"]} = errors_on(changeset)
     end
 
     test "update_submission/2 with valid data updates the submission" do
@@ -101,7 +104,9 @@ defmodule App.SubmissionsTest do
     end
 
     test "create_comment/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Submissions.create_comment(@invalid_attrs)
+      assert {:error, changeset = comment} = Submissions.create_comment(@invalid_attrs)
+      assert %{title: ["can't be blank"]} = errors_on(changeset)
+      assert %{description: ["can't be blank"]} = errors_on(changeset)
     end
 
     test "update_comment/2 with valid data updates the comment" do
@@ -161,7 +166,8 @@ defmodule App.SubmissionsTest do
     end
 
     test "create_rating/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Submissions.create_rating(@invalid_attrs)
+      assert {:error, changeset = rating} = Submissions.create_rating(@invalid_attrs)
+      assert %{score: ["can't be blank"]} = errors_on(changeset)
     end
 
     test "update_rating/2 with valid data updates the rating" do
