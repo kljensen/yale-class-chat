@@ -1,0 +1,28 @@
+<h1>Show Submission</h1>
+
+<ul>
+
+  <li>
+    <strong>Title:</strong>
+    <%= @submission.title %>
+  </li>
+
+  <li>
+    <strong>Description:</strong>
+    <%= @submission.description %>
+  </li>
+
+  <li>
+    <strong>Slug:</strong>
+    <%= @submission.slug %>
+  </li>
+
+  <li>
+    <strong>Image url:</strong>
+    <%= @submission.image_url %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.submission_path(@conn, :edit, @submission) %></span>
+<span><%= link "Back", to: Routes.submission_path(@conn, :index) %></span>

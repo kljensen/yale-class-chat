@@ -1,0 +1,32 @@
+<h1>Listing Submissions</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Description</th>
+      <th>Slug</th>
+      <th>Image url</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for submission <- @submissions do %>
+    <tr>
+      <td><%= submission.title %></td>
+      <td><%= submission.description %></td>
+      <td><%= submission.slug %></td>
+      <td><%= submission.image_url %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.submission_path(@conn, :show, submission) %></span>
+        <span><%= link "Edit", to: Routes.submission_path(@conn, :edit, submission) %></span>
+        <span><%= link "Delete", to: Routes.submission_path(@conn, :delete, submission), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Submission", to: Routes.submission_path(@conn, :new) %></span>
