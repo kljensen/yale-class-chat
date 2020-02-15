@@ -1,0 +1,55 @@
+<%= form_for @changeset, @action, fn f -> %>
+  <%= if @changeset.action do %>
+    <div class="alert alert-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
+
+  <%= label f, :title %>
+  <%= text_input f, :title %>
+  <%= error_tag f, :title %>
+
+  <%= label f, :description %>
+  <%= text_input f, :description %>
+  <%= error_tag f, :description %>
+
+  <%= label f, :slug %>
+  <%= text_input f, :slug %>
+  <%= error_tag f, :slug %>
+
+  <%= label f, :opened_at %>
+  <%= datetime_select f, :opened_at %>
+  <%= error_tag f, :opened_at %>
+
+  <%= label f, :closed_at %>
+  <%= datetime_select f, :closed_at %>
+  <%= error_tag f, :closed_at %>
+
+  <%= label f, :allow_submissions %>
+  <%= checkbox f, :allow_submissions %>
+  <%= error_tag f, :allow_submissions %>
+
+  <%= label f, :allow_submission_voting %>
+  <%= checkbox f, :allow_submission_voting %>
+  <%= error_tag f, :allow_submission_voting %>
+
+  <%= label f, :anonymous %>
+  <%= checkbox f, :anonymous %>
+  <%= error_tag f, :anonymous %>
+
+  <%= label f, :allow_submission_comments %>
+  <%= checkbox f, :allow_submission_comments %>
+  <%= error_tag f, :allow_submission_comments %>
+
+  <%= label f, :user_submission_limit %>
+  <%= number_input f, :user_submission_limit %>
+  <%= error_tag f, :user_submission_limit %>
+
+  <%= label f, :sort %>
+  <%= text_input f, :sort %>
+  <%= error_tag f, :sort %>
+
+  <div>
+    <%= submit "Save" %>
+  </div>
+<% end %>

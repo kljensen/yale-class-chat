@@ -8,13 +8,12 @@ defmodule App.Repo.Migrations.CreateTopics do
       add :slug, :string
       add :opened_at, :utc_datetime
       add :closed_at, :utc_datetime
-      add :allow_submissions, :boolean
-      add :allow_submission_voting, :boolean
-      add :anonymous, :boolean
-      add :allow_submission_comments, :boolean
+      add :allow_submissions, :boolean, default: false, null: false
+      add :allow_submission_voting, :boolean, default: false, null: false
+      add :anonymous, :boolean, default: false, null: false
+      add :allow_submission_comments, :boolean, default: false, null: false
       add :user_submission_limit, :integer
       add :sort, :string
-      add :section_id, references(:sections)
 
       timestamps()
     end
