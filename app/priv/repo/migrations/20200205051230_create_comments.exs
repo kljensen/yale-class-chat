@@ -7,6 +7,8 @@ defmodule App.Repo.Migrations.CreateComments do
       add :description, :string
       add :submission_id, references(:submissions)
       add :user_id, references(:users)
+
+      timestamps()
     end
   end
 end

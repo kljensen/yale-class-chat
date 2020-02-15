@@ -1,14 +1,19 @@
 defmodule App.Semester do
   use Ecto.Schema
+  import Ecto.Changeset
 
   schema "semesters" do
     field :name, :string
     has_many :courses, App.Course
+
+    timestamps()
   end
 
-  def changeset(semester, params \\ %{}) do
+  @doc false
+  def changeset(semester, attrs) do
     semester
-    |> Ecto.Changeset.cast(params, [:name])
-    |> Ecto.Changeset.validate_required([:name])
+    |> cast(attrs, [:name])
+    |> validate_required([:name])
+    |> unique_constraint(:name)
   end
 end

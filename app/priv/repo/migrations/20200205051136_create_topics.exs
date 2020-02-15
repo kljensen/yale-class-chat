@@ -15,6 +15,10 @@ defmodule App.Repo.Migrations.CreateTopics do
       add :user_submission_limit, :integer
       add :sort, :string
       add :section_id, references(:sections)
+
+      timestamps()
     end
+
+    create unique_index(:topics, [:slug])
   end
 end

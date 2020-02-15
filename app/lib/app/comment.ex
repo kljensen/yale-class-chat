@@ -6,6 +6,8 @@ defmodule App.Comment do
     field :description, :string
     belongs_to :submission, App.Submission
     belongs_to :user, App.User
+
+    timestamps()
   end
 
   def changeset(comment, params \\ %{}) do

@@ -1,15 +1,19 @@
 defmodule App.Rating do
   use Ecto.Schema
+  import Ecto.Changeset
 
   schema "ratings" do
     field :score, :integer
     belongs_to :submission, App.Submission
     belongs_to :user, App.User
+
+    timestemps()
   end
 
+  @doc false
   def changeset(rating, params \\ %{}) do
     rating
-    |> Ecto.Changeset.cast(params, [:score])
-    |> Ecto.Changeset.validate_required([:score])
+    |> cast(params, [:score])
+    |> validate_required([:score])
   end
 end

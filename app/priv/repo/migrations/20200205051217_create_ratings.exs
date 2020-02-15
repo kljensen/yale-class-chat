@@ -6,6 +6,8 @@ defmodule App.Repo.Migrations.CreateRatings do
       add :score, :integer
       add :submission_id, references(:submissions)
       add :user_id, references(:users)
+
+      timestamps()
     end
   end
 end

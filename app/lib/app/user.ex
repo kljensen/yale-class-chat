@@ -1,19 +1,21 @@
 defmodule App.User do
   use Ecto.Schema
+  import Ecto.Changeset
 
   schema "users" do
-    field :net_id, :string
     field :display_name, :string
     field :email, :string
+    field :net_id, :string
+
+    timestamps()
   end
 
-  def changeset(user, params \\ %{}) do
+  @doc false
+  def changeset(user, attrs) do
     user
-    |> Ecto.Changeset.cast(params, [:net_id, :email])
-    |> Ecto.Changeset.validate_required([:net_id])
-    |> Ecto.Changeset.unsafe_validate_unique([:net_id], App.Repo, message: "net id is already in use")
-    |> Ecto.Changeset.unique_constraint(:net_id)
-    |> Ecto.Changeset.validate_format(:email, ~r/@/)
-    # do we need to ensure emails are also unique?
+    |> cast(attrs, [:net_id, :display_name, :email])
+    |> validate_required([:net_id, :display_name, :email])
+    |> unique_constraint(:net_id)
+    |> validate_format(:email, ~r/@/)
   end
 end

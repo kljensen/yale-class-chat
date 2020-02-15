@@ -32,6 +32,9 @@ config :ueberauth, Ueberauth,
     callback: System.get_env("CAS_CALLBACK_URL"),
   ]}]
 
+# Use UTC for timestamps
+timestamps(): config :app, App.Repo, migration_timestamps: [type: :utc_datetime_usec]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
