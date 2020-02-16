@@ -4,6 +4,7 @@ defmodule App.Submissions.Rating do
 
   schema "ratings" do
     field :score, :integer
+    belongs_to :submission, App.Submissions.Submission
 
     timestamps()
   end

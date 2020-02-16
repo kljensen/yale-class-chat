@@ -14,7 +14,7 @@ defmodule App.Topics.Topic do
     field :sort, :string
     field :title, :string
     field :user_submission_limit, :integer
-
+    belongs_to :section, App.Courses.Section
     timestamps()
   end
 

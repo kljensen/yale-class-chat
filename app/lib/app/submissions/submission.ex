@@ -7,6 +7,9 @@ defmodule App.Submissions.Submission do
     field :image_url, :string
     field :slug, :string
     field :title, :string
+    belongs_to :topic, App.Topics.Topic
+    has_many :comments, App.Submissions.Comment
+    has_many :ratings, App.Submissions.Rating
 
     timestamps()
   end

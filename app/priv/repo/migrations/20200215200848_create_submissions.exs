@@ -7,6 +7,7 @@ defmodule App.Repo.Migrations.CreateSubmissions do
       add :description, :string
       add :slug, :string
       add :image_url, :string
+      add :topic_id, references(:topics)
 
       timestamps()
     end

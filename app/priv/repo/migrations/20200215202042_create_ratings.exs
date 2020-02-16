@@ -4,6 +4,7 @@ defmodule App.Repo.Migrations.CreateRatings do
   def change do
     create table(:ratings) do
       add :score, :integer
+      add :submission_id, references(:submissions)
 
       timestamps()
     end

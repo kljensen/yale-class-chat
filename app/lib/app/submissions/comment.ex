@@ -5,6 +5,7 @@ defmodule App.Submissions.Comment do
   schema "comments" do
     field :description, :string
     field :title, :string
+    belongs_to :submission, App.Submissions.Submission
 
     timestamps()
   end

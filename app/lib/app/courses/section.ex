@@ -5,7 +5,8 @@ defmodule App.Courses.Section do
   schema "sections" do
     field :crn, :string
     field :title, :string
-
+    belongs_to :course, App.Courses.Course
+    has_many :topics, App.Topics.Topic
     timestamps()
   end
 
