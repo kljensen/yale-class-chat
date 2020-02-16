@@ -6,7 +6,7 @@ defmodule App.Courses.Course do
     field :department, :string
     field :name, :string
     field :number, :integer
-
+    belongs_to :semester, App.Courses.Semester
     timestamps()
   end
 

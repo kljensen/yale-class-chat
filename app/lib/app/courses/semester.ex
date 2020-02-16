@@ -4,6 +4,7 @@ defmodule App.Courses.Semester do
 
   schema "semesters" do
     field :name, :string
+    has_many :courses, App.Courses.Course
 
     timestamps()
   end

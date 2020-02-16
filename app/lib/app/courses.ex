@@ -145,9 +145,10 @@ defmodule App.Courses do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_course(attrs \\ %{}) do
+  def create_course(%App.Courses.Semester{} = semester, attrs \\ %{}) do
     %Course{}
     |> Course.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:semester, semester)
     |> Repo.insert()
   end
 
