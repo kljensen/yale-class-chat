@@ -3,12 +3,18 @@ defmodule AppWeb.CourseControllerTest do
 
   alias App.Courses
 
+  def fixture(:semester) do
+    semester = App.CoursesTest.semester_fixture()
+    semester
+  end
+
   @create_attrs %{department: "some department", name: "some name", number: 42}
   @update_attrs %{department: "some updated department", name: "some updated name", number: 43}
   @invalid_attrs %{department: nil, name: nil, number: nil}
 
   def fixture(:course) do
-    {:ok, course} = Courses.create_course(@create_attrs)
+    semester = App.CoursesTest.semester_fixture()
+    {:ok, course} = Courses.create_course(semester, @create_attrs)
     course
   end
 
@@ -28,7 +34,8 @@ defmodule AppWeb.CourseControllerTest do
 
   describe "create course" do
     test "redirects to show when data is valid", %{conn: conn} do
-      conn = post(conn, Routes.course_path(conn, :create), course: @create_attrs)
+      semester = App.CoursesTest.semester_fixture()
+      conn = post(conn, Routes.course_path(conn, :create), semester: semester, course: @create_attrs)
 
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == Routes.course_path(conn, :show, id)
@@ -38,7 +45,8 @@ defmodule AppWeb.CourseControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, Routes.course_path(conn, :create), course: @invalid_attrs)
+      semester = App.CoursesTest.semester_fixture()
+      conn = post(conn, Routes.course_path(conn, :create), semester: semester, course: @invalid_attrs)
       assert html_response(conn, 200) =~ "New Course"
     end
   end

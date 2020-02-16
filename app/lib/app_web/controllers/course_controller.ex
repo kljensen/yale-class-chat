@@ -14,8 +14,8 @@ defmodule AppWeb.CourseController do
     render(conn, "new.html", changeset: changeset)
   end
 
-  def create(conn, %{"course" => course_params}) do
-    case Courses.create_course(course_params) do
+  def create(conn, %{"semester" => semester, "course" => course_params}) do
+    case Courses.create_course(semester, course_params) do
       {:ok, course} ->
         conn
         |> put_flash(:info, "Course created successfully.")

@@ -73,10 +73,14 @@ defmodule App.CoursesTest do
     @invalid_attrs %{department: nil, name: nil, number: nil}
 
     def course_fixture(attrs \\ %{}) do
-      {:ok, course} =
+      params =
         attrs
         |> Enum.into(@valid_attrs)
-        |> Courses.create_course()
+
+      semester = semester_fixture()
+
+      {:ok, course} =
+        Courses.create_course(semester, params)
 
       course
     end
@@ -92,14 +96,19 @@ defmodule App.CoursesTest do
     end
 
     test "create_course/1 with valid data creates a course" do
-      assert {:ok, %Course{} = course} = Courses.create_course(@valid_attrs)
+      semester = semester_fixture()
+      assert {:ok, %Course{} = course} = Courses.create_course(semester, @valid_attrs)
       assert course.department == "some department"
       assert course.name == "some name"
       assert course.number == 42
     end
 
     test "create_course/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Courses.create_course(@invalid_attrs)
+      semester = semester_fixture()
+      assert {:error, changeset = course} = Courses.create_course(semester, @invalid_attrs)
+      assert %{department: ["can't be blank"]} = errors_on(changeset)
+      assert %{name: ["can't be blank"]} = errors_on(changeset)
+      assert %{number: ["can't be blank"]} = errors_on(changeset)
     end
 
     test "update_course/2 with valid data updates the course" do
