@@ -6,6 +6,7 @@ defmodule App.Accounts.User do
     field :display_name, :string
     field :email, :string
     field :net_id, :string
+    field :is_faculty, :boolean, default: false
 
     timestamps()
   end
@@ -13,8 +14,8 @@ defmodule App.Accounts.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:net_id, :display_name, :email])
-    |> validate_required([:net_id, :display_name, :email])
+    |> cast(attrs, [:net_id, :display_name, :email, :is_faculty])
+    |> validate_required([:net_id, :display_name, :email, :is_faculty])
     |> unique_constraint(:net_id)
     |> validate_format(:email, ~r/@/)
   end
