@@ -6,6 +6,8 @@ defmodule App.Repo.Migrations.CreateUserRoles do
       add :role, :string
       add :valid_from, :utc_datetime
       add :valid_to, :utc_datetime
+      add :section_id, references(:sections)
+      add :user_id, references(:users, on_delete: :delete_all), null: false
 
       timestamps()
     end
