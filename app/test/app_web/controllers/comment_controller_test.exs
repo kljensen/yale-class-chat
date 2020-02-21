@@ -13,6 +13,7 @@ defmodule AppWeb.CommentControllerTest do
   end
 
   describe "index" do
+    @tag :skip
     test "lists all comments", %{conn: conn} do
       conn = get(conn, Routes.comment_path(conn, :index))
       assert html_response(conn, 200) =~ "Listing Comments"
@@ -20,6 +21,7 @@ defmodule AppWeb.CommentControllerTest do
   end
 
   describe "new comment" do
+    @tag :skip
     test "renders form", %{conn: conn} do
       conn = get(conn, Routes.comment_path(conn, :new))
       assert html_response(conn, 200) =~ "New Comment"
@@ -27,6 +29,7 @@ defmodule AppWeb.CommentControllerTest do
   end
 
   describe "create comment" do
+    @tag :skip
     test "redirects to show when data is valid", %{conn: conn} do
       conn = post(conn, Routes.comment_path(conn, :create), comment: @create_attrs)
 
@@ -37,6 +40,7 @@ defmodule AppWeb.CommentControllerTest do
       assert html_response(conn, 200) =~ "Show Comment"
     end
 
+    @tag :skip
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.comment_path(conn, :create), comment: @invalid_attrs)
       assert html_response(conn, 200) =~ "New Comment"
@@ -46,6 +50,7 @@ defmodule AppWeb.CommentControllerTest do
   describe "edit comment" do
     setup [:create_comment]
 
+    @tag :skip
     test "renders form for editing chosen comment", %{conn: conn, comment: comment} do
       conn = get(conn, Routes.comment_path(conn, :edit, comment))
       assert html_response(conn, 200) =~ "Edit Comment"
@@ -55,6 +60,7 @@ defmodule AppWeb.CommentControllerTest do
   describe "update comment" do
     setup [:create_comment]
 
+    @tag :skip
     test "redirects when data is valid", %{conn: conn, comment: comment} do
       conn = put(conn, Routes.comment_path(conn, :update, comment), comment: @update_attrs)
       assert redirected_to(conn) == Routes.comment_path(conn, :show, comment)
@@ -63,6 +69,7 @@ defmodule AppWeb.CommentControllerTest do
       assert html_response(conn, 200) =~ "some updated description"
     end
 
+    @tag :skip
     test "renders errors when data is invalid", %{conn: conn, comment: comment} do
       conn = put(conn, Routes.comment_path(conn, :update, comment), comment: @invalid_attrs)
       assert html_response(conn, 200) =~ "Edit Comment"
@@ -72,6 +79,7 @@ defmodule AppWeb.CommentControllerTest do
   describe "delete comment" do
     setup [:create_comment]
 
+    @tag :skip
     test "deletes chosen comment", %{conn: conn, comment: comment} do
       conn = delete(conn, Routes.comment_path(conn, :delete, comment))
       assert redirected_to(conn) == Routes.comment_path(conn, :index)

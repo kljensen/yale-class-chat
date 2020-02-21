@@ -13,6 +13,7 @@ defmodule AppWeb.SubmissionControllerTest do
   end
 
   describe "index" do
+    @tag :skip
     test "lists all submissions", %{conn: conn} do
       conn = get(conn, Routes.submission_path(conn, :index))
       assert html_response(conn, 200) =~ "Listing Submissions"
@@ -20,6 +21,7 @@ defmodule AppWeb.SubmissionControllerTest do
   end
 
   describe "new submission" do
+    @tag :skip
     test "renders form", %{conn: conn} do
       conn = get(conn, Routes.submission_path(conn, :new))
       assert html_response(conn, 200) =~ "New Submission"
@@ -27,6 +29,7 @@ defmodule AppWeb.SubmissionControllerTest do
   end
 
   describe "create submission" do
+    @tag :skip
     test "redirects to show when data is valid", %{conn: conn} do
       conn = post(conn, Routes.submission_path(conn, :create), submission: @create_attrs)
 
@@ -37,6 +40,7 @@ defmodule AppWeb.SubmissionControllerTest do
       assert html_response(conn, 200) =~ "Show Submission"
     end
 
+    @tag :skip
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.submission_path(conn, :create), submission: @invalid_attrs)
       assert html_response(conn, 200) =~ "New Submission"
@@ -46,6 +50,7 @@ defmodule AppWeb.SubmissionControllerTest do
   describe "edit submission" do
     setup [:create_submission]
 
+    @tag :skip
     test "renders form for editing chosen submission", %{conn: conn, submission: submission} do
       conn = get(conn, Routes.submission_path(conn, :edit, submission))
       assert html_response(conn, 200) =~ "Edit Submission"
@@ -55,6 +60,7 @@ defmodule AppWeb.SubmissionControllerTest do
   describe "update submission" do
     setup [:create_submission]
 
+    @tag :skip
     test "redirects when data is valid", %{conn: conn, submission: submission} do
       conn = put(conn, Routes.submission_path(conn, :update, submission), submission: @update_attrs)
       assert redirected_to(conn) == Routes.submission_path(conn, :show, submission)
@@ -63,6 +69,7 @@ defmodule AppWeb.SubmissionControllerTest do
       assert html_response(conn, 200) =~ "some updated description"
     end
 
+    @tag :skip
     test "renders errors when data is invalid", %{conn: conn, submission: submission} do
       conn = put(conn, Routes.submission_path(conn, :update, submission), submission: @invalid_attrs)
       assert html_response(conn, 200) =~ "Edit Submission"
@@ -72,6 +79,7 @@ defmodule AppWeb.SubmissionControllerTest do
   describe "delete submission" do
     setup [:create_submission]
 
+    @tag :skip
     test "deletes chosen submission", %{conn: conn, submission: submission} do
       conn = delete(conn, Routes.submission_path(conn, :delete, submission))
       assert redirected_to(conn) == Routes.submission_path(conn, :index)

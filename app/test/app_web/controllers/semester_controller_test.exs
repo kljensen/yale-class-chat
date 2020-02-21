@@ -13,6 +13,7 @@ defmodule AppWeb.SemesterControllerTest do
   end
 
   describe "index" do
+    @tag :skip
     test "lists all semesters", %{conn: conn} do
       conn = get(conn, Routes.semester_path(conn, :index))
       assert html_response(conn, 200) =~ "Listing Semesters"
@@ -20,6 +21,7 @@ defmodule AppWeb.SemesterControllerTest do
   end
 
   describe "new semester" do
+    @tag :skip
     test "renders form", %{conn: conn} do
       conn = get(conn, Routes.semester_path(conn, :new))
       assert html_response(conn, 200) =~ "New Semester"
@@ -27,6 +29,7 @@ defmodule AppWeb.SemesterControllerTest do
   end
 
   describe "create semester" do
+    @tag :skip
     test "redirects to show when data is valid", %{conn: conn} do
       conn = post(conn, Routes.semester_path(conn, :create), semester: @create_attrs)
 
@@ -37,6 +40,7 @@ defmodule AppWeb.SemesterControllerTest do
       assert html_response(conn, 200) =~ "Show Semester"
     end
 
+    @tag :skip
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.semester_path(conn, :create), semester: @invalid_attrs)
       assert html_response(conn, 200) =~ "New Semester"
@@ -46,6 +50,7 @@ defmodule AppWeb.SemesterControllerTest do
   describe "edit semester" do
     setup [:create_semester]
 
+    @tag :skip
     test "renders form for editing chosen semester", %{conn: conn, semester: semester} do
       conn = get(conn, Routes.semester_path(conn, :edit, semester))
       assert html_response(conn, 200) =~ "Edit Semester"
@@ -55,6 +60,7 @@ defmodule AppWeb.SemesterControllerTest do
   describe "update semester" do
     setup [:create_semester]
 
+    @tag :skip
     test "redirects when data is valid", %{conn: conn, semester: semester} do
       conn = put(conn, Routes.semester_path(conn, :update, semester), semester: @update_attrs)
       assert redirected_to(conn) == Routes.semester_path(conn, :show, semester)
@@ -63,6 +69,7 @@ defmodule AppWeb.SemesterControllerTest do
       assert html_response(conn, 200) =~ "some updated name"
     end
 
+    @tag :skip
     test "renders errors when data is invalid", %{conn: conn, semester: semester} do
       conn = put(conn, Routes.semester_path(conn, :update, semester), semester: @invalid_attrs)
       assert html_response(conn, 200) =~ "Edit Semester"
@@ -72,6 +79,7 @@ defmodule AppWeb.SemesterControllerTest do
   describe "delete semester" do
     setup [:create_semester]
 
+    @tag :skip
     test "deletes chosen semester", %{conn: conn, semester: semester} do
       conn = delete(conn, Routes.semester_path(conn, :delete, semester))
       assert redirected_to(conn) == Routes.semester_path(conn, :index)

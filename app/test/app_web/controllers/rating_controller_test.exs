@@ -13,6 +13,7 @@ defmodule AppWeb.RatingControllerTest do
   end
 
   describe "index" do
+    @tag :skip
     test "lists all ratings", %{conn: conn} do
       conn = get(conn, Routes.rating_path(conn, :index))
       assert html_response(conn, 200) =~ "Listing Ratings"
@@ -20,6 +21,7 @@ defmodule AppWeb.RatingControllerTest do
   end
 
   describe "new rating" do
+    @tag :skip
     test "renders form", %{conn: conn} do
       conn = get(conn, Routes.rating_path(conn, :new))
       assert html_response(conn, 200) =~ "New Rating"
@@ -27,6 +29,7 @@ defmodule AppWeb.RatingControllerTest do
   end
 
   describe "create rating" do
+    @tag :skip
     test "redirects to show when data is valid", %{conn: conn} do
       conn = post(conn, Routes.rating_path(conn, :create), rating: @create_attrs)
 
@@ -37,6 +40,7 @@ defmodule AppWeb.RatingControllerTest do
       assert html_response(conn, 200) =~ "Show Rating"
     end
 
+    @tag :skip
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.rating_path(conn, :create), rating: @invalid_attrs)
       assert html_response(conn, 200) =~ "New Rating"
@@ -46,6 +50,7 @@ defmodule AppWeb.RatingControllerTest do
   describe "edit rating" do
     setup [:create_rating]
 
+    @tag :skip
     test "renders form for editing chosen rating", %{conn: conn, rating: rating} do
       conn = get(conn, Routes.rating_path(conn, :edit, rating))
       assert html_response(conn, 200) =~ "Edit Rating"
@@ -55,6 +60,7 @@ defmodule AppWeb.RatingControllerTest do
   describe "update rating" do
     setup [:create_rating]
 
+    @tag :skip
     test "redirects when data is valid", %{conn: conn, rating: rating} do
       conn = put(conn, Routes.rating_path(conn, :update, rating), rating: @update_attrs)
       assert redirected_to(conn) == Routes.rating_path(conn, :show, rating)
@@ -63,6 +69,7 @@ defmodule AppWeb.RatingControllerTest do
       assert html_response(conn, 200)
     end
 
+    @tag :skip
     test "renders errors when data is invalid", %{conn: conn, rating: rating} do
       conn = put(conn, Routes.rating_path(conn, :update, rating), rating: @invalid_attrs)
       assert html_response(conn, 200) =~ "Edit Rating"
@@ -72,6 +79,7 @@ defmodule AppWeb.RatingControllerTest do
   describe "delete rating" do
     setup [:create_rating]
 
+    @tag :skip
     test "deletes chosen rating", %{conn: conn, rating: rating} do
       conn = delete(conn, Routes.rating_path(conn, :delete, rating))
       assert redirected_to(conn) == Routes.rating_path(conn, :index)

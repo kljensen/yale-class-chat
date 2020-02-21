@@ -19,6 +19,7 @@ defmodule AppWeb.CourseControllerTest do
   end
 
   describe "index" do
+    @tag :skip
     test "lists all courses", %{conn: conn} do
       conn = get(conn, Routes.course_path(conn, :index))
       assert html_response(conn, 200) =~ "Listing Courses"
@@ -26,6 +27,7 @@ defmodule AppWeb.CourseControllerTest do
   end
 
   describe "new course" do
+    @tag :skip
     test "renders form", %{conn: conn} do
       conn = get(conn, Routes.course_path(conn, :new))
       assert html_response(conn, 200) =~ "New Course"
@@ -33,6 +35,7 @@ defmodule AppWeb.CourseControllerTest do
   end
 
   describe "create course" do
+    @tag :skip
     test "redirects to show when data is valid", %{conn: conn} do
       semester = App.CoursesTest.semester_fixture()
       conn = post(conn, Routes.course_path(conn, :create), semester: semester, course: @create_attrs)
@@ -44,6 +47,7 @@ defmodule AppWeb.CourseControllerTest do
       assert html_response(conn, 200) =~ "Show Course"
     end
 
+    @tag :skip
     test "renders errors when data is invalid", %{conn: conn} do
       semester = App.CoursesTest.semester_fixture()
       conn = post(conn, Routes.course_path(conn, :create), semester: semester, course: @invalid_attrs)
@@ -54,6 +58,7 @@ defmodule AppWeb.CourseControllerTest do
   describe "edit course" do
     setup [:create_course]
 
+    @tag :skip
     test "renders form for editing chosen course", %{conn: conn, course: course} do
       conn = get(conn, Routes.course_path(conn, :edit, course))
       assert html_response(conn, 200) =~ "Edit Course"
@@ -63,6 +68,7 @@ defmodule AppWeb.CourseControllerTest do
   describe "update course" do
     setup [:create_course]
 
+    @tag :skip
     test "redirects when data is valid", %{conn: conn, course: course} do
       conn = put(conn, Routes.course_path(conn, :update, course), course: @update_attrs)
       assert redirected_to(conn) == Routes.course_path(conn, :show, course)
@@ -71,6 +77,7 @@ defmodule AppWeb.CourseControllerTest do
       assert html_response(conn, 200) =~ "some updated department"
     end
 
+    @tag :skip
     test "renders errors when data is invalid", %{conn: conn, course: course} do
       conn = put(conn, Routes.course_path(conn, :update, course), course: @invalid_attrs)
       assert html_response(conn, 200) =~ "Edit Course"
@@ -80,6 +87,7 @@ defmodule AppWeb.CourseControllerTest do
   describe "delete course" do
     setup [:create_course]
 
+    @tag :skip
     test "deletes chosen course", %{conn: conn, course: course} do
       conn = delete(conn, Routes.course_path(conn, :delete, course))
       assert redirected_to(conn) == Routes.course_path(conn, :index)
