@@ -2,7 +2,7 @@ defmodule App.SubmissionsTest do
   use App.DataCase
 
   alias App.Submissions
-  alias App.CoursesTest, as: CTest
+  alias App.TopicsTest, as: TTest
 
   describe "submissions" do
     alias App.Submissions.Submission

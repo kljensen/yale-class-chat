@@ -139,14 +139,23 @@ defmodule App.Courses do
 
   ## Examples
 
-      iex> create_course(%{field: value})
+      iex> create_course(%{User}, %{field: value})
       {:ok, %Course{}}
 
       iex> create_course(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_course(%App.Courses.Semester{} = semester, attrs \\ %{}) do
+
+  def create_course(%App.Accounts.User{} = user, %App.Courses.Semester{} = semester, attrs \\ %{}) do
+    if user.is_faculty == true do
+      do_create_course(semester, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_create_course(%App.Courses.Semester{} = semester, attrs \\ %{}) do
     %Course{}
     |> Course.changeset(attrs)
     |> Ecto.Changeset.put_assoc(:semester, semester)
@@ -177,7 +186,7 @@ defmodule App.Courses do
   ## Examples
 
       iex> delete_course(course)
-      {:ok, %Course{}}
+      {:ok, %Course{%App%App.Courses.Semester{} = semester, attrs \\ %{}) do.Courses.Semester{} = semester, attrs \\ %{}) do}}
 
       iex> delete_course(course)
       {:error, %Ecto.Changeset{}}
