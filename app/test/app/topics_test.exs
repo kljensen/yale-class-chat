@@ -27,7 +27,7 @@ defmodule App.TopicsTest do
     test "list_topics/0 returns all topics" do
       topic = topic_fixture()
       retrieved_topics = Topics.list_topics()
-      retrieved_1 = Enum.fetch(retrieved_topics, 1)
+      retrieved_1 = List.first(retrieved_topics)
       assert retrieved_1.id == topic.id
     end
 
@@ -87,7 +87,8 @@ defmodule App.TopicsTest do
     test "update_topic/2 with invalid data returns error changeset" do
       topic = topic_fixture()
       assert {:error, %Ecto.Changeset{}} = Topics.update_topic(topic, @invalid_attrs)
-      assert topic == Topics.get_topic!(topic.id)
+      retrieved_topic = Topics.get_topic!(topic.id)
+      assert topic.id == retrieved_topic.id
     end
 
     test "delete_topic/1 deletes the topic" do
