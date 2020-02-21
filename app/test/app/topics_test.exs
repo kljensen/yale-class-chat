@@ -2,6 +2,7 @@ defmodule App.TopicsTest do
   use App.DataCase
 
   alias App.Topics
+  alias App.CoursesTest, as: CTest
 
   describe "topics" do
     alias App.Topics.Topic
@@ -11,26 +12,34 @@ defmodule App.TopicsTest do
     @invalid_attrs %{allow_submission_comments: nil, allow_submission_voting: nil, allow_submissions: nil, anonymous: nil, closed_at: nil, description: nil, opened_at: nil, slug: nil, sort: nil, title: nil, user_submission_limit: nil}
 
     def topic_fixture(attrs \\ %{}) do
-      {:ok, topic} =
+      params =
         attrs
         |> Enum.into(@valid_attrs)
-        |> Topics.create_topic()
+
+      section = CTest.section_fixture()
+
+      {:ok, topic} =
+        Topics.create_topic(section, params)
 
       topic
     end
 
     test "list_topics/0 returns all topics" do
       topic = topic_fixture()
-      assert Topics.list_topics() == [topic]
+      retrieved_topics = Topics.list_topics()
+      retrieved_1 = Enum.fetch(retrieved_topics, 1)
+      assert retrieved_1.id == topic.id
     end
 
     test "get_topic!/1 returns the topic with given id" do
       topic = topic_fixture()
-      assert Topics.get_topic!(topic.id) == topic
+      retrieved_topic = Topics.get_topic!(topic.id)
+      assert retrieved_topic.id == topic.id
     end
 
     test "create_topic/1 with valid data creates a topic" do
-      assert {:ok, %Topic{} = topic} = Topics.create_topic(@valid_attrs)
+      section = CTest.section_fixture()
+      assert {:ok, %Topic{} = topic} = Topics.create_topic(section, @valid_attrs)
       assert topic.allow_submission_comments == true
       assert topic.allow_submission_voting == true
       assert topic.allow_submissions == true
@@ -45,7 +54,8 @@ defmodule App.TopicsTest do
     end
 
     test "create_topic/1 with invalid data returns error changeset" do
-      assert {:error, changeset = topic} = Topics.create_topic(@invalid_attrs)
+      section = CTest.section_fixture()
+      assert {:error, changeset = topic} = Topics.create_topic(section, @invalid_attrs)
       assert %{allow_submission_comments: ["can't be blank"]} = errors_on(changeset)
       assert %{allow_submission_voting: ["can't be blank"]} = errors_on(changeset)
       assert %{allow_submissions: ["can't be blank"]} = errors_on(changeset)

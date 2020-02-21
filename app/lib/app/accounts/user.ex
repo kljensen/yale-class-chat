@@ -7,6 +7,7 @@ defmodule App.Accounts.User do
     field :email, :string
     field :net_id, :string
     field :is_faculty, :boolean, default: false
+    has_many :user_roles, App.Accounts.User_Role
 
     timestamps()
   end

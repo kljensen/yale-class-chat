@@ -213,6 +213,7 @@ defmodule App.Courses do
   """
   def list_sections do
     Repo.all(Section)
+    |> Repo.preload([{:course, :semester}])
   end
 
   @doc """
@@ -229,7 +230,7 @@ defmodule App.Courses do
       ** (Ecto.NoResultsError)
 
   """
-  def get_section!(id), do: Repo.get!(Section, id)
+  def get_section!(id), do: Repo.get!(Section, id) |> Repo.preload([{:course, :semester}])
 
   @doc """
   Creates a section.
@@ -243,9 +244,10 @@ defmodule App.Courses do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_section(attrs \\ %{}) do
+  def create_section(%App.Courses.Course{} = course, attrs \\ %{}) do
     %Section{}
     |> Section.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:course, course)
     |> Repo.insert()
   end
 

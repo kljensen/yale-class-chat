@@ -49,9 +49,10 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_submission(attrs \\ %{}) do
+  def create_submission(%App.Courses.Section{} = section, attrs \\ %{}) do
     %Submission{}
     |> Submission.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:section, section)
     |> Repo.insert()
   end
 

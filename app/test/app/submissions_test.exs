@@ -2,6 +2,7 @@ defmodule App.SubmissionsTest do
   use App.DataCase
 
   alias App.Submissions
+  alias App.CoursesTest, as: CTest
 
   describe "submissions" do
     alias App.Submissions.Submission
@@ -30,7 +31,8 @@ defmodule App.SubmissionsTest do
     end
 
     test "create_submission/1 with valid data creates a submission" do
-      assert {:ok, %Submission{} = submission} = Submissions.create_submission(@valid_attrs)
+      section = CTest.section_fixture()
+      assert {:ok, %Submission{} = submission} = Submissions.create_submission(section, @valid_attrs)
       assert submission.description == "some description"
       assert submission.image_url == "some image_url"
       assert submission.slug == "some slug"

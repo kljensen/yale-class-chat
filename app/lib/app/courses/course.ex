@@ -17,5 +17,7 @@ defmodule App.Courses.Course do
     course
     |> cast(attrs, [:name, :department, :number])
     |> validate_required([:name, :department, :number])
+    |> foreign_key_constraint(:semester_id)
+    |> assoc_constraint(:semester)
   end
 end

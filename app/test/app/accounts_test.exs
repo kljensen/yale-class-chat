@@ -87,16 +87,19 @@ defmodule App.AccountsTest do
       user__role
     end
 
+    @tag :skip
     test "list_user_roles/0 returns all user_roles" do
       user__role = user__role_fixture()
       assert Accounts.list_user_roles() == [user__role]
     end
 
+    @tag :skip
     test "get_user__role!/1 returns the user__role with given id" do
       user__role = user__role_fixture()
       assert Accounts.get_user__role!(user__role.id) == user__role
     end
 
+    @tag :skip
     test "create_user__role/1 with valid data creates a user__role" do
       assert {:ok, %User_Role{} = user__role} = Accounts.create_user__role(@valid_attrs)
       assert user__role.role == "some role"
@@ -104,10 +107,12 @@ defmodule App.AccountsTest do
       assert user__role.valid_to == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
     end
 
+    @tag :skip
     test "create_user__role/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Accounts.create_user__role(@invalid_attrs)
     end
 
+    @tag :skip
     test "update_user__role/2 with valid data updates the user__role" do
       user__role = user__role_fixture()
       assert {:ok, %User_Role{} = user__role} = Accounts.update_user__role(user__role, @update_attrs)
@@ -116,18 +121,21 @@ defmodule App.AccountsTest do
       assert user__role.valid_to == DateTime.from_naive!(~N[2011-05-18T15:01:01Z], "Etc/UTC")
     end
 
+    @tag :skip
     test "update_user__role/2 with invalid data returns error changeset" do
       user__role = user__role_fixture()
       assert {:error, %Ecto.Changeset{}} = Accounts.update_user__role(user__role, @invalid_attrs)
       assert user__role == Accounts.get_user__role!(user__role.id)
     end
 
+    @tag :skip
     test "delete_user__role/1 deletes the user__role" do
       user__role = user__role_fixture()
       assert {:ok, %User_Role{}} = Accounts.delete_user__role(user__role)
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_user__role!(user__role.id) end
     end
 
+    @tag :skip
     test "change_user__role/1 returns a user__role changeset" do
       user__role = user__role_fixture()
       assert %Ecto.Changeset{} = Accounts.change_user__role(user__role)

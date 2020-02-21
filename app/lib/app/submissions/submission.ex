@@ -20,5 +20,7 @@ defmodule App.Submissions.Submission do
     |> cast(attrs, [:title, :description, :slug, :image_url])
     |> validate_required([:title, :description, :slug])
     |> unique_constraint(:slug)
+    |> foreign_key_constraint(:topic_id)
+    |> assoc_constraint(:topic)
   end
 end

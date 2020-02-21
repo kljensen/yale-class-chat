@@ -49,9 +49,10 @@ defmodule App.Topics do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_topic(attrs \\ %{}) do
+  def create_topic(%App.Courses.Section{} = section, attrs \\ %{}) do
     %Topic{}
     |> Topic.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:section, section)
     |> Repo.insert()
   end
 

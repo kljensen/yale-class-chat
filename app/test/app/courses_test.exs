@@ -95,7 +95,7 @@ defmodule App.CoursesTest do
       assert Courses.get_course!(course.id) == course
     end
 
-    test "create_course/1 with valid data creates a course" do
+    test "create_course/2 with valid data creates a course" do
       semester = semester_fixture()
       assert {:ok, %Course{} = course} = Courses.create_course(semester, @valid_attrs)
       assert course.department == "some department"
@@ -103,7 +103,7 @@ defmodule App.CoursesTest do
       assert course.number == 42
     end
 
-    test "create_course/1 with invalid data returns error changeset" do
+    test "create_course/2 with invalid data returns error changeset" do
       semester = semester_fixture()
       assert {:error, changeset = course} = Courses.create_course(semester, @invalid_attrs)
       assert %{department: ["can't be blank"]} = errors_on(changeset)
@@ -145,10 +145,14 @@ defmodule App.CoursesTest do
     @invalid_attrs %{crn: nil, title: nil}
 
     def section_fixture(attrs \\ %{}) do
-      {:ok, section} =
+      params =
         attrs
         |> Enum.into(@valid_attrs)
-        |> Courses.create_section()
+
+      course = course_fixture()
+
+      {:ok, section} =
+        Courses.create_section(course, params)
 
       section
     end
@@ -163,16 +167,18 @@ defmodule App.CoursesTest do
       assert Courses.get_section!(section.id) == section
     end
 
-    test "create_section/1 with valid data creates a section" do
-      assert {:ok, %Section{} = section} = Courses.create_section(@valid_attrs)
+    test "create_section/2 with valid data creates a section" do
+      course = course_fixture()
+      assert {:ok, %Section{} = section} = Courses.create_section(course, @valid_attrs)
       assert section.crn == "some crn"
       assert section.title == "some title"
-      assert {:error, changeset = section} = Courses.create_section(@valid_attrs)
+      assert {:error, changeset = section} = Courses.create_section(course, @valid_attrs)
       assert %{crn: ["has already been taken"]} = errors_on(changeset)
     end
 
-    test "create_section/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Courses.create_section(@invalid_attrs)
+    test "create_section/2 with invalid data returns error changeset" do
+      course = course_fixture()
+      assert {:error, %Ecto.Changeset{}} = Courses.create_section(course, @invalid_attrs)
     end
 
     test "update_section/2 with valid data updates the section" do
