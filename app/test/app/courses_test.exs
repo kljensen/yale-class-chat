@@ -90,7 +90,10 @@ defmodule App.CoursesTest do
 
     test "list_courses/0 returns all courses" do
       course = course_fixture()
-      assert Courses.list_courses() == [course]
+      course_list = Courses.list_courses()
+      retrieved_course = List.first(course_list)
+      assert course.id == retrieved_course.id
+
     end
 
     test "get_course!/1 returns the course with given id" do

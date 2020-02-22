@@ -20,6 +20,6 @@ defmodule App.Accounts.User_Role do
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:section_id)
     |> assoc_constraint(:user)
-    |> assoc_constraint(:user)
+    |> assoc_constraint(:section)
   end
 end

@@ -153,33 +153,47 @@ defmodule App.AccountsTest do
     @invalid_attrs %{role: nil, valid_from: nil, valid_to: nil}
 
     def course__role_fixture(attrs \\ %{}) do
-      {:ok, course__role} =
+      params = 
         attrs
         |> Enum.into(@valid_attrs)
-        |> Accounts.create_course__role()
+      
+      user = user_fixture()
+      course = CTest.course_fixture()
+      
+      {:ok, course__role} =
+        Accounts.create_course__role(user, course, params)
 
       course__role
     end
 
+
     test "list_course_roles/0 returns all course_roles" do
       course__role = course__role_fixture()
-      assert Accounts.list_course_roles() == [course__role]
+      course_role_list = Accounts.list_course_roles()
+      retrieved_course_role = List.first(course_role_list)
+      assert course__role.id == retrieved_course_role.id
     end
 
     test "get_course__role!/1 returns the course__role with given id" do
       course__role = course__role_fixture()
-      assert Accounts.get_course__role!(course__role.id) == course__role
+      retrieved_course_role = Accounts.get_course__role!(course__role.id)
+      assert retrieved_course_role.id == course__role.id
     end
 
-    test "create_course__role/1 with valid data creates a course__role" do
-      assert {:ok, %Course_Role{} = course__role} = Accounts.create_course__role(@valid_attrs)
+    test "create_course__role/3 with valid data creates a course__role" do
+      user = user_fixture()
+      course = CTest.course_fixture()
+      
+      assert {:ok, %Course_Role{} = course__role} = Accounts.create_course__role(user, course, @valid_attrs)
       assert course__role.role == "some role"
       assert course__role.valid_from == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
       assert course__role.valid_to == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
     end
 
-    test "create_course__role/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_course__role(@invalid_attrs)
+    test "create_course__role/3 with invalid data returns error changeset" do
+      user = user_fixture()
+      course = CTest.course_fixture()
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_course__role(user, course, @invalid_attrs)
     end
 
     test "update_course__role/2 with valid data updates the course__role" do
@@ -193,7 +207,10 @@ defmodule App.AccountsTest do
     test "update_course__role/2 with invalid data returns error changeset" do
       course__role = course__role_fixture()
       assert {:error, %Ecto.Changeset{}} = Accounts.update_course__role(course__role, @invalid_attrs)
-      assert course__role == Accounts.get_course__role!(course__role.id)
+      retrieved_course_role = Accounts.get_course__role!(course__role.id)
+      assert course__role.id == retrieved_course_role.id
+      assert course__role.valid_from == retrieved_course_role.valid_from
+      assert course__role.valid_to == retrieved_course_role.valid_to
     end
 
     test "delete_course__role/1 deletes the course__role" do
@@ -216,33 +233,49 @@ defmodule App.AccountsTest do
     @invalid_attrs %{role: nil, valid_from: nil, valid_to: nil}
 
     def section__role_fixture(attrs \\ %{}) do
-      {:ok, section__role} =
+      params = 
         attrs
         |> Enum.into(@valid_attrs)
-        |> Accounts.create_section__role()
+      
+      user = user_fixture()
+      section = CTest.section_fixture()
+
+      {:ok, section__role} =
+        Accounts.create_section__role(user, section, params)
 
       section__role
     end
 
     test "list_section_roles/0 returns all section_roles" do
       section__role = section__role_fixture()
-      assert Accounts.list_section_roles() == [section__role]
+      section__role_list = Accounts.list_section_roles()
+      retrieved_section_role = List.first(section__role_list)
+      assert section__role.id == retrieved_section_role.id
     end
 
     test "get_section__role!/1 returns the section__role with given id" do
       section__role = section__role_fixture()
-      assert Accounts.get_section__role!(section__role.id) == section__role
+      retrieved_section_role = Accounts.get_section__role!(section__role.id)
+      assert retrieved_section_role.id == section__role.id
     end
 
-    test "create_section__role/1 with valid data creates a section__role" do
-      assert {:ok, %Section_Role{} = section__role} = Accounts.create_section__role(@valid_attrs)
+    test "create_section__role/3 with valid data creates a section__role" do
+      user = user_fixture()
+      section = CTest.section_fixture()
+
+      assert {:ok, %Section_Role{} = section__role} = Accounts.create_section__role(user, section, @valid_attrs)
       assert section__role.role == "some role"
       assert section__role.valid_from == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
       assert section__role.valid_to == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
+      assert section__role.user_id == user.id
+      assert section__role.section_id == section.id
     end
 
-    test "create_section__role/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_section__role(@invalid_attrs)
+    test "create_section__role/3 with invalid data returns error changeset" do
+      user = user_fixture()
+      section = CTest.section_fixture()
+
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_section__role(user, section, @invalid_attrs)
     end
 
     test "update_section__role/2 with valid data updates the section__role" do
@@ -256,7 +289,10 @@ defmodule App.AccountsTest do
     test "update_section__role/2 with invalid data returns error changeset" do
       section__role = section__role_fixture()
       assert {:error, %Ecto.Changeset{}} = Accounts.update_section__role(section__role, @invalid_attrs)
-      assert section__role == Accounts.get_section__role!(section__role.id)
+      retrieved_section_role = Accounts.get_section__role!(section__role.id) 
+      assert section__role.id == retrieved_section_role.id
+      assert section__role.valid_from == retrieved_section_role.valid_from
+      assert section__role.valid_to == retrieved_section_role.valid_to
     end
 
     test "delete_section__role/1 deletes the section__role" do

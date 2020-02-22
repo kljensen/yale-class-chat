@@ -243,9 +243,11 @@ defmodule App.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_course__role(attrs \\ %{}) do
+  def create_course__role(%App.Accounts.User{} = user, %App.Courses.Course{} = course, attrs \\ %{}) do
     %Course_Role{}
     |> Course_Role.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:user, user)
+    |> Ecto.Changeset.put_assoc(:course, course)
     |> Repo.insert()
   end
 
@@ -339,9 +341,11 @@ defmodule App.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_section__role(attrs \\ %{}) do
+  def create_section__role(%App.Accounts.User{} = user, %App.Courses.Section{} = section, attrs \\ %{}) do
     %Section_Role{}
     |> Section_Role.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:user, user)
+    |> Ecto.Changeset.put_assoc(:section, section)
     |> Repo.insert()
   end
 
