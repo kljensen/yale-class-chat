@@ -149,7 +149,14 @@ defmodule App.Courses do
 
   def create_course(%App.Accounts.User{} = user, %App.Courses.Semester{} = semester, attrs \\ %{}) do
     if user.is_faculty == true do
-      do_create_course(semester, attrs)
+      {stat, course} = do_create_course(semester, attrs)
+
+      if stat == :ok do
+        #Add user to course as administrator
+        
+      end
+
+      {stat, course}
     else
       {:error, "unauthorized"}
     end
@@ -174,6 +181,7 @@ defmodule App.Courses do
       {:error, %Ecto.Changeset{}}
 
   """
+
   def update_course(%Course{} = course, attrs) do
     course
     |> Course.changeset(attrs)

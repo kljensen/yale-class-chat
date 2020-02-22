@@ -39,6 +39,8 @@ defmodule AppWeb.Router do
     resources "/topics", TopicController
     resources "/users", UserController
     resources "/user_roles", User_RoleController
+    resources "/course_roles", Course_RoleController
+    resources "/section_roles", Section_RoleController
   end
 
   scope "/secret", AppWeb do

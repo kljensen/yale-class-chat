@@ -2,6 +2,7 @@ defmodule App.CoursesTest do
   use App.DataCase
 
   alias App.Courses
+  alias App.AccountsTest, as: ATest
 
   describe "semesters" do
     alias App.Courses.Semester
@@ -79,8 +80,10 @@ defmodule App.CoursesTest do
 
       semester = semester_fixture()
 
+      user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
+
       {:ok, course} =
-        Courses.create_course(semester, params)
+        Courses.create_course(user_faculty, semester, params)
 
       course
     end
@@ -95,17 +98,25 @@ defmodule App.CoursesTest do
       assert Courses.get_course!(course.id) == course
     end
 
-    test "create_course/2 with valid data creates a course" do
+    test "create_course/3 with valid data creates a course" do
       semester = semester_fixture()
-      assert {:ok, %Course{} = course} = Courses.create_course(semester, @valid_attrs)
+      user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
+      assert {:ok, %Course{} = course} = Courses.create_course(user_faculty, semester, @valid_attrs)
       assert course.department == "some department"
       assert course.name == "some name"
       assert course.number == 42
     end
 
-    test "create_course/2 with invalid data returns error changeset" do
+    test "create_course/3 with non-faculty user fails to create a course" do
       semester = semester_fixture()
-      assert {:error, changeset = course} = Courses.create_course(semester, @invalid_attrs)
+      user_faculty = ATest.user_fixture(%{is_faculty: false, net_id: "student net id"})
+      assert {:error, "unauthorized"} = Courses.create_course(user_faculty, semester, @valid_attrs)
+    end
+
+    test "create_course/3 with invalid data returns error changeset" do
+      semester = semester_fixture()
+      user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
+      assert {:error, changeset = course} = Courses.create_course(user_faculty, semester, @invalid_attrs)
       assert %{department: ["can't be blank"]} = errors_on(changeset)
       assert %{name: ["can't be blank"]} = errors_on(changeset)
       assert %{number: ["can't be blank"]} = errors_on(changeset)

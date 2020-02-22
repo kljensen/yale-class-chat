@@ -13,10 +13,13 @@ defmodule App.Accounts.User_Role do
   end
 
   @doc false
-  def changeset(user__role, attrs, [:user_id]) do
+  def changeset(user__role, attrs) do
     user__role
-    |> cast(attrs, [:role, :valid_from, :valid_to, :section_id, :user_id])
-    |> validate_required([:role, :valid_from, :valid_to, :section_id, :user_id])
+    |> cast(attrs, [:role, :valid_from, :valid_to])
+    |> validate_required([:role, :valid_from, :valid_to])
     |> foreign_key_constraint(:user_id)
+    |> foreign_key_constraint(:section_id)
+    |> assoc_constraint(:user)
+    |> assoc_constraint(:user)
   end
 end
