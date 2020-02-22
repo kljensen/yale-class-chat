@@ -6,6 +6,8 @@ defmodule App.Repo.Migrations.CreateCourseRoles do
       add :role, :string
       add :valid_from, :utc_datetime
       add :valid_to, :utc_datetime
+      add :user_id, references(:users, on_delete: :delete_all), null: false
+      add :course_id, references(:courses, on_delete: :delete_all), null: false
 
       timestamps()
     end
