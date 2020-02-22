@@ -1,0 +1,23 @@
+<h1>Show Course  role</h1>
+
+<ul>
+
+  <li>
+    <strong>Role:</strong>
+    <%= @course__role.role %>
+  </li>
+
+  <li>
+    <strong>Valid from:</strong>
+    <%= @course__role.valid_from %>
+  </li>
+
+  <li>
+    <strong>Valid to:</strong>
+    <%= @course__role.valid_to %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.course__role_path(@conn, :edit, @course__role) %></span>
+<span><%= link "Back", to: Routes.course__role_path(@conn, :index) %></span>

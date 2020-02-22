@@ -1,0 +1,30 @@
+<h1>Listing Course roles</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Role</th>
+      <th>Valid from</th>
+      <th>Valid to</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for course__role <- @course_roles do %>
+    <tr>
+      <td><%= course__role.role %></td>
+      <td><%= course__role.valid_from %></td>
+      <td><%= course__role.valid_to %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.course__role_path(@conn, :show, course__role) %></span>
+        <span><%= link "Edit", to: Routes.course__role_path(@conn, :edit, course__role) %></span>
+        <span><%= link "Delete", to: Routes.course__role_path(@conn, :delete, course__role), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Course  role", to: Routes.course__role_path(@conn, :new) %></span>
