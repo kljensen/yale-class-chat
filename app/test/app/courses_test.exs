@@ -1,7 +1,8 @@
 defmodule App.CoursesTest do
   use App.DataCase
-
+  @moduletag :working
   alias App.Courses
+  alias App.Accounts
   alias App.AccountsTest, as: ATest
 
   describe "semesters" do
@@ -164,9 +165,10 @@ defmodule App.CoursesTest do
         |> Enum.into(@valid_attrs)
 
       course = course_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
 
       {:ok, section} =
-        Courses.create_section(course, params)
+        Courses.create_section(user_faculty, course, params)
 
       section
     end
@@ -183,35 +185,66 @@ defmodule App.CoursesTest do
 
     test "create_section/2 with valid data creates a section" do
       course = course_fixture()
-      assert {:ok, %Section{} = section} = Courses.create_section(course, @valid_attrs)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+
+      assert {:ok, %Section{} = section} = Courses.create_section(user_faculty, course, @valid_attrs)
       assert section.crn == "some crn"
       assert section.title == "some title"
-      assert {:error, changeset = section} = Courses.create_section(course, @valid_attrs)
+      assert {:error, changeset = section} = Courses.create_section(user_faculty, course, @valid_attrs)
       assert %{crn: ["has already been taken"]} = errors_on(changeset)
     end
 
     test "create_section/2 with invalid data returns error changeset" do
       course = course_fixture()
-      assert {:error, %Ecto.Changeset{}} = Courses.create_section(course, @invalid_attrs)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+
+      assert {:error, %Ecto.Changeset{}} = Courses.create_section(user_faculty, course, @invalid_attrs)
+    end
+
+    test "create_section/2 as unauthorized user returns error" do
+      course = course_fixture()
+      user_noauth = ATest.user_fixture()
+
+      assert {:error, "unauthorized"} = Courses.create_section(user_noauth, course, @invalid_attrs)
     end
 
     test "update_section/2 with valid data updates the section" do
       section = section_fixture()
-      assert {:ok, %Section{} = section} = Courses.update_section(section, @update_attrs)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+
+      assert {:ok, %Section{} = section} = Courses.update_section(user_faculty, section, @update_attrs)
       assert section.crn == "some updated crn"
       assert section.title == "some updated title"
     end
 
     test "update_section/2 with invalid data returns error changeset" do
       section = section_fixture()
-      assert {:error, %Ecto.Changeset{}} = Courses.update_section(section, @invalid_attrs)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+
+      assert {:error, %Ecto.Changeset{}} = Courses.update_section(user_faculty, section, @invalid_attrs)
       assert section == Courses.get_section!(section.id)
+    end
+
+    test "update_section/2 by unauthorized user returns error" do
+      section = section_fixture()
+      user_noauth = ATest.user_fixture()
+
+      assert {:error, "unauthorized"} = Courses.update_section(user_noauth, section, @invalid_attrs)
     end
 
     test "delete_section/1 deletes the section" do
       section = section_fixture()
-      assert {:ok, %Section{}} = Courses.delete_section(section)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      
+      assert {:ok, %Section{}} = Courses.delete_section(user_faculty, section)
       assert_raise Ecto.NoResultsError, fn -> Courses.get_section!(section.id) end
+    end
+
+    test "delete_section/1 by unauthorized user returns error" do
+      section = section_fixture()
+      user_noauth = ATest.user_fixture()
+      
+      assert {:error, "unauthorized"} = Courses.delete_section(user_noauth, section)
     end
 
     test "change_section/1 returns a section changeset" do

@@ -38,6 +38,22 @@ defmodule App.Accounts do
   def get_user!(id), do: Repo.get!(User, id)
 
   @doc """
+  Gets a single user by net_id.
+
+  Raises `Ecto.NoResultsError` if the User does not exist.
+
+  ## Examples
+
+      iex> get_user_by!("net_id")
+      %User{}
+
+      iex> get_user_by!("invalid net_id")
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_user_by!(net_id), do: Repo.get_by!(User, net_id: net_id)
+
+  @doc """
   Creates a user.
 
   ## Examples
@@ -232,6 +248,33 @@ defmodule App.Accounts do
   def get_course__role!(id), do: Repo.get!(Course_Role, id)
 
   @doc """
+  Gets the current course__role for a given user and course.
+
+  Raises `Ecto.NoResultsError` if the Course  role does not exist.
+
+  ## Examples
+
+      iex> get_current_course__role!(%User{}, %Course{})
+      %Course_Role{}
+
+      iex> get_current_course__role!(%InvalidUser{}, %InvalidCourse{})
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_current_course__role!(%App.Accounts.User{} = user, %App.Courses.Course{} = course) do
+    {:ok, current_time} = DateTime.now("Etc/UTC")
+    uid = user.id
+    cid = course.id
+    query = from u_r in "course_roles",
+              where: u_r.user_id == ^uid and u_r.course_id == ^cid  and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
+              select: u_r.role
+    
+    results = Repo.all(query)
+    List.first(results)
+  end
+
+
+  @doc """
   Creates a course__role.
 
   ## Examples
@@ -244,6 +287,14 @@ defmodule App.Accounts do
 
   """
   def create_course__role(%App.Accounts.User{} = user, %App.Courses.Course{} = course, attrs \\ %{}) do
+    %Course_Role{}
+    |> Course_Role.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:user, user)
+    |> Ecto.Changeset.put_assoc(:course, course)
+    |> Repo.insert()
+  end
+
+  defp do_create_course__role(%App.Accounts.User{} = user, %App.Courses.Course{} = course, attrs \\ %{}) do
     %Course_Role{}
     |> Course_Role.changeset(attrs)
     |> Ecto.Changeset.put_assoc(:user, user)
