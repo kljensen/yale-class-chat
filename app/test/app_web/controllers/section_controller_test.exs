@@ -1,5 +1,6 @@
 defmodule AppWeb.SectionControllerTest do
   use AppWeb.ConnCase
+  @moduletag :skip
 
   alias App.Courses
 
@@ -13,7 +14,6 @@ defmodule AppWeb.SectionControllerTest do
   end
 
   describe "index" do
-    @tag :skip
     test "lists all sections", %{conn: conn} do
       conn = get(conn, Routes.section_path(conn, :index))
       assert html_response(conn, 200) =~ "Listing Sections"
@@ -21,7 +21,6 @@ defmodule AppWeb.SectionControllerTest do
   end
 
   describe "new section" do
-    @tag :skip
     test "renders form", %{conn: conn} do
       conn = get(conn, Routes.section_path(conn, :new))
       assert html_response(conn, 200) =~ "New Section"
@@ -29,7 +28,6 @@ defmodule AppWeb.SectionControllerTest do
   end
 
   describe "create section" do
-    @tag :skip
     test "redirects to show when data is valid", %{conn: conn} do
       conn = post(conn, Routes.section_path(conn, :create), section: @create_attrs)
 
@@ -40,7 +38,6 @@ defmodule AppWeb.SectionControllerTest do
       assert html_response(conn, 200) =~ "Show Section"
     end
 
-    @tag :skip
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.section_path(conn, :create), section: @invalid_attrs)
       assert html_response(conn, 200) =~ "New Section"
@@ -50,7 +47,6 @@ defmodule AppWeb.SectionControllerTest do
   describe "edit section" do
     setup [:create_section]
 
-    @tag :skip
     test "renders form for editing chosen section", %{conn: conn, section: section} do
       conn = get(conn, Routes.section_path(conn, :edit, section))
       assert html_response(conn, 200) =~ "Edit Section"
@@ -60,7 +56,6 @@ defmodule AppWeb.SectionControllerTest do
   describe "update section" do
     setup [:create_section]
 
-    @tag :skip
     test "redirects when data is valid", %{conn: conn, section: section} do
       conn = put(conn, Routes.section_path(conn, :update, section), section: @update_attrs)
       assert redirected_to(conn) == Routes.section_path(conn, :show, section)
@@ -69,7 +64,6 @@ defmodule AppWeb.SectionControllerTest do
       assert html_response(conn, 200) =~ "some updated crn"
     end
 
-    @tag :skip
     test "renders errors when data is invalid", %{conn: conn, section: section} do
       conn = put(conn, Routes.section_path(conn, :update, section), section: @invalid_attrs)
       assert html_response(conn, 200) =~ "Edit Section"
@@ -79,7 +73,6 @@ defmodule AppWeb.SectionControllerTest do
   describe "delete section" do
     setup [:create_section]
 
-    @tag :skip
     test "deletes chosen section", %{conn: conn, section: section} do
       conn = delete(conn, Routes.section_path(conn, :delete, section))
       assert redirected_to(conn) == Routes.section_path(conn, :index)

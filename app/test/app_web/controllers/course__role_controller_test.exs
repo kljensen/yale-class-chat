@@ -1,5 +1,6 @@
 defmodule AppWeb.Course_RoleControllerTest do
   use AppWeb.ConnCase
+  @moduletag :skip
 
   alias App.Accounts
 
@@ -13,7 +14,6 @@ defmodule AppWeb.Course_RoleControllerTest do
   end
 
   describe "index" do
-    @tag :skip
     test "lists all course_roles", %{conn: conn} do
       conn = get(conn, Routes.course__role_path(conn, :index))
       assert html_response(conn, 200) =~ "Listing Course roles"
@@ -21,7 +21,6 @@ defmodule AppWeb.Course_RoleControllerTest do
   end
 
   describe "new course__role" do
-    @tag :skip
     test "renders form", %{conn: conn} do
       conn = get(conn, Routes.course__role_path(conn, :new))
       assert html_response(conn, 200) =~ "New Course  role"
@@ -29,7 +28,6 @@ defmodule AppWeb.Course_RoleControllerTest do
   end
 
   describe "create course__role" do
-    @tag :skip
     test "redirects to show when data is valid", %{conn: conn} do
       conn = post(conn, Routes.course__role_path(conn, :create), course__role: @create_attrs)
 
@@ -40,7 +38,6 @@ defmodule AppWeb.Course_RoleControllerTest do
       assert html_response(conn, 200) =~ "Show Course  role"
     end
 
-    @tag :skip
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.course__role_path(conn, :create), course__role: @invalid_attrs)
       assert html_response(conn, 200) =~ "New Course  role"
@@ -50,7 +47,6 @@ defmodule AppWeb.Course_RoleControllerTest do
   describe "edit course__role" do
     setup [:create_course__role]
 
-    @tag :skip
     test "renders form for editing chosen course__role", %{conn: conn, course__role: course__role} do
       conn = get(conn, Routes.course__role_path(conn, :edit, course__role))
       assert html_response(conn, 200) =~ "Edit Course  role"
@@ -60,7 +56,6 @@ defmodule AppWeb.Course_RoleControllerTest do
   describe "update course__role" do
     setup [:create_course__role]
 
-    @tag :skip
     test "redirects when data is valid", %{conn: conn, course__role: course__role} do
       conn = put(conn, Routes.course__role_path(conn, :update, course__role), course__role: @update_attrs)
       assert redirected_to(conn) == Routes.course__role_path(conn, :show, course__role)
@@ -69,7 +64,6 @@ defmodule AppWeb.Course_RoleControllerTest do
       assert html_response(conn, 200) =~ "some updated role"
     end
 
-    @tag :skip
     test "renders errors when data is invalid", %{conn: conn, course__role: course__role} do
       conn = put(conn, Routes.course__role_path(conn, :update, course__role), course__role: @invalid_attrs)
       assert html_response(conn, 200) =~ "Edit Course  role"
@@ -79,7 +73,6 @@ defmodule AppWeb.Course_RoleControllerTest do
   describe "delete course__role" do
     setup [:create_course__role]
 
-    @tag :skip
     test "deletes chosen course__role", %{conn: conn, course__role: course__role} do
       conn = delete(conn, Routes.course__role_path(conn, :delete, course__role))
       assert redirected_to(conn) == Routes.course__role_path(conn, :index)

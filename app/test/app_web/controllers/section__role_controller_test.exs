@@ -1,5 +1,6 @@
 defmodule AppWeb.Section_RoleControllerTest do
   use AppWeb.ConnCase
+  @moduletag :skip
 
   alias App.Accounts
 
@@ -13,7 +14,6 @@ defmodule AppWeb.Section_RoleControllerTest do
   end
 
   describe "index" do
-    @tag :skip
     test "lists all section_roles", %{conn: conn} do
       conn = get(conn, Routes.section__role_path(conn, :index))
       assert html_response(conn, 200) =~ "Listing Section roles"
@@ -21,7 +21,6 @@ defmodule AppWeb.Section_RoleControllerTest do
   end
 
   describe "new section__role" do
-    @tag :skip
     test "renders form", %{conn: conn} do
       conn = get(conn, Routes.section__role_path(conn, :new))
       assert html_response(conn, 200) =~ "New Section  role"
@@ -29,7 +28,6 @@ defmodule AppWeb.Section_RoleControllerTest do
   end
 
   describe "create section__role" do
-    @tag :skip
     test "redirects to show when data is valid", %{conn: conn} do
       conn = post(conn, Routes.section__role_path(conn, :create), section__role: @create_attrs)
 
@@ -40,7 +38,6 @@ defmodule AppWeb.Section_RoleControllerTest do
       assert html_response(conn, 200) =~ "Show Section  role"
     end
 
-    @tag :skip
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.section__role_path(conn, :create), section__role: @invalid_attrs)
       assert html_response(conn, 200) =~ "New Section  role"
@@ -50,7 +47,6 @@ defmodule AppWeb.Section_RoleControllerTest do
   describe "edit section__role" do
     setup [:create_section__role]
 
-    @tag :skip
     test "renders form for editing chosen section__role", %{conn: conn, section__role: section__role} do
       conn = get(conn, Routes.section__role_path(conn, :edit, section__role))
       assert html_response(conn, 200) =~ "Edit Section  role"
@@ -60,7 +56,6 @@ defmodule AppWeb.Section_RoleControllerTest do
   describe "update section__role" do
     setup [:create_section__role]
 
-    @tag :skip
     test "redirects when data is valid", %{conn: conn, section__role: section__role} do
       conn = put(conn, Routes.section__role_path(conn, :update, section__role), section__role: @update_attrs)
       assert redirected_to(conn) == Routes.section__role_path(conn, :show, section__role)
@@ -69,7 +64,6 @@ defmodule AppWeb.Section_RoleControllerTest do
       assert html_response(conn, 200) =~ "some updated role"
     end
 
-    @tag :skip
     test "renders errors when data is invalid", %{conn: conn, section__role: section__role} do
       conn = put(conn, Routes.section__role_path(conn, :update, section__role), section__role: @invalid_attrs)
       assert html_response(conn, 200) =~ "Edit Section  role"
@@ -79,7 +73,6 @@ defmodule AppWeb.Section_RoleControllerTest do
   describe "delete section__role" do
     setup [:create_section__role]
 
-    @tag :skip
     test "deletes chosen section__role", %{conn: conn, section__role: section__role} do
       conn = delete(conn, Routes.section__role_path(conn, :delete, section__role))
       assert redirected_to(conn) == Routes.section__role_path(conn, :index)

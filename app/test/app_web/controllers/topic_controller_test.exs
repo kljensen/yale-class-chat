@@ -1,5 +1,6 @@
 defmodule AppWeb.TopicControllerTest do
   use AppWeb.ConnCase
+  @moduletag :skip
 
   alias App.Topics
 
@@ -13,7 +14,6 @@ defmodule AppWeb.TopicControllerTest do
   end
 
   describe "index" do
-    @tag :skip
     test "lists all topics", %{conn: conn} do
       conn = get(conn, Routes.topic_path(conn, :index))
       assert html_response(conn, 200) =~ "Listing Topics"
@@ -21,7 +21,6 @@ defmodule AppWeb.TopicControllerTest do
   end
 
   describe "new topic" do
-    @tag :skip
     test "renders form", %{conn: conn} do
       conn = get(conn, Routes.topic_path(conn, :new))
       assert html_response(conn, 200) =~ "New Topic"
@@ -29,7 +28,6 @@ defmodule AppWeb.TopicControllerTest do
   end
 
   describe "create topic" do
-    @tag :skip
     test "redirects to show when data is valid", %{conn: conn} do
       conn = post(conn, Routes.topic_path(conn, :create), topic: @create_attrs)
 
@@ -40,7 +38,6 @@ defmodule AppWeb.TopicControllerTest do
       assert html_response(conn, 200) =~ "Show Topic"
     end
 
-    @tag :skip
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.topic_path(conn, :create), topic: @invalid_attrs)
       assert html_response(conn, 200) =~ "New Topic"
@@ -50,7 +47,6 @@ defmodule AppWeb.TopicControllerTest do
   describe "edit topic" do
     setup [:create_topic]
 
-    @tag :skip
     test "renders form for editing chosen topic", %{conn: conn, topic: topic} do
       conn = get(conn, Routes.topic_path(conn, :edit, topic))
       assert html_response(conn, 200) =~ "Edit Topic"
@@ -60,7 +56,6 @@ defmodule AppWeb.TopicControllerTest do
   describe "update topic" do
     setup [:create_topic]
 
-    @tag :skip
     test "redirects when data is valid", %{conn: conn, topic: topic} do
       conn = put(conn, Routes.topic_path(conn, :update, topic), topic: @update_attrs)
       assert redirected_to(conn) == Routes.topic_path(conn, :show, topic)
@@ -69,7 +64,6 @@ defmodule AppWeb.TopicControllerTest do
       assert html_response(conn, 200) =~ "some updated description"
     end
 
-    @tag :skip
     test "renders errors when data is invalid", %{conn: conn, topic: topic} do
       conn = put(conn, Routes.topic_path(conn, :update, topic), topic: @invalid_attrs)
       assert html_response(conn, 200) =~ "Edit Topic"
@@ -79,7 +73,6 @@ defmodule AppWeb.TopicControllerTest do
   describe "delete topic" do
     setup [:create_topic]
 
-    @tag :skip
     test "deletes chosen topic", %{conn: conn, topic: topic} do
       conn = delete(conn, Routes.topic_path(conn, :delete, topic))
       assert redirected_to(conn) == Routes.topic_path(conn, :index)

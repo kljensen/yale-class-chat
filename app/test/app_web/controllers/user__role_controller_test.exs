@@ -1,5 +1,6 @@
 defmodule AppWeb.User_RoleControllerTest do
   use AppWeb.ConnCase
+  @moduletag :skip
 
   alias App.Accounts
 
@@ -13,7 +14,6 @@ defmodule AppWeb.User_RoleControllerTest do
   end
 
   describe "index" do
-    @tag :skip
     test "lists all user_roles", %{conn: conn} do
       conn = get(conn, Routes.user__role_path(conn, :index))
       assert html_response(conn, 200) =~ "Listing User roles"
@@ -21,7 +21,6 @@ defmodule AppWeb.User_RoleControllerTest do
   end
 
   describe "new user__role" do
-    @tag :skip
     test "renders form", %{conn: conn} do
       conn = get(conn, Routes.user__role_path(conn, :new))
       assert html_response(conn, 200) =~ "New User  role"
@@ -29,7 +28,6 @@ defmodule AppWeb.User_RoleControllerTest do
   end
 
   describe "create user__role" do
-    @tag :skip
     test "redirects to show when data is valid", %{conn: conn} do
       conn = post(conn, Routes.user__role_path(conn, :create), user__role: @create_attrs)
 
@@ -40,7 +38,6 @@ defmodule AppWeb.User_RoleControllerTest do
       assert html_response(conn, 200) =~ "Show User  role"
     end
 
-    @tag :skip
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.user__role_path(conn, :create), user__role: @invalid_attrs)
       assert html_response(conn, 200) =~ "New User  role"
@@ -50,7 +47,6 @@ defmodule AppWeb.User_RoleControllerTest do
   describe "edit user__role" do
     setup [:create_user__role]
 
-    @tag :skip
     test "renders form for editing chosen user__role", %{conn: conn, user__role: user__role} do
       conn = get(conn, Routes.user__role_path(conn, :edit, user__role))
       assert html_response(conn, 200) =~ "Edit User  role"
@@ -60,7 +56,6 @@ defmodule AppWeb.User_RoleControllerTest do
   describe "update user__role" do
     setup [:create_user__role]
 
-    @tag :skip
     test "redirects when data is valid", %{conn: conn, user__role: user__role} do
       conn = put(conn, Routes.user__role_path(conn, :update, user__role), user__role: @update_attrs)
       assert redirected_to(conn) == Routes.user__role_path(conn, :show, user__role)
@@ -69,7 +64,6 @@ defmodule AppWeb.User_RoleControllerTest do
       assert html_response(conn, 200) =~ "some updated role"
     end
 
-    @tag :skip
     test "renders errors when data is invalid", %{conn: conn, user__role: user__role} do
       conn = put(conn, Routes.user__role_path(conn, :update, user__role), user__role: @invalid_attrs)
       assert html_response(conn, 200) =~ "Edit User  role"
@@ -79,7 +73,6 @@ defmodule AppWeb.User_RoleControllerTest do
   describe "delete user__role" do
     setup [:create_user__role]
 
-    @tag :skip
     test "deletes chosen user__role", %{conn: conn, user__role: user__role} do
       conn = delete(conn, Routes.user__role_path(conn, :delete, user__role))
       assert redirected_to(conn) == Routes.user__role_path(conn, :index)
