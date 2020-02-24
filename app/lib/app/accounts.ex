@@ -286,12 +286,15 @@ defmodule App.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_course__role(%App.Accounts.User{} = user, %App.Courses.Course{} = course, attrs \\ %{}) do
-    %Course_Role{}
-    |> Course_Role.changeset(attrs)
-    |> Ecto.Changeset.put_assoc(:user, user)
-    |> Ecto.Changeset.put_assoc(:course, course)
-    |> Repo.insert()
+  def create_course__role(%App.Accounts.User{} = user_auth, %App.Accounts.User{} = user, %App.Courses.Course{} = course, attrs \\ %{}) do
+    allowed_roles = ["owner"]
+    auth_role = App.Accounts.get_current_course__role!(user_auth, course)
+
+    if Enum.member?(allowed_roles, auth_role) do
+      do_create_course__role(user, course, attrs)
+    else
+      {:error, "unauthorized"}
+    end
   end
 
   defp do_create_course__role(%App.Accounts.User{} = user, %App.Courses.Course{} = course, attrs \\ %{}) do
@@ -314,7 +317,19 @@ defmodule App.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_course__role(%Course_Role{} = course__role, attrs) do
+  def update_course__role(%App.Accounts.User{} = user_auth, %Course_Role{} = course__role, attrs) do
+    allowed_roles = ["owner"]
+    course = App.Courses.get_course!(course__role.course_id)
+    auth_role = get_current_course__role!(user_auth, course)
+
+    if Enum.member?(allowed_roles, auth_role) do
+      do_update_course__role(course__role, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_update_course__role(%Course_Role{} = course__role, attrs) do
     course__role
     |> Course_Role.changeset(attrs)
     |> Repo.update()
@@ -332,7 +347,19 @@ defmodule App.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_course__role(%Course_Role{} = course__role) do
+  def delete_course__role(%App.Accounts.User{} = user_auth, %Course_Role{} = course__role) do
+    allowed_roles = ["owner"]
+    course = App.Courses.get_course!(course__role.course_id)
+    auth_role = get_current_course__role!(user_auth, course)
+
+    if Enum.member?(allowed_roles, auth_role) do
+      do_delete_course__role(course__role)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_delete_course__role(%Course_Role{} = course__role) do
     Repo.delete(course__role)
   end
 

@@ -1,8 +1,13 @@
 defmodule App.SubmissionsTest do
   use App.DataCase
-
+  #@moduletag :working
   alias App.Submissions
+  alias App.Topics
+  alias App.Courses
+  alias App.Accounts
   alias App.TopicsTest, as: TTest
+  alias App.AccountsTest, as: ATest
+
 
   describe "submissions" do
     alias App.Submissions.Submission
@@ -12,10 +17,19 @@ defmodule App.SubmissionsTest do
     @invalid_attrs %{description: nil, image_url: nil, slug: nil, title: nil}
 
     def submission_fixture(attrs \\ %{}) do
-      {:ok, submission} =
+      params =
         attrs
         |> Enum.into(@valid_attrs)
-        |> Submissions.create_submission()
+      
+      topic = TTest.topic_fixture()
+      user = ATest.user_fixture()
+      section = App.Courses.get_section!(topic.section_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+
+      #App.Accounts.create_section_role()
+
+      {:ok, submission} =
+        Submissions.create_submission()
 
       submission
     end

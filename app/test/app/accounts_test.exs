@@ -88,13 +88,11 @@ defmodule App.AccountsTest do
       user__role
     end
 
-    @tag :skip
     test "list_user_roles/0 returns all user_roles" do
       user__role = user__role_fixture()
       assert Accounts.list_user_roles() == [user__role]
     end
 
-    @tag :skip
     test "get_user__role!/1 returns the user__role with given id" do
       user__role = user__role_fixture()
       assert Accounts.get_user__role!(user__role.id) == user__role
@@ -110,12 +108,10 @@ defmodule App.AccountsTest do
       assert user__role.valid_to == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
     end
 
-    @tag :skip
     test "create_user__role/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Accounts.create_user__role(@invalid_attrs)
     end
 
-    @tag :skip
     test "update_user__role/2 with valid data updates the user__role" do
       user__role = user__role_fixture()
       assert {:ok, %User_Role{} = user__role} = Accounts.update_user__role(user__role, @update_attrs)
@@ -124,21 +120,18 @@ defmodule App.AccountsTest do
       assert user__role.valid_to == DateTime.from_naive!(~N[2011-05-18T15:01:01Z], "Etc/UTC")
     end
 
-    @tag :skip
     test "update_user__role/2 with invalid data returns error changeset" do
       user__role = user__role_fixture()
       assert {:error, %Ecto.Changeset{}} = Accounts.update_user__role(user__role, @invalid_attrs)
       assert user__role == Accounts.get_user__role!(user__role.id)
     end
 
-    @tag :skip
     test "delete_user__role/1 deletes the user__role" do
       user__role = user__role_fixture()
       assert {:ok, %User_Role{}} = Accounts.delete_user__role(user__role)
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_user__role!(user__role.id) end
     end
 
-    @tag :skip
     test "change_user__role/1 returns a user__role changeset" do
       user__role = user__role_fixture()
       assert %Ecto.Changeset{} = Accounts.change_user__role(user__role)
@@ -159,18 +152,19 @@ defmodule App.AccountsTest do
       
       user = user_fixture()
       course = CTest.course_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
       
       {:ok, course__role} =
-        Accounts.create_course__role(user, course, params)
+        Accounts.create_course__role(user_faculty, user, course, params)
 
       course__role
     end
 
 
-    test "list_course_roles/0 returns all course_roles" do
+    test "list_course_roles/0 returns all course_roles" do     
       course__role = course__role_fixture()
       course_role_list = Accounts.list_course_roles()
-      retrieved_course_role = List.first(course_role_list)
+      retrieved_course_role = List.last(course_role_list)
       assert course__role.id == retrieved_course_role.id
     end
 
@@ -180,33 +174,59 @@ defmodule App.AccountsTest do
       assert retrieved_course_role.id == course__role.id
     end
 
-    test "create_course__role/3 with valid data creates a course__role" do
+    test "create_course__role/4 with valid data creates a course__role" do
       user = user_fixture()
       course = CTest.course_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
       
-      assert {:ok, %Course_Role{} = course__role} = Accounts.create_course__role(user, course, @valid_attrs)
+      assert {:ok, %Course_Role{} = course__role} = Accounts.create_course__role(user_faculty, user, course, @valid_attrs)
       assert course__role.role == "some role"
       assert course__role.valid_from == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
       assert course__role.valid_to == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
     end
 
-    test "create_course__role/3 with invalid data returns error changeset" do
+    test "create_course__role/4 with invalid data returns error changeset" do
       user = user_fixture()
       course = CTest.course_fixture()
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_course__role(user, course, @invalid_attrs)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_course__role(user_faculty, user, course, @invalid_attrs)
     end
 
-    test "update_course__role/2 with valid data updates the course__role" do
+    test "create_course__role/4 by unauthorized user returns error" do
+      user = user_fixture()
+      course = CTest.course_fixture()
+      user_faculty = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
+
+      assert {:error, "unauthorized"} = Accounts.create_course__role(user_faculty, user, course, @invalid_attrs)
+    end
+
+    test "update_course__role/3 with valid data updates the course__role" do
       course__role = course__role_fixture()
-      assert {:ok, %Course_Role{} = course__role} = Accounts.update_course__role(course__role, @update_attrs)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+
+      assert {:ok, %Course_Role{} = course__role} = Accounts.update_course__role(user_faculty, course__role, @update_attrs)
       assert course__role.role == "some updated role"
       assert course__role.valid_from == DateTime.from_naive!(~N[2011-05-18T15:01:01Z], "Etc/UTC")
       assert course__role.valid_to == DateTime.from_naive!(~N[2011-05-18T15:01:01Z], "Etc/UTC")
     end
 
-    test "update_course__role/2 with invalid data returns error changeset" do
+    test "update_course__role/3 with invalid data returns error changeset" do
       course__role = course__role_fixture()
-      assert {:error, %Ecto.Changeset{}} = Accounts.update_course__role(course__role, @invalid_attrs)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+
+      assert {:error, %Ecto.Changeset{}} = Accounts.update_course__role(user_faculty, course__role, @invalid_attrs)
+      retrieved_course_role = Accounts.get_course__role!(course__role.id)
+      assert course__role.id == retrieved_course_role.id
+      assert course__role.valid_from == retrieved_course_role.valid_from
+      assert course__role.valid_to == retrieved_course_role.valid_to
+    end
+
+    test "update_course__role/3 by unauthorized user returns error" do
+      course__role = course__role_fixture()
+      user_faculty = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
+
+      assert {:error, "unauthorized"} = Accounts.update_course__role(user_faculty, course__role, @invalid_attrs)
       retrieved_course_role = Accounts.get_course__role!(course__role.id)
       assert course__role.id == retrieved_course_role.id
       assert course__role.valid_from == retrieved_course_role.valid_from
@@ -215,8 +235,21 @@ defmodule App.AccountsTest do
 
     test "delete_course__role/1 deletes the course__role" do
       course__role = course__role_fixture()
-      assert {:ok, %Course_Role{}} = Accounts.delete_course__role(course__role)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+
+      assert {:ok, %Course_Role{}} = Accounts.delete_course__role(user_faculty, course__role)
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_course__role!(course__role.id) end
+    end
+
+    test "delete_course__role/1 by unauthorized user returns error" do
+      course__role = course__role_fixture()
+      user_faculty = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
+
+      assert {:error, "unauthorized"} = Accounts.delete_course__role(user_faculty, course__role)
+      retrieved_course_role = Accounts.get_course__role!(course__role.id)
+      assert course__role.id == retrieved_course_role.id
+      assert course__role.valid_from == retrieved_course_role.valid_from
+      assert course__role.valid_to == retrieved_course_role.valid_to    
     end
 
     test "change_course__role/1 returns a course__role changeset" do
