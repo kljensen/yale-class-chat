@@ -5,6 +5,7 @@ defmodule App.Submissions.Rating do
   schema "ratings" do
     field :score, :integer
     belongs_to :submission, App.Submissions.Submission
+    belongs_to :user, App.Accounts.User
 
     timestamps()
   end
@@ -14,5 +15,7 @@ defmodule App.Submissions.Rating do
     rating
     |> cast(attrs, [:score])
     |> validate_required([:score])
+    |> foreign_key_constraint(:user_id)
+    |> assoc_constraint(:user)
   end
 end

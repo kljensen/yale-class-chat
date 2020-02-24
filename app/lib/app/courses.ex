@@ -49,7 +49,15 @@ defmodule App.Courses do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_semester(attrs \\ %{}) do
+  def create_semester(%App.Accounts.User{} = user, attrs \\ %{}) do
+    if user.is_faculty == true do
+      do_create_semester(attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_create_semester(attrs \\ %{}) do
     %Semester{}
     |> Semester.changeset(attrs)
     |> Repo.insert()
@@ -67,7 +75,15 @@ defmodule App.Courses do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_semester(%Semester{} = semester, attrs) do
+  def update_semester(%App.Accounts.User{} = user, %Semester{} = semester, attrs \\ %{}) do
+    if user.is_faculty == true do
+      do_update_semester(semester, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_update_semester(%Semester{} = semester, attrs) do
     semester
     |> Semester.changeset(attrs)
     |> Repo.update()
@@ -85,7 +101,15 @@ defmodule App.Courses do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_semester(%Semester{} = semester) do
+  def delete_semester(%App.Accounts.User{} = user, %Semester{} = semester) do
+    if user.is_faculty == true do
+      do_delete_semester(semester)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_delete_semester(%Semester{} = semester) do
     Repo.delete(semester)
   end
 
@@ -139,14 +163,36 @@ defmodule App.Courses do
 
   ## Examples
 
-      iex> create_course(%{field: value})
+      iex> create_course(%{User}, %{field: value})
       {:ok, %Course{}}
 
       iex> create_course(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_course(%App.Courses.Semester{} = semester, attrs \\ %{}) do
+
+  def create_course(%App.Accounts.User{} = user, %App.Courses.Semester{} = semester, attrs \\ %{}) do
+    if user.is_faculty == true do
+      {stat, course} = do_create_course(semester, attrs)
+
+      if stat == :ok do
+        #Add user to course as owner
+        {:ok, current_time} = DateTime.now("Etc/UTC")
+        attrs = %{role: "owner", valid_from: current_time, valid_to: "2100-01-01T00:00:00Z"}
+        %App.Accounts.Course_Role{}
+        |> App.Accounts.Course_Role.changeset(attrs)
+        |> Ecto.Changeset.put_assoc(:user, user)
+        |> Ecto.Changeset.put_assoc(:course, course)
+        |> Repo.insert()
+      end
+
+      {stat, course}
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_create_course(%App.Courses.Semester{} = semester, attrs \\ %{}) do
     %Course{}
     |> Course.changeset(attrs)
     |> Ecto.Changeset.put_assoc(:semester, semester)
@@ -165,7 +211,19 @@ defmodule App.Courses do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_course(%Course{} = course, attrs) do
+
+  def update_course(%App.Accounts.User{} = user, %Course{} = course, attrs) do
+    allowed_roles = ["owner"]
+    course_role = App.Accounts.get_current_course__role!(user, course)
+
+    if Enum.member?(allowed_roles, course_role) do
+      do_update_course(course, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_update_course(%Course{} = course, attrs) do
     course
     |> Course.changeset(attrs)
     |> Repo.update()
@@ -177,13 +235,24 @@ defmodule App.Courses do
   ## Examples
 
       iex> delete_course(course)
-      {:ok, %Course{}}
+      {:ok, %Course{%App%App.Courses.Semester{} = semester, attrs \\ %{}) do.Courses.Semester{} = semester, attrs \\ %{}) do}}
 
       iex> delete_course(course)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_course(%Course{} = course) do
+  def delete_course(%App.Accounts.User{} = user, %Course{} = course) do
+    allowed_roles = ["owner"]
+    course_role = App.Accounts.get_current_course__role!(user, course)
+
+    if Enum.member?(allowed_roles, course_role) do
+      do_delete_course(course)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_delete_course(%Course{} = course) do
     Repo.delete(course)
   end
 
@@ -213,6 +282,7 @@ defmodule App.Courses do
   """
   def list_sections do
     Repo.all(Section)
+    |> Repo.preload([{:course, :semester}])
   end
 
   @doc """
@@ -229,7 +299,7 @@ defmodule App.Courses do
       ** (Ecto.NoResultsError)
 
   """
-  def get_section!(id), do: Repo.get!(Section, id)
+  def get_section!(id), do: Repo.get!(Section, id) |> Repo.preload([{:course, :semester}])
 
   @doc """
   Creates a section.
@@ -243,9 +313,22 @@ defmodule App.Courses do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_section(attrs \\ %{}) do
+  def create_section(%App.Accounts.User{} = user, %App.Courses.Course{} = course, attrs \\ %{}) do
+    #If user role is Administrator or Owner, then allow creation of a section
+    allowed_roles = ["owner"]
+    course_role = App.Accounts.get_current_course__role!(user, course)
+
+    if Enum.member?(allowed_roles, course_role) do
+      do_create_section(course, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_create_section(%App.Courses.Course{} = course, attrs \\ %{}) do
     %Section{}
     |> Section.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:course, course)
     |> Repo.insert()
   end
 
@@ -261,7 +344,20 @@ defmodule App.Courses do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_section(%Section{} = section, attrs) do
+  def update_section(%App.Accounts.User{} = user, %Section{} = section, attrs) do
+    #If user role is Administrator or Owner, then allow update of a section
+    allowed_roles = ["owner"]
+    course = get_course!(section.course_id)
+    course_role = App.Accounts.get_current_course__role!(user, course)
+
+    if Enum.member?(allowed_roles, course_role) do
+      do_update_section(section, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_update_section(%Section{} = section, attrs) do
     section
     |> Section.changeset(attrs)
     |> Repo.update()
@@ -279,7 +375,20 @@ defmodule App.Courses do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_section(%Section{} = section) do
+  def delete_section(%App.Accounts.User{} = user, %Section{} = section) do
+    #If user role is Administrator or Owner, then allow update of a section
+    allowed_roles = ["owner"]
+    course = get_course!(section.course_id)
+    course_role = App.Accounts.get_current_course__role!(user, course)
+
+    if Enum.member?(allowed_roles, course_role) do
+      do_delete_section(section)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_delete_section(%Section{} = section) do
     Repo.delete(section)
   end
 

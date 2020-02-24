@@ -1,0 +1,23 @@
+<h1>Show Section  role</h1>
+
+<ul>
+
+  <li>
+    <strong>Role:</strong>
+    <%= @section__role.role %>
+  </li>
+
+  <li>
+    <strong>Valid from:</strong>
+    <%= @section__role.valid_from %>
+  </li>
+
+  <li>
+    <strong>Valid to:</strong>
+    <%= @section__role.valid_to %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.section__role_path(@conn, :edit, @section__role) %></span>
+<span><%= link "Back", to: Routes.section__role_path(@conn, :index) %></span>

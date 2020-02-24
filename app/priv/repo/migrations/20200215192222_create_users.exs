@@ -6,6 +6,7 @@ defmodule App.Repo.Migrations.CreateUsers do
       add :net_id, :string
       add :display_name, :string
       add :email, :string
+      add :is_faculty, :boolean, default: false
 
       timestamps()
     end

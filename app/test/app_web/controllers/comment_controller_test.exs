@@ -1,6 +1,6 @@
 defmodule AppWeb.CommentControllerTest do
   use AppWeb.ConnCase
-
+  @moduletag :skip
   alias App.Submissions
 
   @create_attrs %{description: "some description", title: "some title"}

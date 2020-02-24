@@ -1,5 +1,6 @@
 defmodule AppWeb.SectionControllerTest do
   use AppWeb.ConnCase
+  @moduletag :skip
 
   alias App.Courses
 

@@ -49,9 +49,23 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_submission(attrs \\ %{}) do
+  def create_submission(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic, attrs \\ %{}) do
+    allowed_roles = ["student"]
+    section = App.Courses.get_section!(topic.section_id)
+    section_role = App.Accounts.get_current_section__role!(user, section)
+
+    if Enum.member?(allowed_roles, section_role) do
+      do_create_submission(user, topic, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_create_submission(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic, attrs \\ %{}) do
     %Submission{}
     |> Submission.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:topic, topic)
+    |> Ecto.Changeset.put_assoc(:user, user)
     |> Repo.insert()
   end
 
@@ -67,7 +81,15 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_submission(%Submission{} = submission, attrs) do
+  def update_submission(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
+    if user.id == submission.user_id do
+      do_update_submission(submission, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_update_submission(%Submission{} = submission, attrs) do
     submission
     |> Submission.changeset(attrs)
     |> Repo.update()
@@ -85,7 +107,15 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_submission(%Submission{} = submission) do
+  def delete_submission(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission) do
+    if user.id == submission.user_id do
+      do_delete_submission(submission)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_delete_submission(%Submission{} = submission) do
     Repo.delete(submission)
   end
 
@@ -145,9 +175,24 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_comment(attrs \\ %{}) do
+  def create_comment(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
+    allowed_roles = ["student"]
+    topic = App.Topics.get_topic!(submission.topic_id)
+    section = App.Courses.get_section!(topic.section_id)
+    section_role = App.Accounts.get_current_section__role!(user, section)
+
+    if Enum.member?(allowed_roles, section_role) do
+      do_create_comment(user, submission, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_create_comment(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
     %Comment{}
     |> Comment.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:user, user)
+    |> Ecto.Changeset.put_assoc(:submission, submission)
     |> Repo.insert()
   end
 
@@ -163,7 +208,15 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_comment(%Comment{} = comment, attrs) do
+  def update_comment(%App.Accounts.User{} = user, %App.Submissions.Comment{} = comment, attrs \\ %{}) do
+    if user.id == comment.user_id do
+      do_update_comment(comment, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_update_comment(%Comment{} = comment, attrs) do
     comment
     |> Comment.changeset(attrs)
     |> Repo.update()
@@ -181,7 +234,15 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_comment(%Comment{} = comment) do
+  def delete_comment(%App.Accounts.User{} = user, %App.Submissions.Comment{} = comment) do
+    if user.id == comment.user_id do
+      do_delete_comment(comment)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_delete_comment(%Comment{} = comment) do
     Repo.delete(comment)
   end
 
@@ -241,9 +302,24 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_rating(attrs \\ %{}) do
+  def create_rating(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
+    allowed_roles = ["student"]
+    topic = App.Topics.get_topic!(submission.topic_id)
+    section = App.Courses.get_section!(topic.section_id)
+    section_role = App.Accounts.get_current_section__role!(user, section)
+
+    if Enum.member?(allowed_roles, section_role) do
+      do_create_rating(user, submission, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_create_rating(user, submission, attrs \\ %{}) do
     %Rating{}
     |> Rating.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:user, user)
+    |> Ecto.Changeset.put_assoc(:submission, submission)
     |> Repo.insert()
   end
 
@@ -259,7 +335,21 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_rating(%Rating{} = rating, attrs) do
+  def update_rating(%App.Accounts.User{} = user, %App.Submissions.Rating{} = rating, attrs \\ %{}) do
+    allowed_roles = ["student"]
+    submission = get_submission!(rating.submission_id)
+    topic = App.Topics.get_topic!(submission.topic_id)
+    section = App.Courses.get_section!(topic.section_id)
+    section_role = App.Accounts.get_current_section__role!(user, section)
+
+    if Enum.member?(allowed_roles, section_role) do
+      do_update_rating(rating, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_update_rating(%Rating{} = rating, attrs) do
     rating
     |> Rating.changeset(attrs)
     |> Repo.update()
@@ -277,7 +367,21 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_rating(%Rating{} = rating) do
+  def delete_rating(%App.Accounts.User{} = user, %App.Submissions.Rating{} = rating) do
+    allowed_roles = ["student"]
+    submission = get_submission!(rating.submission_id)
+    topic = App.Topics.get_topic!(submission.topic_id)
+    section = App.Courses.get_section!(topic.section_id)
+    section_role = App.Accounts.get_current_section__role!(user, section)
+
+    if Enum.member?(allowed_roles, section_role) do
+      do_delete_rating(rating)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_delete_rating(%Rating{} = rating) do
     Repo.delete(rating)
   end
 

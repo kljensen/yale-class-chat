@@ -7,6 +7,8 @@ defmodule App.Courses.Section do
     field :title, :string
     belongs_to :course, App.Courses.Course
     has_many :topics, App.Topics.Topic
+    has_many :section_roles, App.Accounts.Section_Role
+
     timestamps()
   end
 
@@ -16,5 +18,7 @@ defmodule App.Courses.Section do
     |> cast(attrs, [:title, :crn])
     |> validate_required([:title, :crn])
     |> unique_constraint(:crn)
+    |> foreign_key_constraint(:course_id)
+    |> assoc_constraint(:course)
   end
 end

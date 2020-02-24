@@ -1,5 +1,6 @@
 defmodule AppWeb.UserControllerTest do
   use AppWeb.ConnCase
+  @moduletag :skip
 
   alias App.Accounts
 

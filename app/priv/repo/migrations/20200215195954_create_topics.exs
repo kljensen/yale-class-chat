@@ -14,7 +14,7 @@ defmodule App.Repo.Migrations.CreateTopics do
       add :allow_submission_comments, :boolean, default: false, null: false
       add :user_submission_limit, :integer
       add :sort, :string
-      add :section_id, references(:sections)
+      add :section_id, references(:sections, on_delete: :delete_all), null: false
 
       timestamps()
     end

@@ -1,5 +1,6 @@
 defmodule AppWeb.SubmissionControllerTest do
   use AppWeb.ConnCase
+  @moduletag :skip
 
   alias App.Submissions
 

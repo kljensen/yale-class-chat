@@ -1,5 +1,6 @@
 defmodule AppWeb.PageControllerTest do
   use AppWeb.ConnCase
+  @moduletag :skip
 
   test "GET /", %{conn: conn} do
     conn = get(conn, "/")

@@ -6,7 +6,7 @@ defmodule App.Repo.Migrations.CreateCourses do
       add :name, :string
       add :department, :string
       add :number, :integer
-      add :semester_id, references(:semesters)
+      add :semester_id, references(:semesters, on_delete: :delete_all), null: false
 
       timestamps()
     end
