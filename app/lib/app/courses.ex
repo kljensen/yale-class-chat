@@ -213,7 +213,7 @@ defmodule App.Courses do
   """
 
   def update_course(%App.Accounts.User{} = user, %Course{} = course, attrs) do
-    allowed_roles = ["administrator", "owner"]
+    allowed_roles = ["owner"]
     course_role = App.Accounts.get_current_course__role!(user, course)
 
     if Enum.member?(allowed_roles, course_role) do
@@ -242,7 +242,7 @@ defmodule App.Courses do
 
   """
   def delete_course(%App.Accounts.User{} = user, %Course{} = course) do
-    allowed_roles = ["administrator", "owner"]
+    allowed_roles = ["owner"]
     course_role = App.Accounts.get_current_course__role!(user, course)
 
     if Enum.member?(allowed_roles, course_role) do
@@ -315,7 +315,7 @@ defmodule App.Courses do
   """
   def create_section(%App.Accounts.User{} = user, %App.Courses.Course{} = course, attrs \\ %{}) do
     #If user role is Administrator or Owner, then allow creation of a section
-    allowed_roles = ["administrator", "owner"]
+    allowed_roles = ["owner"]
     course_role = App.Accounts.get_current_course__role!(user, course)
 
     if Enum.member?(allowed_roles, course_role) do
@@ -346,7 +346,7 @@ defmodule App.Courses do
   """
   def update_section(%App.Accounts.User{} = user, %Section{} = section, attrs) do
     #If user role is Administrator or Owner, then allow update of a section
-    allowed_roles = ["administrator", "owner"]
+    allowed_roles = ["owner"]
     course = get_course!(section.course_id)
     course_role = App.Accounts.get_current_course__role!(user, course)
 
@@ -377,7 +377,7 @@ defmodule App.Courses do
   """
   def delete_section(%App.Accounts.User{} = user, %Section{} = section) do
     #If user role is Administrator or Owner, then allow update of a section
-    allowed_roles = ["administrator", "owner"]
+    allowed_roles = ["owner"]
     course = get_course!(section.course_id)
     course_role = App.Accounts.get_current_course__role!(user, course)
 

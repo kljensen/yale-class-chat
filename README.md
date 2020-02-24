@@ -98,25 +98,26 @@ Here are some draft stories
       first authentication.
   - I can refresh my status in my "account settings"
 - As an authenticated faculty person
-  - I can create a "course".
-  - I can create sections of a course.
-  - I can make a user "administrator" for a course.
+  - ~~I can create a "course".~~
+- As a course owner
+  - ~~I can make a user "administrator" for a course.~~
+  - ~~I can create sections of a course.~~
   - I can "freeze" a course, preventing write.
   - I can "archive" a course, preventing both read and write.
 - As an authenticated administrator for a course
-  - I can add users to a course
-    - I can set a user's role for a course: student, guest.
+  - ~~I can add users to a course~~
+    - ~~I can set a user's role for a course: student, guest.~~
     - I can toggle a user's activity: active, inactive
       - This will govern read & write access to course
         data. This is mostly used for students who
         drop a course.
-  - I can create a "topic" and specify the courses or
+  - ~~I can create a "topic" and specify the courses or
     sections to which this topic is assigned. (Topics
     assigned to a course but not a particular section
-    will be assigned to all sections of that course.)
-  - I can set attributes of a topic:
-    - title: the title that appears in the UI
-    - slug: the string in the URL
+    will be assigned to all sections of that course.)~~
+  - ~~I can set attributes of a topic:~~
+    - ~~title: the title that appears in the UI~~
+    - ~~slug: the string in the URL~~
     - opened_at: the date after which the topic is "writeable"
       as long as the `open` (or similar) flag is true.
     - closed_at: the date after which the topic is not "writeable"
@@ -126,8 +127,7 @@ Here are some draft stories
       can be voted upon by authorized users. If `allow_submission_voting`
       is true and `allow_submissions` is false, then the topic is
       effectively in "reviewing" mode: people are voting on submissions.
-    - submission_limit: integer representing maximum number of submissions
-      per authorized user
+    - submission_limit: integer representing maximum number of submissions per authorized user
     - allow_comments: boolean indicating that comments on submissions
       are allowed.
     - sort_order: controls the sort order of submissions. Can be
