@@ -49,7 +49,19 @@ defmodule App.Topics do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_topic(%App.Courses.Section{} = section, attrs \\ %{}) do
+  def create_topic(%App.Accounts.User{} = user, %App.Courses.Section{} = section, attrs \\ %{}) do
+    allowed_roles = ["administrator", "owner"]
+    course = App.Courses.get_course!(section.course_id)
+    course_role = App.Accounts.get_current_course__role!(user, course)
+
+    if Enum.member?(allowed_roles, course_role) do
+      do_create_topic(section, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_create_topic(%App.Courses.Section{} = section, attrs \\ %{}) do
     %Topic{}
     |> Topic.changeset(attrs)
     |> Ecto.Changeset.put_assoc(:section, section)
@@ -68,7 +80,20 @@ defmodule App.Topics do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_topic(%Topic{} = topic, attrs) do
+  def update_topic(%App.Accounts.User{} = user, %Topic{} = topic, attrs \\ %{}) do
+    allowed_roles = ["administrator", "owner"]
+    section = App.Courses.get_section!(topic.section_id)
+    course = App.Courses.get_course!(section.course_id)
+    course_role = App.Accounts.get_current_course__role!(user, course)
+
+    if Enum.member?(allowed_roles, course_role) do
+      do_update_topic(topic, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_update_topic(%Topic{} = topic, attrs) do
     topic
     |> Topic.changeset(attrs)
     |> Repo.update()
@@ -86,7 +111,20 @@ defmodule App.Topics do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_topic(%Topic{} = topic) do
+  def delete_topic(%App.Accounts.User{} = user, %Topic{} = topic) do
+    allowed_roles = ["administrator", "owner"]
+    section = App.Courses.get_section!(topic.section_id)
+    course = App.Courses.get_course!(section.course_id)
+    course_role = App.Accounts.get_current_course__role!(user, course)
+
+    if Enum.member?(allowed_roles, course_role) do
+      do_delete_topic(topic)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_delete_topic(%Topic{} = topic) do
     Repo.delete(topic)
   end
 
