@@ -122,12 +122,18 @@ defmodule App.CoursesTest do
       course_list = Courses.list_courses()
       retrieved_course = List.first(course_list)
       assert course.id == retrieved_course.id
-
+      assert retrieved_course.department == course.department
+      assert retrieved_course.name == course.name
+      assert retrieved_course.number == course.number
     end
 
     test "get_course!/1 returns the course with given id" do
       course = course_fixture()
-      assert Courses.get_course!(course.id) == course
+      retrieved_course = Courses.get_course!(course.id)
+      assert retrieved_course.id == course.id
+      assert retrieved_course.department == course.department
+      assert retrieved_course.name == course.name
+      assert retrieved_course.number == course.number
     end
 
     test "create_course/3 with valid data creates a course" do
@@ -176,7 +182,11 @@ defmodule App.CoursesTest do
       user_faculty = Accounts.get_user_by!("faculty net id")
 
       assert {:error, %Ecto.Changeset{}} = Courses.update_course(user_faculty, course, @invalid_attrs)
-      assert course == Courses.get_course!(course.id)
+      retrieved_course = Courses.get_course!(course.id)
+      assert retrieved_course.id == course.id
+      assert retrieved_course.department == course.department
+      assert retrieved_course.name == course.name
+      assert retrieved_course.number == course.number
     end
 
     test "delete_course/1 deletes the course" do
@@ -192,7 +202,11 @@ defmodule App.CoursesTest do
       user_noauth = ATest.user_fixture()
 
       assert {:error, "unauthorized"} = Courses.delete_course(user_noauth, course)
-      assert course == Courses.get_course!(course.id)
+      retrieved_course = Courses.get_course!(course.id)
+      assert retrieved_course.id == course.id
+      assert retrieved_course.department == course.department
+      assert retrieved_course.name == course.name
+      assert retrieved_course.number == course.number
     end
 
     test "change_course/1 returns a course changeset" do
@@ -224,12 +238,19 @@ defmodule App.CoursesTest do
 
     test "list_sections/0 returns all sections" do
       section = section_fixture()
-      assert Courses.list_sections() == [section]
+      retrieved_sections = Courses.list_sections()
+      retrieved_section = List.first(retrieved_sections)
+      assert retrieved_section.id == section.id
+      assert retrieved_section.crn == section.crn
+      assert retrieved_section.title == section.title
     end
 
     test "get_section!/1 returns the section with given id" do
       section = section_fixture()
-      assert Courses.get_section!(section.id) == section
+      retrieved_section = Courses.get_section!(section.id)
+      assert retrieved_section.id == section.id
+      assert retrieved_section.crn == section.crn
+      assert retrieved_section.title == section.title
     end
 
     test "create_section/2 with valid data creates a section" do
@@ -271,7 +292,10 @@ defmodule App.CoursesTest do
       user_faculty = Accounts.get_user_by!("faculty net id")
 
       assert {:error, %Ecto.Changeset{}} = Courses.update_section(user_faculty, section, @invalid_attrs)
-      assert section == Courses.get_section!(section.id)
+      retrieved_section = Courses.get_section!(section.id)
+      assert retrieved_section.id == section.id
+      assert retrieved_section.crn == section.crn
+      assert retrieved_section.title == section.title
     end
 
     test "update_section/2 by unauthorized user returns error" do
@@ -294,7 +318,10 @@ defmodule App.CoursesTest do
       user_noauth = ATest.user_fixture()
       
       assert {:error, "unauthorized"} = Courses.delete_section(user_noauth, section)
-      assert section == Courses.get_section!(section.id)
+      retrieved_section = Courses.get_section!(section.id)
+      assert retrieved_section.id == section.id
+      assert retrieved_section.crn == section.crn
+      assert retrieved_section.title == section.title
     end
 
     test "change_section/1 returns a section changeset" do

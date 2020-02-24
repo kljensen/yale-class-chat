@@ -139,7 +139,6 @@ defmodule App.Courses do
   """
   def list_courses do
     Repo.all(Course)
-    |> Repo.preload(:semester)
   end
 
   @doc """
@@ -156,7 +155,7 @@ defmodule App.Courses do
       ** (Ecto.NoResultsError)
 
   """
-  def get_course!(id), do: Repo.get!(Course, id) |> Repo.preload(:semester)
+  def get_course!(id), do: Repo.get!(Course, id)
 
   @doc """
   Creates a course.
@@ -282,7 +281,6 @@ defmodule App.Courses do
   """
   def list_sections do
     Repo.all(Section)
-    |> Repo.preload([{:course, :semester}])
   end
 
   @doc """
@@ -299,7 +297,7 @@ defmodule App.Courses do
       ** (Ecto.NoResultsError)
 
   """
-  def get_section!(id), do: Repo.get!(Section, id) |> Repo.preload([{:course, :semester}])
+  def get_section!(id), do: Repo.get!(Section, id)
 
   @doc """
   Creates a section.
