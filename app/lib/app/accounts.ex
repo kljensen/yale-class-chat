@@ -408,6 +408,32 @@ defmodule App.Accounts do
   def get_section__role!(id), do: Repo.get!(Section_Role, id)
 
   @doc """
+  Gets the current section__role for a given user and course.
+
+  Raises `Ecto.NoResultsError` if the Section  role does not exist.
+
+  ## Examples
+
+      iex> get_current_course__role!(%User{}, %Section{})
+      %Section_Role{}
+
+      iex> get_current_course__role!(%InvalidUser{}, %InvalidSection{})
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_current_section__role!(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
+    {:ok, current_time} = DateTime.now("Etc/UTC")
+    uid = user.id
+    sid = section.id
+    query = from u_r in "section_roles",
+              where: u_r.user_id == ^uid and u_r.section_id == ^sid  and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
+              select: u_r.role
+    
+    results = Repo.all(query)
+    List.first(results)
+  end
+
+  @doc """
   Creates a section__role.
 
   ## Examples

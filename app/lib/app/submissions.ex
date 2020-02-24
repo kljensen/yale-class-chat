@@ -49,10 +49,23 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_submission(%App.Courses.Section{} = section, attrs \\ %{}) do
+  def create_submission(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic, attrs \\ %{}) do
+    allowed_roles = ["student"]
+    section = App.Courses.get_section!(topic.section_id)
+    section_role = App.Accounts.get_current_section__role!(user, section)
+
+    if Enum.member?(allowed_roles, section_role) do
+      do_create_submission(user, topic, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_create_submission(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic, attrs \\ %{}) do
     %Submission{}
     |> Submission.changeset(attrs)
-    |> Ecto.Changeset.put_assoc(:section, section)
+    |> Ecto.Changeset.put_assoc(:topic, topic)
+    |> Ecto.Changeset.put_assoc(:user, user)
     |> Repo.insert()
   end
 
@@ -68,7 +81,15 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_submission(%Submission{} = submission, attrs) do
+  def update_submission(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
+    if user.id == submission.user_id do
+      do_update_submission(submission, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_update_submission(%Submission{} = submission, attrs) do
     submission
     |> Submission.changeset(attrs)
     |> Repo.update()
@@ -86,7 +107,15 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_submission(%Submission{} = submission) do
+  def delete_submission(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission) do
+    if user.id == submission.user_id do
+      do_delete_submission(submission)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_delete_submission(%Submission{} = submission) do
     Repo.delete(submission)
   end
 

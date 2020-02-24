@@ -9,6 +9,23 @@ defmodule App.SubmissionsTest do
   alias App.AccountsTest, as: ATest
 
 
+  setup [:create_topic]
+
+  defp create_topic(_context) do
+    topic = TTest.topic_fixture()
+    section = App.Courses.get_section!(topic.section_id)
+    user_faculty = Accounts.get_user_by!("faculty net id")
+    submitter = ATest.user_fixture(%{net_id: "submitter"})
+    {:ok, current_time} = DateTime.now("Etc/UTC")
+    role = role_fixture()
+    App.Accounts.create_section__role(user_faculty, submitter, section, role)
+
+
+    [topic: topic, section: section, user_faculty: user_faculty, submitter: submitter]
+  end
+
+  
+
   describe "submissions" do
     alias App.Submissions.Submission
 
@@ -16,73 +33,131 @@ defmodule App.SubmissionsTest do
     @update_attrs %{description: "some updated description", image_url: "some updated image_url", slug: "some updated slug", title: "some updated title"}
     @invalid_attrs %{description: nil, image_url: nil, slug: nil, title: nil}
 
-    def submission_fixture(attrs \\ %{}) do
+
+    def role_fixture(attrs \\ %{}) do
+      {:ok, current_time} = DateTime.now("Etc/UTC")
+      defaults = %{role: "student", valid_from: current_time, valid_to: "2100-01-01T00:00:00Z"}
+
+      params =
+        attrs
+        |> Enum.into(defaults)
+
+      params
+    end
+
+    def submission_fixture(submitter, topic, attrs \\ %{}) do
       params =
         attrs
         |> Enum.into(@valid_attrs)
-      
-      topic = TTest.topic_fixture()
-      user = ATest.user_fixture()
-      section = App.Courses.get_section!(topic.section_id)
-      user_faculty = Accounts.get_user_by!("faculty net id")
-
-      #App.Accounts.create_section_role()
 
       {:ok, submission} =
-        Submissions.create_submission()
+        Submissions.create_submission(submitter, topic, params)
 
       submission
     end
 
-    test "list_submissions/0 returns all submissions" do
-      submission = submission_fixture()
-      assert Submissions.list_submissions() == [submission]
+    test "list_submissions/0 returns all submissions", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      retrieved_submissions = Submissions.list_submissions()
+      retrieved_submission = List.first(retrieved_submissions)
+      assert retrieved_submission.id == submission.id
+      assert retrieved_submission.description == submission.description
+      assert retrieved_submission.image_url == submission.image_url
+      assert retrieved_submission.slug == submission.slug
+      assert retrieved_submission.title == submission.title      
     end
 
-    test "get_submission!/1 returns the submission with given id" do
-      submission = submission_fixture()
-      assert Submissions.get_submission!(submission.id) == submission
+    test "get_submission!/1 returns the submission with given id", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      retrieved_submission = Submissions.get_submission!(submission.id)
+      assert retrieved_submission.id == submission.id
+      assert retrieved_submission.description == submission.description
+      assert retrieved_submission.image_url == submission.image_url
+      assert retrieved_submission.slug == submission.slug
+      assert retrieved_submission.title == submission.title
     end
 
-    test "create_submission/1 with valid data creates a submission" do
-      section = CTest.section_fixture()
-      assert {:ok, %Submission{} = submission} = Submissions.create_submission(section, @valid_attrs)
+    test "create_submission/3 with valid data creates a submission", context do
+      submitter = context[:submitter]
+      topic = context[:topic]
+
+      assert {:ok, %Submission{} = submission} = Submissions.create_submission(submitter, topic, @valid_attrs)
       assert submission.description == "some description"
       assert submission.image_url == "some image_url"
       assert submission.slug == "some slug"
       assert submission.title == "some title"
     end
 
-    test "create_submission/1 with invalid data returns error changeset" do
-      assert {:error, changeset = submission} = Submissions.create_submission(@invalid_attrs)
+    test "create_submission/3 with invalid data returns error changeset", context do
+      submitter = context[:submitter]
+      topic = context[:topic]
+      assert {:error, changeset = submission} = Submissions.create_submission(submitter, topic, @invalid_attrs)
       assert %{title: ["can't be blank"]} = errors_on(changeset)
       assert %{description: ["can't be blank"]} = errors_on(changeset)
       assert %{slug: ["can't be blank"]} = errors_on(changeset)
     end
 
-    test "update_submission/2 with valid data updates the submission" do
-      submission = submission_fixture()
-      assert {:ok, %Submission{} = submission} = Submissions.update_submission(submission, @update_attrs)
+    test "create_submission/3 with unauthorized user returns error", context do
+      user_noauth = ATest.user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
+      topic = context[:topic]
+      assert {:error, "unauthorized"} = Submissions.create_submission(user_noauth, topic, @invalid_attrs)
+    end
+
+    test "update_submission/3 with valid data updates the submission", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      submitter = context[:submitter]
+      assert {:ok, %Submission{} = submission} = Submissions.update_submission(submitter, submission, @update_attrs)
       assert submission.description == "some updated description"
       assert submission.image_url == "some updated image_url"
       assert submission.slug == "some updated slug"
       assert submission.title == "some updated title"
     end
 
-    test "update_submission/2 with invalid data returns error changeset" do
-      submission = submission_fixture()
-      assert {:error, %Ecto.Changeset{}} = Submissions.update_submission(submission, @invalid_attrs)
-      assert submission == Submissions.get_submission!(submission.id)
+    test "update_submission/3 with invalid data returns error changeset", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      submitter = context[:submitter]
+      assert {:error, %Ecto.Changeset{}} = Submissions.update_submission(submitter, submission, @invalid_attrs)
+      retrieved_submission = Submissions.get_submission!(submission.id)
+      assert retrieved_submission.id == submission.id
+      assert retrieved_submission.description == submission.description
+      assert retrieved_submission.image_url == submission.image_url
+      assert retrieved_submission.slug == submission.slug
+      assert retrieved_submission.title == submission.title
     end
 
-    test "delete_submission/1 deletes the submission" do
-      submission = submission_fixture()
-      assert {:ok, %Submission{}} = Submissions.delete_submission(submission)
+    test "update_submission/3 with unauthorized user returns error", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      user_noauth = ATest.user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
+      assert {:error, "unauthorized"} = Submissions.update_submission(user_noauth, submission, @invalid_attrs)
+      retrieved_submission = Submissions.get_submission!(submission.id)
+      assert retrieved_submission.id == submission.id
+      assert retrieved_submission.description == submission.description
+      assert retrieved_submission.image_url == submission.image_url
+      assert retrieved_submission.slug == submission.slug
+      assert retrieved_submission.title == submission.title
+    end
+
+    test "delete_submission/2 deletes the submission", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      submitter = context[:submitter]
+      assert {:ok, %Submission{}} = Submissions.delete_submission(submitter, submission)
       assert_raise Ecto.NoResultsError, fn -> Submissions.get_submission!(submission.id) end
     end
 
-    test "change_submission/1 returns a submission changeset" do
-      submission = submission_fixture()
+    test "delete_submission/2 with unauthorized user returns error", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      user_noauth = ATest.user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
+      assert {:error, "unauthorized"} = Submissions.delete_submission(user_noauth, submission)
+      retrieved_submission = Submissions.get_submission!(submission.id)
+      assert retrieved_submission.id == submission.id
+      assert retrieved_submission.description == submission.description
+      assert retrieved_submission.image_url == submission.image_url
+      assert retrieved_submission.slug == submission.slug
+      assert retrieved_submission.title == submission.title
+    end
+
+    test "change_submission/1 returns a submission changeset", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
       assert %Ecto.Changeset{} = Submissions.change_submission(submission)
     end
   end
