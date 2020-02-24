@@ -1,6 +1,6 @@
 defmodule App.CoursesTest do
   use App.DataCase
-  @moduletag :working
+
   alias App.Courses
   alias App.Accounts
   alias App.AccountsTest, as: ATest
