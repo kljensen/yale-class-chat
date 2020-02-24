@@ -175,9 +175,24 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_comment(attrs \\ %{}) do
+  def create_comment(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
+    allowed_roles = ["student"]
+    topic = App.Topics.get_topic!(submission.topic_id)
+    section = App.Courses.get_section!(topic.section_id)
+    section_role = App.Accounts.get_current_section__role!(user, section)
+
+    if Enum.member?(allowed_roles, section_role) do
+      do_create_comment(user, submission, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_create_comment(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
     %Comment{}
     |> Comment.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:user, user)
+    |> Ecto.Changeset.put_assoc(:submission, submission)
     |> Repo.insert()
   end
 
@@ -193,7 +208,15 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_comment(%Comment{} = comment, attrs) do
+  def update_comment(%App.Accounts.User{} = user, %App.Submissions.Comment{} = comment, attrs \\ %{}) do
+    if user.id == comment.user_id do
+      do_update_comment(comment, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_update_comment(%Comment{} = comment, attrs) do
     comment
     |> Comment.changeset(attrs)
     |> Repo.update()
@@ -211,7 +234,15 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_comment(%Comment{} = comment) do
+  def delete_comment(%App.Accounts.User{} = user, %App.Submissions.Comment{} = comment) do
+    if user.id == comment.user_id do
+      do_delete_comment(comment)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_delete_comment(%Comment{} = comment) do
     Repo.delete(comment)
   end
 

@@ -6,6 +6,7 @@ defmodule App.Submissions.Comment do
     field :description, :string
     field :title, :string
     belongs_to :submission, App.Submissions.Submission
+    belongs_to :user, App.Accounts.User
 
     timestamps()
   end
@@ -15,5 +16,7 @@ defmodule App.Submissions.Comment do
     comment
     |> cast(attrs, [:title, :description])
     |> validate_required([:title, :description])
+    |> foreign_key_constraint(:user_id)
+    |> assoc_constraint(:user)
   end
 end
