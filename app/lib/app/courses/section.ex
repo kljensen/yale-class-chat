@@ -7,7 +7,7 @@ defmodule App.Courses.Section do
     field :title, :string
     belongs_to :course, App.Courses.Course
     has_many :topics, App.Topics.Topic
-    has_many :user_roles, App.Accounts.User_Role
+    has_many :section_roles, App.Accounts.Section_Role
 
     timestamps()
   end

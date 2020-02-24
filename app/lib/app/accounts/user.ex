@@ -7,7 +7,11 @@ defmodule App.Accounts.User do
     field :email, :string
     field :net_id, :string
     field :is_faculty, :boolean, default: false
-    has_many :user_roles, App.Accounts.User_Role
+    has_many :course_roles, App.Accounts.Course_Role
+    has_many :section_roles, App.Accounts.Section_Role
+    has_many :submissions, App.Submissions.Submission
+    has_many :comments, App.Submissions.Comment
+    has_many :ratings, App.Submissions.Rating
 
     timestamps()
   end
