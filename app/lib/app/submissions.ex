@@ -302,9 +302,24 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_rating(attrs \\ %{}) do
+  def create_rating(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
+    allowed_roles = ["student"]
+    topic = App.Topics.get_topic!(submission.topic_id)
+    section = App.Courses.get_section!(topic.section_id)
+    section_role = App.Accounts.get_current_section__role!(user, section)
+
+    if Enum.member?(allowed_roles, section_role) do
+      do_create_rating(user, submission, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_create_rating(user, submission, attrs \\ %{}) do
     %Rating{}
     |> Rating.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:user, user)
+    |> Ecto.Changeset.put_assoc(:submission, submission)
     |> Repo.insert()
   end
 
@@ -320,7 +335,21 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_rating(%Rating{} = rating, attrs) do
+  def update_rating(%App.Accounts.User{} = user, %App.Submissions.Rating{} = rating, attrs \\ %{}) do
+    allowed_roles = ["student"]
+    submission = get_submission!(rating.submission_id)
+    topic = App.Topics.get_topic!(submission.topic_id)
+    section = App.Courses.get_section!(topic.section_id)
+    section_role = App.Accounts.get_current_section__role!(user, section)
+
+    if Enum.member?(allowed_roles, section_role) do
+      do_update_rating(rating, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_update_rating(%Rating{} = rating, attrs) do
     rating
     |> Rating.changeset(attrs)
     |> Repo.update()
@@ -338,7 +367,21 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_rating(%Rating{} = rating) do
+  def delete_rating(%App.Accounts.User{} = user, %App.Submissions.Rating{} = rating) do
+    allowed_roles = ["student"]
+    submission = get_submission!(rating.submission_id)
+    topic = App.Topics.get_topic!(submission.topic_id)
+    section = App.Courses.get_section!(topic.section_id)
+    section_role = App.Accounts.get_current_section__role!(user, section)
+
+    if Enum.member?(allowed_roles, section_role) do
+      do_delete_rating(rating)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_delete_rating(%Rating{} = rating) do
     Repo.delete(rating)
   end
 

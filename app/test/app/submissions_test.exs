@@ -288,55 +288,97 @@ defmodule App.SubmissionsTest do
     @update_attrs %{score: 43}
     @invalid_attrs %{score: nil}
 
-    def rating_fixture(attrs \\ %{}) do
-      {:ok, rating} =
+    def rating_fixture(user, submission, attrs \\ %{}) do
+      params = 
         attrs
         |> Enum.into(@valid_attrs)
-        |> Submissions.create_rating()
+
+      {:ok, rating} =
+        Submissions.create_rating(user, submission, params)
 
       rating
     end
 
-    test "list_ratings/0 returns all ratings" do
-      rating = rating_fixture()
-      assert Submissions.list_ratings() == [rating]
+    test "list_ratings/0 returns all ratings", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      rating = rating_fixture(student, submission)
+      retrieved_ratings = Submissions.list_ratings()
+      retrieved_rating = List.first(retrieved_ratings)
+      assert retrieved_rating.id == rating.id
+      assert retrieved_rating.score == rating.score
     end
 
-    test "get_rating!/1 returns the rating with given id" do
-      rating = rating_fixture()
-      assert Submissions.get_rating!(rating.id) == rating
+    test "get_rating!/1 returns the rating with given id", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      rating = rating_fixture(student, submission)
+      retrieved_rating = Submissions.get_rating!(rating.id)
+      assert retrieved_rating.id == rating.id
+      assert retrieved_rating.score == rating.score
     end
 
-    test "create_rating/1 with valid data creates a rating" do
-      assert {:ok, %Rating{} = rating} = Submissions.create_rating(@valid_attrs)
+    test "create_rating/3 with valid data creates a rating", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      assert {:ok, %Rating{} = rating} = Submissions.create_rating(student, submission, @valid_attrs)
       assert rating.score == 42
     end
 
-    test "create_rating/1 with invalid data returns error changeset" do
-      assert {:error, changeset = rating} = Submissions.create_rating(@invalid_attrs)
+    test "create_rating/3 with invalid data returns error changeset", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      assert {:error, changeset = rating} = Submissions.create_rating(student, submission, @invalid_attrs)
       assert %{score: ["can't be blank"]} = errors_on(changeset)
     end
 
-    test "update_rating/2 with valid data updates the rating" do
-      rating = rating_fixture()
-      assert {:ok, %Rating{} = rating} = Submissions.update_rating(rating, @update_attrs)
+    test "create_rating/3 by unauthorized user returns error", context do
+      student_notreg = context[:student_notreg]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      assert {:error, "unauthorized"} = Submissions.create_rating(student_notreg, submission, @valid_attrs)
+    end
+
+    test "update_rating/3 with valid data updates the rating", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      rating = rating_fixture(student, submission)
+      assert {:ok, %Rating{} = rating} = Submissions.update_rating(student, rating, @update_attrs)
       assert rating.score == 43
     end
 
-    test "update_rating/2 with invalid data returns error changeset" do
-      rating = rating_fixture()
-      assert {:error, %Ecto.Changeset{}} = Submissions.update_rating(rating, @invalid_attrs)
-      assert rating == Submissions.get_rating!(rating.id)
+    test "update_rating/3 with invalid data returns error changeset", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      rating = rating_fixture(student, submission)
+      assert {:error, %Ecto.Changeset{}} = Submissions.update_rating(student, rating, @invalid_attrs)
+      retrieved_rating = Submissions.get_rating!(rating.id)
+      assert retrieved_rating.id == rating.id
+      assert retrieved_rating.score == rating.score
     end
 
-    test "delete_rating/1 deletes the rating" do
-      rating = rating_fixture()
-      assert {:ok, %Rating{}} = Submissions.delete_rating(rating)
+    test "update_rating/3 by unauthorized user returns error", context do
+      student = context[:student]
+      student_notreg = context[:student_notreg]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      rating = rating_fixture(student, submission)
+      assert {:error, "unauthorized"} = Submissions.update_rating(student_notreg, rating, @invalid_attrs)
+      retrieved_rating = Submissions.get_rating!(rating.id)
+      assert retrieved_rating.id == rating.id
+      assert retrieved_rating.score == rating.score
+    end
+
+    test "delete_rating/2 deletes the rating", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      rating = rating_fixture(student, submission)
+      assert {:ok, %Rating{}} = Submissions.delete_rating(student, rating)
       assert_raise Ecto.NoResultsError, fn -> Submissions.get_rating!(rating.id) end
     end
 
-    test "change_rating/1 returns a rating changeset" do
-      rating = rating_fixture()
+    test "change_rating/1 returns a rating changeset", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      rating = rating_fixture(student, submission)
       assert %Ecto.Changeset{} = Submissions.change_rating(rating)
     end
   end
