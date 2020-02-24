@@ -13,10 +13,14 @@ defmodule App.CoursesTest do
     @invalid_attrs %{name: nil}
 
     def semester_fixture(attrs \\ %{}) do
-      {:ok, semester} =
+      params = 
         attrs
         |> Enum.into(@valid_attrs)
-        |> Courses.create_semester()
+
+      user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id (semester)"})
+
+      {:ok, semester} =
+        Courses.create_semester(user_faculty, params)
 
       semester
     end
@@ -31,34 +35,58 @@ defmodule App.CoursesTest do
       assert Courses.get_semester!(semester.id) == semester
     end
 
-    test "create_semester/1 with valid data creates a semester" do
-      assert {:ok, %Semester{} = semester} = Courses.create_semester(@valid_attrs)
+    test "create_semester/2 with valid data creates a semester" do
+      user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
+      assert {:ok, %Semester{} = semester} = Courses.create_semester(user_faculty, @valid_attrs)
       assert semester.name == "some name"
-      assert {:error, changeset = semester} = Courses.create_semester(@valid_attrs)
+      assert {:error, changeset = semester} = Courses.create_semester(user_faculty, @valid_attrs)
       assert %{name: ["has already been taken"]} = errors_on(changeset)
     end
 
-    test "create_semester/1 with invalid data returns error changeset" do
-      assert {:error, changeset = semester} = Courses.create_semester(@invalid_attrs)
+    test "create_semester/2 with invalid data returns error changeset" do
+      user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
+      assert {:error, changeset = semester} = Courses.create_semester(user_faculty, @invalid_attrs)
       assert %{name: ["can't be blank"]} = errors_on(changeset)
     end
 
-    test "update_semester/2 with valid data updates the semester" do
+    test "create_semester/2 by non-faculty user returns error" do
+      user_noauth = ATest.user_fixture()
+      assert {:error, "unauthorized"} = Courses.create_semester(user_noauth, @valid_attrs)
+    end
+
+    test "update_semester/3 with valid data updates the semester" do
       semester = semester_fixture()
-      assert {:ok, %Semester{} = semester} = Courses.update_semester(semester, @update_attrs)
+      user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
+      assert {:ok, %Semester{} = semester} = Courses.update_semester(user_faculty, semester, @update_attrs)
       assert semester.name == "some updated name"
     end
 
-    test "update_semester/2 with invalid data returns error changeset" do
+    test "update_semester/3 with invalid data returns error changeset" do
       semester = semester_fixture()
-      assert {:error, %Ecto.Changeset{}} = Courses.update_semester(semester, @invalid_attrs)
+      user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
+      assert {:error, %Ecto.Changeset{}} = Courses.update_semester(user_faculty, semester, @invalid_attrs)
+      assert semester == Courses.get_semester!(semester.id)
+    end
+    
+    test "update_semester/3 by unauthorized user returns error" do
+      semester = semester_fixture()
+      user_noauth = ATest.user_fixture()
+      assert {:error, "unauthorized"} = Courses.update_semester(user_noauth, semester, @invalid_attrs)
       assert semester == Courses.get_semester!(semester.id)
     end
 
-    test "delete_semester/1 deletes the semester" do
+    test "delete_semester/2 deletes the semester" do
       semester = semester_fixture()
-      assert {:ok, %Semester{}} = Courses.delete_semester(semester)
+      user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
+      assert {:ok, %Semester{}} = Courses.delete_semester(user_faculty, semester)
       assert_raise Ecto.NoResultsError, fn -> Courses.get_semester!(semester.id) end
+    end
+
+    test "delete_semester/2 by unauthorized user returns error" do
+      semester = semester_fixture()
+      user_noauth = ATest.user_fixture()
+      assert {:error, "unauthorized"} = Courses.delete_semester(user_noauth, semester)
+      assert semester == Courses.get_semester!(semester.id)
     end
 
     test "change_semester/1 returns a semester changeset" do
@@ -126,24 +154,45 @@ defmodule App.CoursesTest do
       assert %{number: ["can't be blank"]} = errors_on(changeset)
     end
 
-    test "update_course/2 with valid data updates the course" do
+    test "update_course/3 with valid data updates the course" do
       course = course_fixture()
-      assert {:ok, %Course{} = course} = Courses.update_course(course, @update_attrs)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+
+      assert {:ok, %Course{} = course} = Courses.update_course(user_faculty, course, @update_attrs)
       assert course.department == "some updated department"
       assert course.name == "some updated name"
       assert course.number == 43
     end
 
-    test "update_course/2 with invalid data returns error changeset" do
+    test "update_course/3 by unauthorized user returns error" do
       course = course_fixture()
-      assert {:error, %Ecto.Changeset{}} = Courses.update_course(course, @invalid_attrs)
+      user_noauth = ATest.user_fixture()
+
+      assert {:error, "unauthorized"} = Courses.update_course(user_noauth, course, @update_attrs)
+    end
+
+    test "update_course/3 with invalid data returns error changeset" do
+      course = course_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+
+      assert {:error, %Ecto.Changeset{}} = Courses.update_course(user_faculty, course, @invalid_attrs)
       assert course == Courses.get_course!(course.id)
     end
 
     test "delete_course/1 deletes the course" do
       course = course_fixture()
-      assert {:ok, %Course{}} = Courses.delete_course(course)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+
+      assert {:ok, %Course{}} = Courses.delete_course(user_faculty, course)
       assert_raise Ecto.NoResultsError, fn -> Courses.get_course!(course.id) end
+    end
+
+    test "delete_course/1 by unautorized user returns error" do
+      course = course_fixture()
+      user_noauth = ATest.user_fixture()
+
+      assert {:error, "unauthorized"} = Courses.delete_course(user_noauth, course)
+      assert course == Courses.get_course!(course.id)
     end
 
     test "change_course/1 returns a course changeset" do
@@ -245,6 +294,7 @@ defmodule App.CoursesTest do
       user_noauth = ATest.user_fixture()
       
       assert {:error, "unauthorized"} = Courses.delete_section(user_noauth, section)
+      assert section == Courses.get_section!(section.id)
     end
 
     test "change_section/1 returns a section changeset" do

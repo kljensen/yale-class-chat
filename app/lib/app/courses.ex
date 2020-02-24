@@ -49,7 +49,15 @@ defmodule App.Courses do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_semester(attrs \\ %{}) do
+  def create_semester(%App.Accounts.User{} = user, attrs \\ %{}) do
+    if user.is_faculty == true do
+      do_create_semester(attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_create_semester(attrs \\ %{}) do
     %Semester{}
     |> Semester.changeset(attrs)
     |> Repo.insert()
@@ -67,7 +75,15 @@ defmodule App.Courses do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_semester(%Semester{} = semester, attrs) do
+  def update_semester(%App.Accounts.User{} = user, %Semester{} = semester, attrs \\ %{}) do
+    if user.is_faculty == true do
+      do_update_semester(semester, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_update_semester(%Semester{} = semester, attrs) do
     semester
     |> Semester.changeset(attrs)
     |> Repo.update()
@@ -85,7 +101,15 @@ defmodule App.Courses do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_semester(%Semester{} = semester) do
+  def delete_semester(%App.Accounts.User{} = user, %Semester{} = semester) do
+    if user.is_faculty == true do
+      do_delete_semester(semester)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_delete_semester(%Semester{} = semester) do
     Repo.delete(semester)
   end
 
@@ -188,7 +212,18 @@ defmodule App.Courses do
 
   """
 
-  def update_course(%Course{} = course, attrs) do
+  def update_course(%App.Accounts.User{} = user, %Course{} = course, attrs) do
+    allowed_roles = ["administrator", "owner"]
+    course_role = App.Accounts.get_current_course__role!(user, course)
+
+    if Enum.member?(allowed_roles, course_role) do
+      do_update_course(course, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_update_course(%Course{} = course, attrs) do
     course
     |> Course.changeset(attrs)
     |> Repo.update()
@@ -206,7 +241,18 @@ defmodule App.Courses do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_course(%Course{} = course) do
+  def delete_course(%App.Accounts.User{} = user, %Course{} = course) do
+    allowed_roles = ["administrator", "owner"]
+    course_role = App.Accounts.get_current_course__role!(user, course)
+
+    if Enum.member?(allowed_roles, course_role) do
+      do_delete_course(course)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_delete_course(%Course{} = course) do
     Repo.delete(course)
   end
 
