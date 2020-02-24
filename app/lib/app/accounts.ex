@@ -419,7 +419,19 @@ defmodule App.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_section__role(%App.Accounts.User{} = user, %App.Courses.Section{} = section, attrs \\ %{}) do
+  def create_section__role(%App.Accounts.User{} = user_auth, %App.Accounts.User{} = user, %App.Courses.Section{} = section, attrs \\ %{}) do
+    allowed_roles = ["administrator", "owner"]
+    course = App.Courses.get_course!(section.course_id)
+    auth_role = App.Accounts.get_current_course__role!(user_auth, course)
+
+    if Enum.member?(allowed_roles, auth_role) do
+      do_create_section__role(user, section, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_create_section__role(%App.Accounts.User{} = user, %App.Courses.Section{} = section, attrs \\ %{}) do
     %Section_Role{}
     |> Section_Role.changeset(attrs)
     |> Ecto.Changeset.put_assoc(:user, user)
@@ -439,7 +451,20 @@ defmodule App.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_section__role(%Section_Role{} = section__role, attrs) do
+  def update_section__role(%App.Accounts.User{} = user_auth, %Section_Role{} = section__role, attrs) do
+    allowed_roles = ["administrator", "owner"]
+    section = App.Courses.get_section!(section__role.section_id)
+    course = App.Courses.get_course!(section.course_id)
+    auth_role = App.Accounts.get_current_course__role!(user_auth, course)
+
+    if Enum.member?(allowed_roles, auth_role) do
+      do_update_section__role(section__role, attrs)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_update_section__role(%Section_Role{} = section__role, attrs) do
     section__role
     |> Section_Role.changeset(attrs)
     |> Repo.update()
@@ -457,7 +482,20 @@ defmodule App.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_section__role(%Section_Role{} = section__role) do
+  def delete_section__role(%App.Accounts.User{} = user_auth, %Section_Role{} = section__role) do
+    allowed_roles = ["administrator", "owner"]
+    section = App.Courses.get_section!(section__role.section_id)
+    course = App.Courses.get_course!(section.course_id)
+    auth_role = App.Accounts.get_current_course__role!(user_auth, course)
+
+    if Enum.member?(allowed_roles, auth_role) do
+      do_delete_section__role(section__role)
+    else
+      {:error, "unauthorized"}
+    end
+  end
+
+  defp do_delete_section__role(%Section_Role{} = section__role) do
     Repo.delete(section__role)
   end
 

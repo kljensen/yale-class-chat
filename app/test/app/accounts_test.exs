@@ -272,9 +272,10 @@ defmodule App.AccountsTest do
       
       user = user_fixture()
       section = CTest.section_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
 
       {:ok, section__role} =
-        Accounts.create_section__role(user, section, params)
+        Accounts.create_section__role(user_faculty, user, section, params)
 
       section__role
     end
@@ -292,11 +293,11 @@ defmodule App.AccountsTest do
       assert retrieved_section_role.id == section__role.id
     end
 
-    test "create_section__role/3 with valid data creates a section__role" do
+    test "create_section__role/4 with valid data creates a section__role" do
       user = user_fixture()
       section = CTest.section_fixture()
-
-      assert {:ok, %Section_Role{} = section__role} = Accounts.create_section__role(user, section, @valid_attrs)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      assert {:ok, %Section_Role{} = section__role} = Accounts.create_section__role(user_faculty, user, section, @valid_attrs)
       assert section__role.role == "some role"
       assert section__role.valid_from == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
       assert section__role.valid_to == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
@@ -304,34 +305,67 @@ defmodule App.AccountsTest do
       assert section__role.section_id == section.id
     end
 
-    test "create_section__role/3 with invalid data returns error changeset" do
+    test "create_section__role/4 with invalid data returns error changeset" do
       user = user_fixture()
       section = CTest.section_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
 
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_section__role(user, section, @invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_section__role(user_faculty, user, section, @invalid_attrs)
     end
 
-    test "update_section__role/2 with valid data updates the section__role" do
+    test "create_section__role/4 by unauthorized user returns error" do
+      user = user_fixture()
+      section = CTest.section_fixture()
+      user_noauth = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
+
+      assert {:error, "unauthorized"} = Accounts.create_section__role(user_noauth, user, section, @invalid_attrs)
+    end
+
+    test "update_section__role/3 with valid data updates the section__role" do
       section__role = section__role_fixture()
-      assert {:ok, %Section_Role{} = section__role} = Accounts.update_section__role(section__role, @update_attrs)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      assert {:ok, %Section_Role{} = section__role} = Accounts.update_section__role(user_faculty, section__role, @update_attrs)
       assert section__role.role == "some updated role"
       assert section__role.valid_from == DateTime.from_naive!(~N[2011-05-18T15:01:01Z], "Etc/UTC")
       assert section__role.valid_to == DateTime.from_naive!(~N[2011-05-18T15:01:01Z], "Etc/UTC")
     end
 
-    test "update_section__role/2 with invalid data returns error changeset" do
+    test "update_section__role/3 with invalid data returns error changeset" do
       section__role = section__role_fixture()
-      assert {:error, %Ecto.Changeset{}} = Accounts.update_section__role(section__role, @invalid_attrs)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      assert {:error, %Ecto.Changeset{}} = Accounts.update_section__role(user_faculty, section__role, @invalid_attrs)
       retrieved_section_role = Accounts.get_section__role!(section__role.id) 
       assert section__role.id == retrieved_section_role.id
       assert section__role.valid_from == retrieved_section_role.valid_from
       assert section__role.valid_to == retrieved_section_role.valid_to
     end
 
-    test "delete_section__role/1 deletes the section__role" do
+    test "update_section__role/3 by unauthorized user returns error" do
       section__role = section__role_fixture()
-      assert {:ok, %Section_Role{}} = Accounts.delete_section__role(section__role)
+      user_noauth = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
+
+      assert {:error, "unauthorized"} = Accounts.update_section__role(user_noauth, section__role, @invalid_attrs)
+      retrieved_section_role = Accounts.get_section__role!(section__role.id) 
+      assert section__role.id == retrieved_section_role.id
+      assert section__role.valid_from == retrieved_section_role.valid_from
+      assert section__role.valid_to == retrieved_section_role.valid_to
+    end
+
+    test "delete_section__role/2 deletes the section__role" do
+      section__role = section__role_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      assert {:ok, %Section_Role{}} = Accounts.delete_section__role(user_faculty, section__role)
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_section__role!(section__role.id) end
+    end
+
+    test "delete_section__role/2 by unauthorized user returns error" do
+      section__role = section__role_fixture()
+      user_noauth = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
+      assert {:error, "unauthorized"} = Accounts.delete_section__role(user_noauth, section__role)
+      retrieved_section_role = Accounts.get_section__role!(section__role.id) 
+      assert section__role.id == retrieved_section_role.id
+      assert section__role.valid_from == retrieved_section_role.valid_from
+      assert section__role.valid_to == retrieved_section_role.valid_to
     end
 
     test "change_section__role/1 returns a section__role changeset" do
