@@ -3,6 +3,7 @@ defmodule App.TopicsTest do
 
   alias App.Topics
   alias App.Accounts
+  alias App.Courses
   alias App.AccountsTest, as: ATest
   alias App.CoursesTest, as: CTest
 
@@ -40,7 +41,7 @@ defmodule App.TopicsTest do
       assert retrieved_topic.id == topic.id
     end
 
-    test "create_topic/1 with valid data creates a topic" do
+    test "create_topic/3 with valid data creates a topic" do
       section = CTest.section_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
       assert {:ok, %Topic{} = topic} = Topics.create_topic(user_faculty, section, @valid_attrs)
@@ -57,7 +58,7 @@ defmodule App.TopicsTest do
       assert topic.user_submission_limit == 42
     end
 
-    test "create_topic/1 with invalid data returns error changeset" do
+    test "create_topic/3 with invalid data returns error changeset" do
       section = CTest.section_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
       assert {:error, changeset = topic} = Topics.create_topic(user_faculty, section, @invalid_attrs)
@@ -73,11 +74,20 @@ defmodule App.TopicsTest do
       assert %{user_submission_limit: ["can't be blank"]} = errors_on(changeset)
     end
 
-    test "create_topic/1 by unauthorized user returns error" do
+    test "create_topic/3 by unauthorized user returns error" do
       section = CTest.section_fixture()
       user_noauth = ATest.user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
-      
+
       assert {:error, "unauthorized"} = Topics.create_topic(user_noauth, section, @invalid_attrs)
+    end
+
+    test "create_topic/3 with non-writeable course returns error" do
+      section = CTest.section_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      course = Courses.get_course!(section.course_id)
+      Courses.update_course(user_faculty, course, %{allow_write: false})
+
+      assert {:error, "course write not allowed"} = Topics.create_topic(user_faculty, section, @invalid_attrs)
     end
 
     test "update_topic/2 with valid data updates the topic" do
@@ -103,7 +113,7 @@ defmodule App.TopicsTest do
       assert {:error, %Ecto.Changeset{}} = Topics.update_topic(user_faculty, topic, @invalid_attrs)
       retrieved_topic = Topics.get_topic!(topic.id)
       assert topic.id == retrieved_topic.id
-      assert topic.allow_submission_comments == retrieved_topic.allow_submission_comments 
+      assert topic.allow_submission_comments == retrieved_topic.allow_submission_comments
       assert topic.allow_submission_voting == retrieved_topic.allow_submission_voting
       assert topic.allow_submissions == retrieved_topic.allow_submissions
       assert topic.anonymous == retrieved_topic.anonymous
@@ -122,7 +132,7 @@ defmodule App.TopicsTest do
       assert {:error, "unauthorized"} = Topics.update_topic(user_noauth, topic, @invalid_attrs)
       retrieved_topic = Topics.get_topic!(topic.id)
       assert topic.id == retrieved_topic.id
-      assert topic.allow_submission_comments == retrieved_topic.allow_submission_comments 
+      assert topic.allow_submission_comments == retrieved_topic.allow_submission_comments
       assert topic.allow_submission_voting == retrieved_topic.allow_submission_voting
       assert topic.allow_submissions == retrieved_topic.allow_submissions
       assert topic.anonymous == retrieved_topic.anonymous
@@ -135,20 +145,30 @@ defmodule App.TopicsTest do
       assert topic.user_submission_limit == retrieved_topic.user_submission_limit
     end
 
-    test "delete_topic/1 deletes the topic" do
+    test "update_topic/2 with non-writeable course returns error" do
+      topic = topic_fixture()
+      section = Courses.get_section!(topic.section_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      course = Courses.get_course!(section.course_id)
+      Courses.update_course(user_faculty, course, %{allow_write: false})
+
+      assert {:error, "course write not allowed"} = Topics.update_topic(user_faculty, topic, @update_attrs)
+    end
+
+    test "delete_topic/2 deletes the topic" do
       topic = topic_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
       assert {:ok, %Topic{}} = Topics.delete_topic(user_faculty, topic)
       assert_raise Ecto.NoResultsError, fn -> Topics.get_topic!(topic.id) end
     end
 
-    test "delete_topic/1 by unauthorized user returns error" do
+    test "delete_topic/2 by unauthorized user returns error" do
       topic = topic_fixture()
       user_noauth = ATest.user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
       assert {:error, "unauthorized"} = Topics.delete_topic(user_noauth, topic)
       retrieved_topic = Topics.get_topic!(topic.id)
       assert topic.id == retrieved_topic.id
-      assert topic.allow_submission_comments == retrieved_topic.allow_submission_comments 
+      assert topic.allow_submission_comments == retrieved_topic.allow_submission_comments
       assert topic.allow_submission_voting == retrieved_topic.allow_submission_voting
       assert topic.allow_submissions == retrieved_topic.allow_submissions
       assert topic.anonymous == retrieved_topic.anonymous
@@ -159,6 +179,16 @@ defmodule App.TopicsTest do
       assert topic.sort == retrieved_topic.sort
       assert topic.title == retrieved_topic.title
       assert topic.user_submission_limit == retrieved_topic.user_submission_limit
+    end
+
+    test "delete_topic/2 with non-writeable course returns error" do
+      topic = topic_fixture()
+      section = Courses.get_section!(topic.section_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      course = Courses.get_course!(section.course_id)
+      Courses.update_course(user_faculty, course, %{allow_write: false})
+
+      assert {:error, "course write not allowed"} = Topics.delete_topic(user_faculty, topic)
     end
 
     test "change_topic/1 returns a topic changeset" do

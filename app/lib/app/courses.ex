@@ -316,10 +316,13 @@ defmodule App.Courses do
     allowed_roles = ["owner"]
     course_role = App.Accounts.get_current_course__role!(user, course)
 
-    if Enum.member?(allowed_roles, course_role) do
-      do_create_section(course, attrs)
-    else
-      {:error, "unauthorized"}
+    cond do
+      course.allow_write == false ->
+        {:error, "course write not allowed"}
+      Enum.member?(allowed_roles, course_role) == false ->
+        {:error, "unauthorized"}
+      true ->
+        do_create_section(course, attrs)
     end
   end
 
@@ -348,10 +351,13 @@ defmodule App.Courses do
     course = get_course!(section.course_id)
     course_role = App.Accounts.get_current_course__role!(user, course)
 
-    if Enum.member?(allowed_roles, course_role) do
-      do_update_section(section, attrs)
-    else
-      {:error, "unauthorized"}
+    cond do
+      course.allow_write == false ->
+        {:error, "course write not allowed"}
+      Enum.member?(allowed_roles, course_role) == false ->
+        {:error, "unauthorized"}
+      true ->
+        do_update_section(section, attrs)
     end
   end
 
@@ -379,10 +385,13 @@ defmodule App.Courses do
     course = get_course!(section.course_id)
     course_role = App.Accounts.get_current_course__role!(user, course)
 
-    if Enum.member?(allowed_roles, course_role) do
-      do_delete_section(section)
-    else
-      {:error, "unauthorized"}
+    cond do
+      course.allow_write == false ->
+        {:error, "course write not allowed"}
+      Enum.member?(allowed_roles, course_role) == false ->
+        {:error, "unauthorized"}
+      true ->
+        do_delete_section(section)
     end
   end
 

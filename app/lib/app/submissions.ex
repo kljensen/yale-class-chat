@@ -52,12 +52,16 @@ defmodule App.Submissions do
   def create_submission(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic, attrs \\ %{}) do
     allowed_roles = ["student"]
     section = App.Courses.get_section!(topic.section_id)
-    section_role = App.Accounts.get_current_section__role!(user, section)
+    course = App.Courses.get_course!(section.course_id)
+    auth_role = App.Accounts.get_current_section__role!(user, section)
 
-    if Enum.member?(allowed_roles, section_role) do
-      do_create_submission(user, topic, attrs)
-    else
-      {:error, "unauthorized"}
+    cond do
+      course.allow_write == false ->
+        {:error, "course write not allowed"}
+      Enum.member?(allowed_roles, auth_role) == false ->
+        {:error, "unauthorized"}#
+      true ->
+        do_create_submission(user, topic, attrs)
     end
   end
 
@@ -82,10 +86,18 @@ defmodule App.Submissions do
 
   """
   def update_submission(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
-    if user.id == submission.user_id do
-      do_update_submission(submission, attrs)
-    else
-      {:error, "unauthorized"}
+    topic = App.Topics.get_topic!(submission.topic_id)
+    section = App.Courses.get_section!(topic.section_id)
+    course = App.Courses.get_course!(section.course_id)
+    auth_role = App.Accounts.get_current_section__role!(user, section)
+
+    cond do
+      course.allow_write == false ->
+        {:error, "course write not allowed"}
+      user.id != submission.user_id ->
+        {:error, "unauthorized"}#
+      true ->
+        do_update_submission(submission, attrs)
     end
   end
 
@@ -108,10 +120,18 @@ defmodule App.Submissions do
 
   """
   def delete_submission(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission) do
-    if user.id == submission.user_id do
-      do_delete_submission(submission)
-    else
-      {:error, "unauthorized"}
+    topic = App.Topics.get_topic!(submission.topic_id)
+    section = App.Courses.get_section!(topic.section_id)
+    course = App.Courses.get_course!(section.course_id)
+    auth_role = App.Accounts.get_current_section__role!(user, section)
+
+    cond do
+      course.allow_write == false ->
+        {:error, "course write not allowed"}
+      user.id != submission.user_id ->
+        {:error, "unauthorized"}#
+      true ->
+        do_delete_submission(submission)
     end
   end
 
@@ -179,12 +199,16 @@ defmodule App.Submissions do
     allowed_roles = ["student"]
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
-    section_role = App.Accounts.get_current_section__role!(user, section)
+    course = App.Courses.get_course!(section.course_id)
+    auth_role = App.Accounts.get_current_section__role!(user, section)
 
-    if Enum.member?(allowed_roles, section_role) do
-      do_create_comment(user, submission, attrs)
-    else
-      {:error, "unauthorized"}
+    cond do
+      course.allow_write == false ->
+        {:error, "course write not allowed"}
+      Enum.member?(allowed_roles, auth_role) == false ->
+        {:error, "unauthorized"}#
+      true ->
+        do_create_comment(user, submission, attrs)
     end
   end
 
@@ -209,10 +233,18 @@ defmodule App.Submissions do
 
   """
   def update_comment(%App.Accounts.User{} = user, %App.Submissions.Comment{} = comment, attrs \\ %{}) do
-    if user.id == comment.user_id do
-      do_update_comment(comment, attrs)
-    else
-      {:error, "unauthorized"}
+    submission = get_submission!(comment.submission_id)
+    topic = App.Topics.get_topic!(submission.topic_id)
+    section = App.Courses.get_section!(topic.section_id)
+    course = App.Courses.get_course!(section.course_id)
+
+    cond do
+      course.allow_write == false ->
+        {:error, "course write not allowed"}
+      user.id != comment.user_id ->
+        {:error, "unauthorized"}
+      true ->
+        do_update_comment(comment, attrs)
     end
   end
 
@@ -235,10 +267,18 @@ defmodule App.Submissions do
 
   """
   def delete_comment(%App.Accounts.User{} = user, %App.Submissions.Comment{} = comment) do
-    if user.id == comment.user_id do
-      do_delete_comment(comment)
-    else
-      {:error, "unauthorized"}
+    submission = get_submission!(comment.submission_id)
+    topic = App.Topics.get_topic!(submission.topic_id)
+    section = App.Courses.get_section!(topic.section_id)
+    course = App.Courses.get_course!(section.course_id)
+
+    cond do
+      course.allow_write == false ->
+        {:error, "course write not allowed"}
+      user.id != comment.user_id ->
+        {:error, "unauthorized"}
+      true ->
+        do_delete_comment(comment)
     end
   end
 
@@ -306,12 +346,16 @@ defmodule App.Submissions do
     allowed_roles = ["student"]
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
-    section_role = App.Accounts.get_current_section__role!(user, section)
+    course = App.Courses.get_course!(section.course_id)
+    auth_role = App.Accounts.get_current_section__role!(user, section)
 
-    if Enum.member?(allowed_roles, section_role) do
-      do_create_rating(user, submission, attrs)
-    else
-      {:error, "unauthorized"}
+    cond do
+      course.allow_write == false ->
+        {:error, "course write not allowed"}
+      Enum.member?(allowed_roles, auth_role) == false ->
+        {:error, "unauthorized"}#
+      true ->
+        do_create_rating(user, submission, attrs)
     end
   end
 
@@ -340,12 +384,16 @@ defmodule App.Submissions do
     submission = get_submission!(rating.submission_id)
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
-    section_role = App.Accounts.get_current_section__role!(user, section)
+    course = App.Courses.get_course!(section.course_id)
+    auth_role = App.Accounts.get_current_section__role!(user, section)
 
-    if Enum.member?(allowed_roles, section_role) do
-      do_update_rating(rating, attrs)
-    else
-      {:error, "unauthorized"}
+    cond do
+      course.allow_write == false ->
+        {:error, "course write not allowed"}
+      Enum.member?(allowed_roles, auth_role) == false ->
+        {:error, "unauthorized"}#
+      true ->
+        do_update_rating(rating, attrs)
     end
   end
 
@@ -372,12 +420,16 @@ defmodule App.Submissions do
     submission = get_submission!(rating.submission_id)
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
-    section_role = App.Accounts.get_current_section__role!(user, section)
+    course = App.Courses.get_course!(section.course_id)
+    auth_role = App.Accounts.get_current_section__role!(user, section)
 
-    if Enum.member?(allowed_roles, section_role) do
-      do_delete_rating(rating)
-    else
-      {:error, "unauthorized"}
+    cond do
+      course.allow_write == false ->
+        {:error, "course write not allowed"}
+      Enum.member?(allowed_roles, auth_role) == false ->
+        {:error, "unauthorized"}#
+      true ->
+        do_delete_rating(rating)
     end
   end
 

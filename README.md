@@ -102,7 +102,7 @@ Here are some draft stories
 - As a course owner
   - ~~I can make a user "administrator" for a course.~~
   - ~~I can create sections of a course.~~
-  - I can "freeze" a course, preventing write.
+  - ~~I can "freeze" a course, preventing write.~~
   - I can "archive" a course, preventing both read and write.
 - As an authenticated administrator for a course
   - ~~I can add users to a course~~
