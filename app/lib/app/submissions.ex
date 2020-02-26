@@ -56,6 +56,8 @@ defmodule App.Submissions do
     auth_role = App.Accounts.get_current_section__role!(user, section)
 
     cond do
+      topic.allow_submissions == false ->
+        {:error, "creating submissions not allowed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
       Enum.member?(allowed_roles, auth_role) == false ->
@@ -92,6 +94,8 @@ defmodule App.Submissions do
     auth_role = App.Accounts.get_current_section__role!(user, section)
 
     cond do
+      topic.allow_submissions == false ->
+        {:error, "updating submissions not allowed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
       user.id != submission.user_id ->
@@ -126,6 +130,8 @@ defmodule App.Submissions do
     auth_role = App.Accounts.get_current_section__role!(user, section)
 
     cond do
+      topic.allow_submissions == false ->
+        {:error, "deleting submissions not allowed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
       user.id != submission.user_id ->

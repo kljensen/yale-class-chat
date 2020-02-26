@@ -110,7 +110,7 @@ Here are some draft stories
     - I can toggle a user's activity: active, inactive
       - This will govern read & write access to course
         data. This is mostly used for students who
-        drop a course.
+        drop a course. *fundamentally, this is covered by switching their user_role from "student" (which has write permissions) to "guest" (which only has read permissions); do we need a separate flag for this?*
   - ~~I can create a "topic" and specify the courses or
     sections to which this topic is assigned. (Topics
     assigned to a course but not a particular section
@@ -121,8 +121,7 @@ Here are some draft stories
     - opened_at: the date after which the topic is "writeable"
       as long as the `open` (or similar) flag is true.
     - closed_at: the date after which the topic is not "writeable"
-    - allow_submissions: boolean indicating that new submissions
-      are allowed
+    - ~~allow_submissions: boolean indicating that new submissions (or changes to existing submissions) are allowed~~
     - allow_submission_voting: boolean indicating that submissions
       can be voted upon by authorized users. If `allow_submission_voting`
       is true and `allow_submissions` is false, then the topic is

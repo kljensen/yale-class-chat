@@ -100,7 +100,15 @@ defmodule App.SubmissionsTest do
     test "create_submission/3 with unauthorized user returns error", context do
       user_noauth = ATest.user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
       topic = context[:topic]
-      assert {:error, "unauthorized"} = Submissions.create_submission(user_noauth, topic, @invalid_attrs)
+      assert {:error, "unauthorized"} = Submissions.create_submission(user_noauth, topic, @valid_attrs)
+    end
+
+    test "create_submission/3 on topic with allow_submissions == false returns error", context do
+      submitter = context[:submitter]
+      topic = context[:topic]
+      user_faculty = context[:user_faculty]
+      {:ok, topic} = Topics.update_topic(user_faculty, topic, %{allow_submissions: false})
+      assert {:error, "creating submissions not allowed"} = Submissions.create_submission(submitter, topic, @valid_attrs)
     end
 
     test "create_submission/3 on non-writeable course returns error", context do
@@ -110,7 +118,7 @@ defmodule App.SubmissionsTest do
       user_faculty = Accounts.get_user_by!("faculty net id")
       course = Courses.get_course!(section.course_id)
       Courses.update_course(user_faculty, course, %{allow_write: false})
-      assert {:error, "course write not allowed"} = Submissions.create_submission(submitter, topic, @invalid_attrs)
+      assert {:error, "course write not allowed"} = Submissions.create_submission(submitter, topic, @valid_attrs)
     end
 
     test "update_submission/3 with valid data updates the submission", context do
@@ -147,7 +155,16 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.title == submission.title
     end
 
-    test "update_submission/3  on non-writeable course returns error", context do
+    test "update_submission/3 on topic with allow_submissions == false returns error", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      submitter = context[:submitter]
+      topic = context[:topic]
+      user_faculty = context[:user_faculty]
+      {:ok, topic} = Topics.update_topic(user_faculty, topic, %{allow_submissions: false})
+      assert {:error, "updating submissions not allowed"} = Submissions.update_submission(submitter, submission, @update_attrs)
+    end
+
+    test "update_submission/3 on non-writeable course returns error", context do
       submission = submission_fixture(context[:submitter], context[:topic])
       submitter = context[:submitter]
       topic = context[:topic]
@@ -181,6 +198,15 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.image_url == submission.image_url
       assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
+    end
+
+    test "delete_submission/2 on topic with allow_submissions == false returns error", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      submitter = context[:submitter]
+      topic = context[:topic]
+      user_faculty = context[:user_faculty]
+      {:ok, topic} = Topics.update_topic(user_faculty, topic, %{allow_submissions: false})
+      assert {:error, "deleting submissions not allowed"} = Submissions.delete_submission(submitter, submission)
     end
 
     test "delete_submission/2 on non-writeable course returns error", context do
