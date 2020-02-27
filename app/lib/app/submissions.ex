@@ -22,6 +22,64 @@ defmodule App.Submissions do
   end
 
   @doc """
+  Returns the list of submissions for a given topic.
+
+  ## Examples
+
+      iex> list_submissions(topic)
+      [%Submission{}, ...]
+
+  """
+  def list_submissions(%App.Topics.Topic{} = topic) do
+    tid = topic.id
+    Repo.all(from s in Submission, where: s.topic_id == ^tid)
+  end
+
+  @doc """
+  Returns the list of submissions by a given user.
+
+  ## Examples
+
+      iex> list_user_submissions(user)
+      [%Submission{}, ...]
+
+  """
+  def list_user_submissions(%App.Accounts.User{} = user) do
+    uid = user.id
+    Repo.all(from s in Submission, where: s.user_id == ^uid)
+  end
+
+  @doc """
+  Returns the list of submissions by a given user for a given topic.
+
+  ## Examples
+
+      iex> list_user_submissions(user, topic)
+      [%Submission{}, ...]
+
+  """
+  def list_user_submissions(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic) do
+    tid = topic.id
+    uid = user.id
+    Repo.all(from s in Submission, where: s.topic_id == ^tid, where: s.user_id == ^uid)
+  end
+
+  @doc """
+  Returns the count of submissions by a given user for a given topic.
+
+  ## Examples
+
+      iex> count_user_submissions(user, topic)
+      [%Submission{}, ...]
+
+  """
+  def count_user_submissions(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic) do
+    tid = topic.id
+    uid = user.id
+    Repo.all(from s in Submission, where: s.topic_id == ^tid, where: s.user_id == ^uid, select: count(s.id))
+  end
+
+  @doc """
   Gets a single submission.
 
   Raises `Ecto.NoResultsError` if the Submission does not exist.
@@ -57,6 +115,8 @@ defmodule App.Submissions do
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
+      count_user_submissions(user, topic) >= [topic.user_submission_limit] ->
+        {:error, "user submission limit reached"}
       Date.compare(current_time, topic.opened_at) == :lt ->
         {:error, "topic not yet open"}
       Date.compare(current_time, topic.closed_at) == :gt ->

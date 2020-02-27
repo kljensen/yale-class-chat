@@ -126,16 +126,17 @@ Here are some draft stories
       can be voted upon by authorized users. If `allow_submission_voting`
       is true and `allow_submissions` is false, then the topic is
       effectively in "reviewing" mode: people are voting on submissions.~~
-    - submission_limit: integer representing maximum number of submissions per authorized user
+    - ~~submission_limit: integer representing maximum number of submissions per authorized user~~
     - ~~allow_comments: boolean indicating that comments on submissions are allowed.~~
     - sort_order: controls the sort order of submissions. Can be
       by date, votes (ascending, descending), random.
+    - anonymous: controls whether submitter ids/names are displayed to end users
   - I can toggle the status of a submission
     - viewable/hidden ***I need more clarification on what this does (can submitters and admins still see the submission?)***
 - As an authenticated user
   - I can see the courses to which I have read access.
-  - I can submit sub-topics to topics with status Open
-  - I can vote/rate and comment on sub-topics in topics with status Review
+  - ~~I can submit sub-topics to topics with status Open~~
+  - ~~I can vote/rate and comment on sub-topics in topics with status Review~~
   - I can rank sub-topics in topics with status Selection
   - I can see my assigned sub-topic and team members in topics with status Assigned
 - To be continued...

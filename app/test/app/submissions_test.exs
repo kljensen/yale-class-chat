@@ -67,6 +67,78 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.title == submission.title
     end
 
+    test "list_submissions/1 returns all submissions for the given topic", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      {:ok, topic2} = App.Topics.create_topic(context[:user_faculty], context[:section], %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2100-04-17T14:00:00Z", description: "some other description", opened_at: "2010-04-17T14:00:00Z", slug: "some other slug", sort: "some other sort", title: "some other title", user_submission_limit: 42})
+      retrieved_submissions = Submissions.list_submissions(topic2)
+      assert length(retrieved_submissions) == 0
+      retrieved_submissions = Submissions.list_submissions(context[:topic])
+      assert length(retrieved_submissions) == 1
+      retrieved_submission = List.first(retrieved_submissions)
+      assert retrieved_submission.id == submission.id
+      assert retrieved_submission.description == submission.description
+      assert retrieved_submission.image_url == submission.image_url
+      assert retrieved_submission.slug == submission.slug
+      assert retrieved_submission.title == submission.title
+    end
+
+    test "list_user_submissions/1 returns all submissions by the given user", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      submission2 = submission_fixture(context[:student], context[:topic], %{slug: "student slug"})
+      retrieved_submissions = Submissions.list_user_submissions(context[:submitter])
+      assert length(retrieved_submissions) == 1
+      retrieved_submission = List.first(retrieved_submissions)
+      assert retrieved_submission.id == submission.id
+      assert retrieved_submission.description == submission.description
+      assert retrieved_submission.image_url == submission.image_url
+      assert retrieved_submission.slug == submission.slug
+      assert retrieved_submission.title == submission.title
+      retrieved_submissions = Submissions.list_user_submissions(context[:student])
+      assert length(retrieved_submissions) == 1
+      retrieved_submission = List.first(retrieved_submissions)
+      assert retrieved_submission.id == submission2.id
+      assert retrieved_submission.description == submission2.description
+      assert retrieved_submission.image_url == submission2.image_url
+      assert retrieved_submission.slug == submission2.slug
+      assert retrieved_submission.title == submission2.title
+    end
+
+    test "list_user_submissions/2 returns all submissions by the given user for the given topic", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      submission2 = submission_fixture(context[:student], context[:topic], %{slug: "student slug"})
+      {:ok, topic2} = App.Topics.create_topic(context[:user_faculty], context[:section], %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2100-04-17T14:00:00Z", description: "some other description", opened_at: "2010-04-17T14:00:00Z", slug: "some other slug", sort: "some other sort", title: "some other title", user_submission_limit: 42})
+      retrieved_submissions = Submissions.list_user_submissions(context[:submitter], topic2)
+      assert length(retrieved_submissions) == 0
+      retrieved_submissions = Submissions.list_user_submissions(context[:student], topic2)
+      assert length(retrieved_submissions) == 0
+      retrieved_submissions = Submissions.list_user_submissions(context[:submitter], context[:topic])
+      assert length(retrieved_submissions) == 1
+      retrieved_submission = List.first(retrieved_submissions)
+      assert retrieved_submission.id == submission.id
+      assert retrieved_submission.description == submission.description
+      assert retrieved_submission.image_url == submission.image_url
+      assert retrieved_submission.slug == submission.slug
+      assert retrieved_submission.title == submission.title
+      retrieved_submissions = Submissions.list_user_submissions(context[:student], context[:topic])
+      assert length(retrieved_submissions) == 1
+      retrieved_submission = List.first(retrieved_submissions)
+      assert retrieved_submission.id == submission2.id
+      assert retrieved_submission.description == submission2.description
+      assert retrieved_submission.image_url == submission2.image_url
+      assert retrieved_submission.slug == submission2.slug
+      assert retrieved_submission.title == submission2.title
+    end
+
+    test "count_user_submissions/2 returns count of all submissions by the given user for the given topic", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      submission2 = submission_fixture(context[:student], context[:topic], %{slug: "student slug"})
+      {:ok, topic2} = App.Topics.create_topic(context[:user_faculty], context[:section], %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2100-04-17T14:00:00Z", description: "some other description", opened_at: "2010-04-17T14:00:00Z", slug: "some other slug", sort: "some other sort", title: "some other title", user_submission_limit: 42})
+      assert Submissions.count_user_submissions(context[:submitter], topic2) == [0]
+      assert Submissions.count_user_submissions(context[:student], topic2) == [0]
+      assert Submissions.count_user_submissions(context[:submitter], context[:topic]) == [1]
+      assert Submissions.count_user_submissions(context[:student], context[:topic]) == [1]
+    end
+
     test "get_submission!/1 returns the submission with given id", context do
       submission = submission_fixture(context[:submitter], context[:topic])
       retrieved_submission = Submissions.get_submission!(submission.id)
@@ -135,6 +207,14 @@ defmodule App.SubmissionsTest do
       course = Courses.get_course!(section.course_id)
       Courses.update_course(user_faculty, course, %{allow_write: false})
       assert {:error, "course write not allowed"} = Submissions.create_submission(submitter, topic, @valid_attrs)
+    end
+
+    test "create_submission/3 returns error if user submisssion limit reached", context do
+      submitter = context[:submitter]
+      topic = context[:topic]
+      user_faculty = context[:user_faculty]
+      {:ok, topic} = Topics.update_topic(user_faculty, topic, %{user_submission_limit: 0})
+      assert {:error, "user submission limit reached"} = Submissions.create_submission(submitter, topic, @valid_attrs)
     end
 
     test "update_submission/3 with valid data updates the submission", context do
