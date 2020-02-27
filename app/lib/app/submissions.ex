@@ -54,8 +54,13 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_section__role!(user, section)
+    {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
+      Date.compare(current_time, topic.opened_at) == :lt ->
+        {:error, "topic not yet open"}
+      Date.compare(current_time, topic.closed_at) == :gt ->
+        {:error, "topic closed"}
       topic.allow_submissions == false ->
         {:error, "creating submissions not allowed"}
       course.allow_write == false ->
@@ -92,8 +97,13 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_section__role!(user, section)
+    {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
+      Date.compare(current_time, topic.opened_at) == :lt ->
+        {:error, "topic not yet open"}
+      Date.compare(current_time, topic.closed_at) == :gt ->
+        {:error, "topic closed"}
       topic.allow_submissions == false ->
         {:error, "updating submissions not allowed"}
       course.allow_write == false ->
@@ -128,8 +138,13 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_section__role!(user, section)
+    {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
+      Date.compare(current_time, topic.opened_at) == :lt ->
+        {:error, "topic not yet open"}
+      Date.compare(current_time, topic.closed_at) == :gt ->
+        {:error, "topic closed"}
       topic.allow_submissions == false ->
         {:error, "deleting submissions not allowed"}
       course.allow_write == false ->
@@ -207,12 +222,19 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_section__role!(user, section)
+    {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
+      topic.allow_submission_comments == false ->
+        {:error, "commenting not allowed"}
+      Date.compare(current_time, topic.opened_at) == :lt ->
+        {:error, "topic not yet open"}
+      Date.compare(current_time, topic.closed_at) == :gt ->
+        {:error, "topic closed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
       Enum.member?(allowed_roles, auth_role) == false ->
-        {:error, "unauthorized"}#
+        {:error, "unauthorized"}
       true ->
         do_create_comment(user, submission, attrs)
     end
@@ -243,8 +265,15 @@ defmodule App.Submissions do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
+    {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
+      topic.allow_submission_comments == false ->
+        {:error, "commenting not allowed"}
+      Date.compare(current_time, topic.opened_at) == :lt ->
+        {:error, "topic not yet open"}
+      Date.compare(current_time, topic.closed_at) == :gt ->
+        {:error, "topic closed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
       user.id != comment.user_id ->
@@ -277,8 +306,15 @@ defmodule App.Submissions do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
+    {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
+      topic.allow_submission_comments == false ->
+        {:error, "commenting not allowed"}
+      Date.compare(current_time, topic.opened_at) == :lt ->
+        {:error, "topic not yet open"}
+      Date.compare(current_time, topic.closed_at) == :gt ->
+        {:error, "topic closed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
       user.id != comment.user_id ->
@@ -354,8 +390,15 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_section__role!(user, section)
+    {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
+      topic.allow_submission_voting == false ->
+        {:error, "rating not allowed"}
+      Date.compare(current_time, topic.opened_at) == :lt ->
+        {:error, "topic not yet open"}
+      Date.compare(current_time, topic.closed_at) == :gt ->
+        {:error, "topic closed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
       Enum.member?(allowed_roles, auth_role) == false ->
@@ -392,8 +435,15 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_section__role!(user, section)
+    {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
+      topic.allow_submission_voting == false ->
+        {:error, "rating not allowed"}
+      Date.compare(current_time, topic.opened_at) == :lt ->
+        {:error, "topic not yet open"}
+      Date.compare(current_time, topic.closed_at) == :gt ->
+        {:error, "topic closed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
       Enum.member?(allowed_roles, auth_role) == false ->
@@ -428,8 +478,15 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_section__role!(user, section)
+    {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
+      topic.allow_submission_voting == false ->
+        {:error, "rating not allowed"}
+      Date.compare(current_time, topic.opened_at) == :lt ->
+        {:error, "topic not yet open"}
+      Date.compare(current_time, topic.closed_at) == :gt ->
+        {:error, "topic closed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
       Enum.member?(allowed_roles, auth_role) == false ->

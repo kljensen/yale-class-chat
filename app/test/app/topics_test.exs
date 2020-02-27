@@ -10,8 +10,8 @@ defmodule App.TopicsTest do
   describe "topics" do
     alias App.Topics.Topic
 
-    @valid_attrs %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2010-04-17T14:00:00Z", description: "some description", opened_at: "2010-04-17T14:00:00Z", slug: "some slug", sort: "some sort", title: "some title", user_submission_limit: 42}
-    @update_attrs %{allow_submission_comments: false, allow_submission_voting: false, allow_submissions: false, anonymous: false, closed_at: "2011-05-18T15:01:01Z", description: "some updated description", opened_at: "2011-05-18T15:01:01Z", slug: "some updated slug", sort: "some updated sort", title: "some updated title", user_submission_limit: 43}
+    @valid_attrs %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2100-04-17T14:00:00Z", description: "some description", opened_at: "2010-04-17T14:00:00Z", slug: "some slug", sort: "some sort", title: "some title", user_submission_limit: 42}
+    @update_attrs %{allow_submission_comments: false, allow_submission_voting: false, allow_submissions: false, anonymous: false, closed_at: "2101-05-18T15:01:01Z", description: "some updated description", opened_at: "2011-05-18T15:01:01Z", slug: "some updated slug", sort: "some updated sort", title: "some updated title", user_submission_limit: 43}
     @invalid_attrs %{allow_submission_comments: nil, allow_submission_voting: nil, allow_submissions: nil, anonymous: nil, closed_at: nil, description: nil, opened_at: nil, slug: nil, sort: nil, title: nil, user_submission_limit: nil}
 
     def topic_fixture(attrs \\ %{}) do
@@ -49,7 +49,7 @@ defmodule App.TopicsTest do
       assert topic.allow_submission_voting == true
       assert topic.allow_submissions == true
       assert topic.anonymous == true
-      assert topic.closed_at == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
+      assert topic.closed_at == DateTime.from_naive!(~N[2100-04-17T14:00:00Z], "Etc/UTC")
       assert topic.description == "some description"
       assert topic.opened_at == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
       assert topic.slug == "some slug"
@@ -98,7 +98,7 @@ defmodule App.TopicsTest do
       assert topic.allow_submission_voting == false
       assert topic.allow_submissions == false
       assert topic.anonymous == false
-      assert topic.closed_at == DateTime.from_naive!(~N[2011-05-18T15:01:01Z], "Etc/UTC")
+      assert topic.closed_at == DateTime.from_naive!(~N[2101-05-18T15:01:01Z], "Etc/UTC")
       assert topic.description == "some updated description"
       assert topic.opened_at == DateTime.from_naive!(~N[2011-05-18T15:01:01Z], "Etc/UTC")
       assert topic.slug == "some updated slug"

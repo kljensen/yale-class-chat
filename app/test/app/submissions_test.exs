@@ -111,6 +111,22 @@ defmodule App.SubmissionsTest do
       assert {:error, "creating submissions not allowed"} = Submissions.create_submission(submitter, topic, @valid_attrs)
     end
 
+    test "create_submission/3 returns error if topic not yet open", context do
+      submitter = context[:submitter]
+      topic = context[:topic]
+      user_faculty = context[:user_faculty]
+      {:ok, topic} = Topics.update_topic(user_faculty, topic, %{opened_at: "2100-04-17T14:00:00Z"})
+      assert {:error, "topic not yet open"} = Submissions.create_submission(submitter, topic, @valid_attrs)
+    end
+
+    test "create_submission/3 returns error if topic closed", context do
+      submitter = context[:submitter]
+      topic = context[:topic]
+      user_faculty = context[:user_faculty]
+      {:ok, topic} = Topics.update_topic(user_faculty, topic, %{closed_at: "2010-04-17T14:00:00Z"})
+      assert {:error, "topic closed"} = Submissions.create_submission(submitter, topic, @valid_attrs)
+    end
+
     test "create_submission/3 on non-writeable course returns error", context do
       submitter = context[:submitter]
       topic = context[:topic]
@@ -160,8 +176,38 @@ defmodule App.SubmissionsTest do
       submitter = context[:submitter]
       topic = context[:topic]
       user_faculty = context[:user_faculty]
-      {:ok, topic} = Topics.update_topic(user_faculty, topic, %{allow_submissions: false})
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{allow_submissions: false})
       assert {:error, "updating submissions not allowed"} = Submissions.update_submission(submitter, submission, @update_attrs)
+    end
+
+    test "update_submission/3 returns error if topic not yet open", context do
+      submitter = context[:submitter]
+      topic = context[:topic]
+      submission = submission_fixture(submitter, topic)
+      user_faculty = context[:user_faculty]
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{opened_at: "2100-04-17T14:00:00Z"})
+      assert {:error, "topic not yet open"} = Submissions.update_submission(submitter, submission, @update_attrs)
+      retrieved_submission = Submissions.get_submission!(submission.id)
+      assert retrieved_submission.id == submission.id
+      assert retrieved_submission.description == submission.description
+      assert retrieved_submission.image_url == submission.image_url
+      assert retrieved_submission.slug == submission.slug
+      assert retrieved_submission.title == submission.title
+    end
+
+    test "update_submission/3 returns error if topic closed", context do
+      submitter = context[:submitter]
+      topic = context[:topic]
+      user_faculty = context[:user_faculty]
+      submission = submission_fixture(submitter, topic)
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{closed_at: "2010-04-17T14:00:00Z"})
+      assert {:error, "topic closed"} = Submissions.update_submission(submitter, submission, @update_attrs)
+      retrieved_submission = Submissions.get_submission!(submission.id)
+      assert retrieved_submission.id == submission.id
+      assert retrieved_submission.description == submission.description
+      assert retrieved_submission.image_url == submission.image_url
+      assert retrieved_submission.slug == submission.slug
+      assert retrieved_submission.title == submission.title
     end
 
     test "update_submission/3 on non-writeable course returns error", context do
@@ -205,8 +251,38 @@ defmodule App.SubmissionsTest do
       submitter = context[:submitter]
       topic = context[:topic]
       user_faculty = context[:user_faculty]
-      {:ok, topic} = Topics.update_topic(user_faculty, topic, %{allow_submissions: false})
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{allow_submissions: false})
       assert {:error, "deleting submissions not allowed"} = Submissions.delete_submission(submitter, submission)
+    end
+
+    test "delete_submission/2 returns error if topic not yet open", context do
+      submitter = context[:submitter]
+      topic = context[:topic]
+      submission = submission_fixture(submitter, topic)
+      user_faculty = context[:user_faculty]
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{opened_at: "2100-04-17T14:00:00Z"})
+      assert {:error, "topic not yet open"} = Submissions.delete_submission(submitter, submission)
+      retrieved_submission = Submissions.get_submission!(submission.id)
+      assert retrieved_submission.id == submission.id
+      assert retrieved_submission.description == submission.description
+      assert retrieved_submission.image_url == submission.image_url
+      assert retrieved_submission.slug == submission.slug
+      assert retrieved_submission.title == submission.title
+    end
+
+    test "delete_submission/2 returns error if topic closed", context do
+      submitter = context[:submitter]
+      topic = context[:topic]
+      user_faculty = context[:user_faculty]
+      submission = submission_fixture(submitter, topic)
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{closed_at: "2010-04-17T14:00:00Z"})
+      assert {:error, "topic closed"} = Submissions.delete_submission(submitter, submission)
+      retrieved_submission = Submissions.get_submission!(submission.id)
+      assert retrieved_submission.id == submission.id
+      assert retrieved_submission.description == submission.description
+      assert retrieved_submission.image_url == submission.image_url
+      assert retrieved_submission.slug == submission.slug
+      assert retrieved_submission.title == submission.title
     end
 
     test "delete_submission/2 on non-writeable course returns error", context do
@@ -305,6 +381,33 @@ defmodule App.SubmissionsTest do
       assert {:error, "course write not allowed"} = Submissions.create_comment(student, submission, @valid_attrs)
     end
 
+    test "create_comment/3 returns error if topic not yet open", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{opened_at: "2100-04-17T14:00:00Z"})
+      assert {:error, "topic not yet open"} = Submissions.create_comment(student, submission, @valid_attrs)
+    end
+
+    test "create_comment/3 returns error if topic closed", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{closed_at: "2010-04-17T14:00:00Z"})
+      assert {:error, "topic closed"} = Submissions.create_comment(student, submission, @valid_attrs)
+    end
+
+    test "create_comment/3 returns error if commenting not allowed", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{allow_submission_comments: false})
+      assert {:error, "commenting not allowed"} = Submissions.create_comment(student, submission, @valid_attrs)
+    end
+
     test "update_comment/3 with valid data updates the comment", context do
       student = context[:student]
       submission = submission_fixture(context[:submitter], context[:topic])
@@ -353,6 +456,48 @@ defmodule App.SubmissionsTest do
       assert retrieved_comment.title == comment.title
     end
 
+    test "update_comment/3 returns error if topic not yet open", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      comment = comment_fixture(student, submission)
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{opened_at: "2100-04-17T14:00:00Z"})
+      assert {:error, "topic not yet open"} = Submissions.update_comment(student, comment, @update_attrs)
+      retrieved_comment = Submissions.get_comment!(comment.id)
+      assert retrieved_comment.id == comment.id
+      assert retrieved_comment.description == comment.description
+      assert retrieved_comment.title == comment.title
+    end
+
+    test "update_comment/3 returns error if topic closed", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      comment = comment_fixture(student, submission)
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{closed_at: "2010-04-17T14:00:00Z"})
+      assert {:error, "topic closed"} = Submissions.update_comment(student, comment, @update_attrs)
+      retrieved_comment = Submissions.get_comment!(comment.id)
+      assert retrieved_comment.id == comment.id
+      assert retrieved_comment.description == comment.description
+      assert retrieved_comment.title == comment.title
+    end
+
+    test "update_comment/3 returns error if commenting not allowed", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      comment = comment_fixture(student, submission)
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{allow_submission_comments: false})
+      assert {:error, "commenting not allowed"} = Submissions.update_comment(student, comment, @update_attrs)
+      retrieved_comment = Submissions.get_comment!(comment.id)
+      assert retrieved_comment.id == comment.id
+      assert retrieved_comment.description == comment.description
+      assert retrieved_comment.title == comment.title
+    end
+
     test "delete_comment/2 deletes the comment", context do
       student = context[:student]
       submission = submission_fixture(context[:submitter], context[:topic])
@@ -383,6 +528,48 @@ defmodule App.SubmissionsTest do
       Courses.update_course(user_faculty, course, %{allow_write: false})
 
       assert {:error, "course write not allowed"} = Submissions.delete_comment(student, comment)
+      retrieved_comment = Submissions.get_comment!(comment.id)
+      assert retrieved_comment.id == comment.id
+      assert retrieved_comment.description == comment.description
+      assert retrieved_comment.title == comment.title
+    end
+
+    test "delete_comment/2 returns error if topic not yet open", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      comment = comment_fixture(student, submission)
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{opened_at: "2100-04-17T14:00:00Z"})
+      assert {:error, "topic not yet open"} = Submissions.delete_comment(student, comment)
+      retrieved_comment = Submissions.get_comment!(comment.id)
+      assert retrieved_comment.id == comment.id
+      assert retrieved_comment.description == comment.description
+      assert retrieved_comment.title == comment.title
+    end
+
+    test "delete_comment/2 returns error if topic closed", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      comment = comment_fixture(student, submission)
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{closed_at: "2010-04-17T14:00:00Z"})
+      assert {:error, "topic closed"} = Submissions.delete_comment(student, comment)
+      retrieved_comment = Submissions.get_comment!(comment.id)
+      assert retrieved_comment.id == comment.id
+      assert retrieved_comment.description == comment.description
+      assert retrieved_comment.title == comment.title
+    end
+
+    test "delete_comment/2 returns error if commenting not allowed", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      comment = comment_fixture(student, submission)
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{allow_submission_comments: false})
+      assert {:error, "commenting not allowed"} = Submissions.delete_comment(student, comment)
       retrieved_comment = Submissions.get_comment!(comment.id)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
@@ -465,6 +652,33 @@ defmodule App.SubmissionsTest do
       assert {:error, "course write not allowed"} = Submissions.create_rating(student, submission, @valid_attrs)
     end
 
+    test "create_rating/3 returns error if topic not yet open", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{opened_at: "2100-04-17T14:00:00Z"})
+      assert {:error, "topic not yet open"} = Submissions.create_rating(student, submission, @valid_attrs)
+    end
+
+    test "create_rating/3 on a closed topic returns error", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{closed_at: "2010-04-17T14:00:00Z"})
+      assert {:error, "topic closed"} = Submissions.create_rating(student, submission, @valid_attrs)
+    end
+
+    test "create_rating/3 returns error if rating not allowed", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{allow_submission_voting: false})
+      assert {:error, "rating not allowed"} = Submissions.create_rating(student, submission, @valid_attrs)
+    end
+
     test "update_rating/3 with valid data updates the rating", context do
       student = context[:student]
       submission = submission_fixture(context[:submitter], context[:topic])
@@ -510,6 +724,45 @@ defmodule App.SubmissionsTest do
       assert retrieved_rating.score == rating.score
     end
 
+    test "update_rating/3 returns error if topic not yet open", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      rating = rating_fixture(student, submission)
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{opened_at: "2100-04-17T14:00:00Z"})
+      assert {:error, "topic not yet open"} = Submissions.update_rating(student, rating, @update_attrs)
+      retrieved_rating = Submissions.get_rating!(rating.id)
+      assert retrieved_rating.id == rating.id
+      assert retrieved_rating.score == rating.score
+    end
+
+    test "update_rating/3 on a closed topic returns error", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      rating = rating_fixture(student, submission)
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{closed_at: "2010-04-17T14:00:00Z"})
+      assert {:error, "topic closed"} = Submissions.update_rating(student, rating, @update_attrs)
+      retrieved_rating = Submissions.get_rating!(rating.id)
+      assert retrieved_rating.id == rating.id
+      assert retrieved_rating.score == rating.score
+    end
+
+    test "update_rating/3 returns error if rating disallowed", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      rating = rating_fixture(student, submission)
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{allow_submission_voting: false})
+      assert {:error, "rating not allowed"} = Submissions.update_rating(student, rating, @update_attrs)
+      retrieved_rating = Submissions.get_rating!(rating.id)
+      assert retrieved_rating.id == rating.id
+      assert retrieved_rating.score == rating.score
+    end
+
     test "delete_rating/2 deletes the rating", context do
       student = context[:student]
       submission = submission_fixture(context[:submitter], context[:topic])
@@ -542,6 +795,44 @@ defmodule App.SubmissionsTest do
       assert retrieved_rating.score == rating.score
     end
 
+    test "delete_rating/2 returns error if topic not yet open", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      rating = rating_fixture(student, submission)
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{opened_at: "2100-04-17T14:00:00Z"})
+      assert {:error, "topic not yet open"} = Submissions.delete_rating(student, rating)
+      retrieved_rating = Submissions.get_rating!(rating.id)
+      assert retrieved_rating.id == rating.id
+      assert retrieved_rating.score == rating.score
+    end
+
+    test "delete_rating/2 on a closed topic returns error", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      rating = rating_fixture(student, submission)
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{closed_at: "2010-04-17T14:00:00Z"})
+      assert {:error, "topic closed"} = Submissions.delete_rating(student, rating)
+      retrieved_rating = Submissions.get_rating!(rating.id)
+      assert retrieved_rating.id == rating.id
+      assert retrieved_rating.score == rating.score
+    end
+
+    test "delete_rating/2 returns error if rating not allowed", context do
+      student = context[:student]
+      submission = submission_fixture(context[:submitter], context[:topic])
+      rating = rating_fixture(student, submission)
+      topic = Topics.get_topic!(submission.topic_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{allow_submission_voting: false})
+      assert {:error, "rating not allowed"} = Submissions.delete_rating(student, rating)
+      retrieved_rating = Submissions.get_rating!(rating.id)
+      assert retrieved_rating.id == rating.id
+      assert retrieved_rating.score == rating.score
+    end
 
     test "change_rating/1 returns a rating changeset", context do
       student = context[:student]
