@@ -135,6 +135,7 @@ Here are some draft stories
     - viewable/hidden ***I need more clarification on what this does (can submitters and admins still see the submission?)***
 - As an authenticated user
   - ~~I can see the courses to which I have read access.~~
+  - I can see the sections to which I have read access.
   - ~~I can submit sub-topics to topics with status Open~~
   - ~~I can vote/rate and comment on sub-topics in topics with status Review~~
   - I can rank sub-topics in topics with status Selection
