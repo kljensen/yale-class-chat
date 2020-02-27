@@ -127,6 +127,21 @@ defmodule App.CoursesTest do
       assert retrieved_course.number == course.number
     end
 
+    test "list_user_courses/1 returns all courses for which a user has a valid user role" do
+      course = course_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      user_faculty2 = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id 2"})
+      course_list = Courses.list_user_courses(user_faculty)
+      assert length(course_list) == 1
+      retrieved_course = List.first(course_list)
+      assert course.id == retrieved_course.id
+      assert retrieved_course.department == course.department
+      assert retrieved_course.name == course.name
+      assert retrieved_course.number == course.number
+      course_list = Courses.list_user_courses(user_faculty2)
+      assert length(course_list) == 0
+    end
+
     test "get_course!/1 returns the course with given id" do
       course = course_fixture()
       retrieved_course = Courses.get_course!(course.id)

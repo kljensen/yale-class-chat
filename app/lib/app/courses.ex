@@ -142,6 +142,28 @@ defmodule App.Courses do
   end
 
   @doc """
+  Returns the list of courses.
+
+  ## Examples
+
+      iex> list_courses()
+      [%Course{}, ...]
+
+  """
+  def list_user_courses(%App.Accounts.User{} = user) do
+    uid = user.id
+    {:ok, current_time} = DateTime.now("Etc/UTC")
+    query = from r in App.Accounts.Course_Role,
+              left_join: c in Course,
+              on: r.course_id == c.id,
+              where: r.user_id == ^uid,
+              where: r.valid_from <= ^current_time,
+              where: r.valid_to >= ^current_time,
+              select: c
+    Repo.all(query)
+  end
+
+  @doc """
   Gets a single course.
 
   Raises `Ecto.NoResultsError` if the Course does not exist.
