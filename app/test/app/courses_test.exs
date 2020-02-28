@@ -142,6 +142,28 @@ defmodule App.CoursesTest do
       assert length(course_list) == 0
     end
 
+    test "list_user_courses/1 returns no courses if user roles expired" do
+      course = course_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      user_faculty2 = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id 2"})
+      {:ok, current_time} = DateTime.now("Etc/UTC")
+      #Expired role returns no courses
+      params = %{role: "administrator", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, -7200, :second)}
+      {:ok, course_role} = Accounts.create_course__role(user_faculty, user_faculty2, course, params)
+      course_list = Courses.list_user_courses(user_faculty2)
+      assert length(course_list) == 0
+      #Valid role returns one course
+      params = %{role: "administrator", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      {:ok, course_role} = Accounts.update_course__role(user_faculty, course_role, params)
+      course_list = Courses.list_user_courses(user_faculty2)
+      assert length(course_list) == 1
+      #Yet to begin role returns no courses
+      params = %{role: "administrator", valid_from: DateTime.add(current_time, 7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      {:ok, course_role} = Accounts.update_course__role(user_faculty, course_role, params)
+      course_list = Courses.list_user_courses(user_faculty2)
+      assert length(course_list) == 0
+    end
+
     test "get_course!/1 returns the course with given id" do
       course = course_fixture()
       retrieved_course = Courses.get_course!(course.id)
@@ -258,6 +280,60 @@ defmodule App.CoursesTest do
       assert retrieved_section.id == section.id
       assert retrieved_section.crn == section.crn
       assert retrieved_section.title == section.title
+    end
+
+    test "list_user_sections/1 returns all sections for which a user has a valid user role" do
+      section = section_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      user_student = ATest.user_fixture(%{is_faculty: false, net_id: "student net id"})
+      user_student2 = ATest.user_fixture(%{is_faculty: false, net_id: "other student net id"})
+      {:ok, current_time} = DateTime.now("Etc/UTC")
+      params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      Accounts.create_section__role(user_faculty, user_student, section, params)
+      section_list = Courses.list_user_sections(user_student)
+      assert length(section_list) == 1
+      retrieved_section = List.first(section_list)
+      assert retrieved_section.id == section.id
+      assert retrieved_section.crn == section.crn
+      assert retrieved_section.title == section.title
+      section_list = Courses.list_user_sections(user_student2)
+      assert length(section_list) == 0
+    end
+
+    test "list_user_sections/1 returns no sections if user roles expired" do
+      section = section_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      user_student = ATest.user_fixture(%{is_faculty: false, net_id: "student net id"})
+      {:ok, current_time} = DateTime.now("Etc/UTC")
+      #Expired role returns no sections
+      params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, -7200, :second)}
+      {:ok, section_role} = Accounts.create_section__role(user_faculty, user_student, section, params)
+      section_list = Courses.list_user_sections(user_student)
+      assert length(section_list) == 0
+      #Valid role returns one section
+      params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      {:ok, section_role} = Accounts.update_section__role(user_faculty, section_role, params)
+      section_list = Courses.list_user_sections(user_student)
+      assert length(section_list) == 1
+      #Yet to begin role returns no sections
+      params = %{role: "student", valid_from: DateTime.add(current_time, 7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      {:ok, section_role} = Accounts.update_section__role(user_faculty, section_role, params)
+      section_list = Courses.list_user_sections(user_student)
+      assert length(section_list) == 0
+    end
+
+    test "list_user_sections/1 returns no sections if course.allow_read == false" do
+      section = section_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      user_student = ATest.user_fixture(%{is_faculty: false, net_id: "student net id"})
+      user_student2 = ATest.user_fixture(%{is_faculty: false, net_id: "other student net id"})
+      {:ok, current_time} = DateTime.now("Etc/UTC")
+      params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      Accounts.create_section__role(user_faculty, user_student, section, params)
+      course = Courses.get_course!(section.course_id)
+      Courses.update_course(user_faculty, course, %{allow_read: false})
+      section_list = Courses.list_user_sections(user_student)
+      assert length(section_list) == 0
     end
 
     test "get_section!/1 returns the section with given id" do

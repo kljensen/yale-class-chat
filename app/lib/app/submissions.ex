@@ -108,11 +108,18 @@ defmodule App.Submissions do
 
   """
   def create_submission(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic, attrs \\ %{}) do
-    allowed_roles = ["student"]
+    allowed_roles = ["administrator", "owner", "student"]
+    admin_roles = ["administrator", "owner"]
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_section__role!(user, section)
+    auth_role = App.Accounts.get_current_section__role(user, section)
     {:ok, current_time} = DateTime.now("Etc/UTC")
+
+    #Only allow admins to hide/unhide submissions or allow them to be ranked
+    unless Enum.member?(admin_roles, auth_role) do
+      if Map.get(attrs, :hidden), do: attrs = Map.delete(attrs, :hidden)
+      if Map.get(attrs, :allow_ranking), do: attrs = Map.delete(attrs, :allow_ranking)
+    end
 
     cond do
       count_user_submissions(user, topic) >= [topic.user_submission_limit] ->
@@ -156,8 +163,16 @@ defmodule App.Submissions do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_section__role!(user, section)
+    admin_roles = ["administrator", "owner"]
+    auth_role = App.Accounts.get_current_section__role(user, section)
     {:ok, current_time} = DateTime.now("Etc/UTC")
+    authorized = Enum.member?(admin_roles, auth_role) or user.id == submission.user_id
+
+    #Only allow admins to hide/unhide submissions or allow them to be ranked
+    unless Enum.member?(admin_roles, auth_role) do
+      if Map.get(attrs, :hidden), do: attrs = Map.delete(attrs, :hidden)
+      if Map.get(attrs, :allow_ranking), do: attrs = Map.delete(attrs, :allow_ranking)
+    end
 
     cond do
       Date.compare(current_time, topic.opened_at) == :lt ->
@@ -168,8 +183,8 @@ defmodule App.Submissions do
         {:error, "updating submissions not allowed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
-      user.id != submission.user_id ->
-        {:error, "unauthorized"}#
+      authorized == false ->
+        {:error, "unauthorized"}
       true ->
         do_update_submission(submission, attrs)
     end
@@ -197,8 +212,10 @@ defmodule App.Submissions do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_section__role!(user, section)
+    admin_roles = ["administrator", "owner"]
+    auth_role = App.Accounts.get_current_section__role(user, section)
     {:ok, current_time} = DateTime.now("Etc/UTC")
+    authorized = Enum.member?(admin_roles, auth_role) or user.id == submission.user_id
 
     cond do
       Date.compare(current_time, topic.opened_at) == :lt ->
@@ -209,7 +226,7 @@ defmodule App.Submissions do
         {:error, "deleting submissions not allowed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
-      user.id != submission.user_id ->
+      authorized == false ->
         {:error, "unauthorized"}#
       true ->
         do_delete_submission(submission)
@@ -281,7 +298,7 @@ defmodule App.Submissions do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_section__role!(user, section)
+    auth_role = App.Accounts.get_current_section__role(user, section)
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
@@ -449,7 +466,7 @@ defmodule App.Submissions do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_section__role!(user, section)
+    auth_role = App.Accounts.get_current_section__role(user, section)
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
@@ -494,7 +511,7 @@ defmodule App.Submissions do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_section__role!(user, section)
+    auth_role = App.Accounts.get_current_section__role(user, section)
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
@@ -537,7 +554,7 @@ defmodule App.Submissions do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_section__role!(user, section)
+    auth_role = App.Accounts.get_current_section__role(user, section)
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do

@@ -142,11 +142,11 @@ defmodule App.Courses do
   end
 
   @doc """
-  Returns the list of courses.
+  Returns the list of courses for which a user has a valid course_role.
 
   ## Examples
 
-      iex> list_courses()
+      iex> list_user_courses()
       [%Course{}, ...]
 
   """
@@ -157,8 +157,8 @@ defmodule App.Courses do
               left_join: c in Course,
               on: r.course_id == c.id,
               where: r.user_id == ^uid,
-              where: r.valid_from <= ^current_time,
-              where: r.valid_to >= ^current_time,
+              where: r.valid_from <= from_now(0, "day"),
+              where: r.valid_to >= from_now(0, "day"),
               select: c
     Repo.all(query)
   end
@@ -235,7 +235,7 @@ defmodule App.Courses do
 
   def update_course(%App.Accounts.User{} = user, %Course{} = course, attrs) do
     allowed_roles = ["owner"]
-    course_role = App.Accounts.get_current_course__role!(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course)
 
     if Enum.member?(allowed_roles, course_role) do
       do_update_course(course, attrs)
@@ -264,7 +264,7 @@ defmodule App.Courses do
   """
   def delete_course(%App.Accounts.User{} = user, %Course{} = course) do
     allowed_roles = ["owner"]
-    course_role = App.Accounts.get_current_course__role!(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course)
 
     if Enum.member?(allowed_roles, course_role) do
       do_delete_course(course)
@@ -306,6 +306,31 @@ defmodule App.Courses do
   end
 
   @doc """
+  Returns the list of sections for which a user had a valid section role.
+
+  ## Examples
+
+      iex> list_courses()
+      [%Course{}, ...]
+
+  """
+  def list_user_sections(%App.Accounts.User{} = user) do
+    uid = user.id
+    {:ok, current_time} = DateTime.now("Etc/UTC")
+    query = from r in App.Accounts.Section_Role,
+              left_join: s in Section,
+              on: r.section_id == s.id,
+              left_join: c in Course,
+              on: s.course_id == c.id,
+              where: r.user_id == ^uid,
+              where: r.valid_from <= from_now(0, "day"),
+              where: r.valid_to >= from_now(0, "day"),
+              where: c.allow_read == true,
+              select: s
+    Repo.all(query)
+  end
+
+  @doc """
   Gets a single section.
 
   Raises `Ecto.NoResultsError` if the Section does not exist.
@@ -336,7 +361,7 @@ defmodule App.Courses do
   def create_section(%App.Accounts.User{} = user, %App.Courses.Course{} = course, attrs \\ %{}) do
     #If user role is Administrator or Owner, then allow creation of a section
     allowed_roles = ["owner"]
-    course_role = App.Accounts.get_current_course__role!(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course)
 
     cond do
       course.allow_write == false ->
@@ -371,7 +396,7 @@ defmodule App.Courses do
     #If user role is Administrator or Owner, then allow update of a section
     allowed_roles = ["owner"]
     course = get_course!(section.course_id)
-    course_role = App.Accounts.get_current_course__role!(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course)
 
     cond do
       course.allow_write == false ->
@@ -405,7 +430,7 @@ defmodule App.Courses do
     #If user role is Administrator or Owner, then allow update of a section
     allowed_roles = ["owner"]
     course = get_course!(section.course_id)
-    course_role = App.Accounts.get_current_course__role!(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course)
 
     cond do
       course.allow_write == false ->

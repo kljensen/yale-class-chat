@@ -103,14 +103,10 @@ Here are some draft stories
   - ~~I can make a user "administrator" for a course.~~
   - ~~I can create sections of a course.~~
   - ~~I can "freeze" a course, preventing write.~~
-  - I can "archive" a course, preventing both read and write.
+  - ~~I can "archive" a course, preventing both read and write.~~ *Note: read is only prevented for sections, not courses; this way, admins and owners can still read courses*
 - As an authenticated administrator for a course
   - ~~I can add users to a course~~
     - ~~I can set a user's role for a course: student, guest.~~
-    - I can toggle a user's activity: active, inactive
-      - This will govern read & write access to course
-        data. This is mostly used for students who
-        drop a course. ***fundamentally, this is covered by switching their user_role from "student" (which has write permissions) to "guest" (which only has read permissions); do we need a separate flag for this?***
   - ~~I can create a "topic" and specify the courses or
     sections to which this topic is assigned. (Topics
     assigned to a course but not a particular section
@@ -135,11 +131,11 @@ Here are some draft stories
     - viewable/hidden ***I need more clarification on what this does (can submitters and admins still see the submission?)***
 - As an authenticated user
   - ~~I can see the courses to which I have read access.~~
-  - I can see the sections to which I have read access.
+  - ~~I can see the sections to which I have read access.~~
   - ~~I can submit sub-topics to topics with status Open~~
   - ~~I can vote/rate and comment on sub-topics in topics with status Review~~
-  - I can rank sub-topics in topics with status Selection
-  - I can see my assigned sub-topic and team members in topics with status Assigned
+  - I can rank submissions in topics with status Selection
+  - I can see my assigned submission and team members in topics with status Assigned
 - To be continued...
 
 ## Q&A with Rodrigo

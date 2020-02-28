@@ -156,14 +156,14 @@ defmodule App.Accounts do
 
   ## Examples
 
-      iex> get_current_course__role!(%User{}, %Course{})
+      iex> get_current_course__role(%User{}, %Course{})
       %Course_Role{}
 
-      iex> get_current_course__role!(%InvalidUser{}, %InvalidCourse{})
+      iex> get_current_course__role(%InvalidUser{}, %InvalidCourse{})
       ** (Ecto.NoResultsError)
 
   """
-  def get_current_course__role!(%App.Accounts.User{} = user, %App.Courses.Course{} = course) do
+  def get_current_course__role(%App.Accounts.User{} = user, %App.Courses.Course{} = course) do
     {:ok, current_time} = DateTime.now("Etc/UTC")
     uid = user.id
     cid = course.id
@@ -190,7 +190,7 @@ defmodule App.Accounts do
   """
   def create_course__role(%App.Accounts.User{} = user_auth, %App.Accounts.User{} = user, %App.Courses.Course{} = course, attrs \\ %{}) do
     allowed_roles = ["owner"]
-    auth_role = App.Accounts.get_current_course__role!(user_auth, course)
+    auth_role = App.Accounts.get_current_course__role(user_auth, course)
     cond do
       course.allow_write == false ->
         {:error, "course write not allowed"}
@@ -224,7 +224,7 @@ defmodule App.Accounts do
   def update_course__role(%App.Accounts.User{} = user_auth, %Course_Role{} = course__role, attrs) do
     allowed_roles = ["owner"]
     course = App.Courses.get_course!(course__role.course_id)
-    auth_role = get_current_course__role!(user_auth, course)
+    auth_role = get_current_course__role(user_auth, course)
     cond do
       course.allow_write == false ->
         {:error, "course write not allowed"}
@@ -256,7 +256,7 @@ defmodule App.Accounts do
   def delete_course__role(%App.Accounts.User{} = user_auth, %Course_Role{} = course__role) do
     allowed_roles = ["owner"]
     course = App.Courses.get_course!(course__role.course_id)
-    auth_role = get_current_course__role!(user_auth, course)
+    auth_role = get_current_course__role(user_auth, course)
 
     cond do
       course.allow_write == false ->
@@ -323,23 +323,35 @@ defmodule App.Accounts do
 
   ## Examples
 
-      iex> get_current_course__role!(%User{}, %Section{})
+      iex> get_current_course__role(%User{}, %Section{})
       %Section_Role{}
 
-      iex> get_current_course__role!(%InvalidUser{}, %InvalidSection{})
+      iex> get_current_course__role(%InvalidUser{}, %InvalidSection{})
       ** (Ecto.NoResultsError)
 
   """
-  def get_current_section__role!(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
+  def get_current_section__role(%App.Accounts.User{} = user, %App.Courses.Section{} = section, inherit_course_role \\ true) do
     {:ok, current_time} = DateTime.now("Etc/UTC")
     uid = user.id
     sid = section.id
-    query = from u_r in "section_roles",
-              where: u_r.user_id == ^uid and u_r.section_id == ^sid  and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
-              select: u_r.role
+    course_role = nil
 
-    results = Repo.all(query)
-    List.first(results)
+    if inherit_course_role == true do
+      cid = section.course_id
+      course = App.Courses.get_course!(cid)
+      course_role = get_current_course__role(user, course)
+    end
+
+    if course_role == nil do
+      query = from u_r in "section_roles",
+                where: u_r.user_id == ^uid and u_r.section_id == ^sid  and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
+                select: u_r.role
+
+      results = Repo.all(query)
+      List.first(results)
+    else
+        course_role
+    end
   end
 
   @doc """
@@ -357,7 +369,7 @@ defmodule App.Accounts do
   def create_section__role(%App.Accounts.User{} = user_auth, %App.Accounts.User{} = user, %App.Courses.Section{} = section, attrs \\ %{}) do
     allowed_roles = ["administrator", "owner"]
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_course__role!(user_auth, course)
+    auth_role = App.Accounts.get_current_course__role(user_auth, course)
 
     cond do
       course.allow_write == false ->
@@ -393,7 +405,7 @@ defmodule App.Accounts do
     allowed_roles = ["administrator", "owner"]
     section = App.Courses.get_section!(section__role.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_course__role!(user_auth, course)
+    auth_role = App.Accounts.get_current_course__role(user_auth, course)
 
     cond do
       course.allow_write == false ->
@@ -427,7 +439,7 @@ defmodule App.Accounts do
     allowed_roles = ["administrator", "owner"]
     section = App.Courses.get_section!(section__role.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_course__role!(user_auth, course)
+    auth_role = App.Accounts.get_current_course__role(user_auth, course)
 
     cond do
       course.allow_write == false ->
