@@ -146,7 +146,7 @@ defmodule App.Courses do
 
   ## Examples
 
-      iex> list_user_courses()
+      iex> list_user_courses(user)
       [%Course{}, ...]
 
   """
@@ -159,6 +159,47 @@ defmodule App.Courses do
               where: r.user_id == ^uid,
               where: r.valid_from <= from_now(0, "day"),
               where: r.valid_to >= from_now(0, "day"),
+              select: c
+    Repo.all(query)
+  end
+
+  @doc """
+  Returns the list of courses in the given semester.
+
+  ## Examples
+
+      iex> list_courses(semester)
+      [%Course{}, ...]
+
+  """
+  def list_courses(%App.Courses.Semester{} = semester) do
+    sid = semester.id
+    query = from c in Course,
+              where: c.semester_id == ^sid,
+              select: c
+    Repo.all(query)
+  end
+
+  @doc """
+  Returns the list of courses for which a user has a valid course_role in a given semester.
+
+  ## Examples
+
+      iex> list_user_courses(semester, user)
+      [%Course{}, ...]
+
+  """
+  def list_user_courses(%App.Courses.Semester{} = semester, %App.Accounts.User{} = user) do
+    uid = user.id
+    sid = semester.id
+    {:ok, current_time} = DateTime.now("Etc/UTC")
+    query = from r in App.Accounts.Course_Role,
+              left_join: c in Course,
+              on: r.course_id == c.id,
+              where: r.user_id == ^uid,
+              where: r.valid_from <= from_now(0, "day"),
+              where: r.valid_to >= from_now(0, "day"),
+              where: c.semester_id == ^sid,
               select: c
     Repo.all(query)
   end

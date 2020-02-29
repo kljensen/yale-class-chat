@@ -30,9 +30,9 @@ defmodule App.SubmissionsTest do
   describe "submissions" do
     alias App.Submissions.Submission
 
-    @valid_attrs %{description: "some description", image_url: "some image_url", slug: "some slug", title: "some title"}
-    @update_attrs %{description: "some updated description", image_url: "some updated image_url", slug: "some updated slug", title: "some updated title"}
-    @invalid_attrs %{description: nil, image_url: nil, slug: nil, title: nil}
+    @valid_attrs %{description: "some description", image_url: "some image_url", slug: "some slug", title: "some title", allow_ranking: true, hidden: true}
+    @update_attrs %{description: "some updated description", image_url: "some updated image_url", slug: "some updated slug", title: "some updated title", allow_ranking: false, hidden: false}
+    @invalid_attrs %{description: nil, image_url: nil, slug: nil, title: nil, allow_ranking: nil, hidden: nil}
 
     def role_fixture(attrs \\ %{}) do
       {:ok, current_time} = DateTime.now("Etc/UTC")
@@ -130,8 +130,8 @@ defmodule App.SubmissionsTest do
     end
 
     test "count_user_submissions/2 returns count of all submissions by the given user for the given topic", context do
-      submission = submission_fixture(context[:submitter], context[:topic])
-      submission2 = submission_fixture(context[:student], context[:topic], %{slug: "student slug"})
+      submission_fixture(context[:submitter], context[:topic])
+      submission_fixture(context[:student], context[:topic], %{slug: "student slug"})
       {:ok, topic2} = App.Topics.create_topic(context[:user_faculty], context[:section], %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2100-04-17T14:00:00Z", description: "some other description", opened_at: "2010-04-17T14:00:00Z", slug: "some other slug", sort: "some other sort", title: "some other title", user_submission_limit: 42})
       assert Submissions.count_user_submissions(context[:submitter], topic2) == [0]
       assert Submissions.count_user_submissions(context[:student], topic2) == [0]
