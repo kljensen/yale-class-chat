@@ -53,11 +53,11 @@ defmodule App.Topics do
     cid = section.course_id
     allowed_section_roles = ["student", "defunct_student", "guest"]
     query = from r in App.Accounts.Section_Role,
-              left_join: s in App.Courses.Section,
+              join: s in App.Courses.Section,
               on: r.section_id == s.id,
-              left_join: c in App.Courses.Course,
+              join: c in App.Courses.Course,
               on: s.course_id == c.id,
-              left_join: t in Topic,
+              join: t in Topic,
               on: t.section_id == s.id,
               where: r.user_id == ^uid,
               where: r.valid_from <= from_now(0, "day"),

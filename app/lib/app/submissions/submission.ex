@@ -8,12 +8,11 @@ defmodule App.Submissions.Submission do
     field :slug, :string
     field :title, :string
     field :allow_ranking, :boolean, default: false
-    field :hidden, :boolean, default: false
+    field :visible, :boolean, default: true
     belongs_to :topic, App.Topics.Topic
     belongs_to :user, App.Accounts.User
     has_many :comments, App.Submissions.Comment
     has_many :ratings, App.Submissions.Rating
-
 
     timestamps()
   end
@@ -21,8 +20,8 @@ defmodule App.Submissions.Submission do
   @doc false
   def changeset(submission, attrs) do
     submission
-    |> cast(attrs, [:title, :description, :slug, :image_url, :allow_ranking, :hidden])
-    |> validate_required([:title, :description, :slug, :allow_ranking, :hidden])
+    |> cast(attrs, [:title, :description, :slug, :image_url, :allow_ranking, :visible])
+    |> validate_required([:title, :description, :slug, :allow_ranking, :visible])
     |> unique_constraint(:slug)
     |> foreign_key_constraint(:topic_id)
     |> assoc_constraint(:topic)

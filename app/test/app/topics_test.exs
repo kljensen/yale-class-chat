@@ -134,7 +134,6 @@ defmodule App.TopicsTest do
 
     test "list_user_topics/3 returns no topics to a user with an invalid section role" do
       setupvars = topic_user_setup()
-      topic = setupvars[:topic]
       section = setupvars[:section]
       section2 = setupvars[:section2]
       student = setupvars[:student]
@@ -202,8 +201,8 @@ defmodule App.TopicsTest do
       student = setupvars[:student]
       user_faculty = setupvars[:user_faculty]
 
-      {:ok, topic} = Topics.update_topic(user_faculty, topic, %{visible: false})
-      {:ok, topic2} = Topics.update_topic(user_faculty, topic2, %{visible: false})
+      Topics.update_topic(user_faculty, topic, %{visible: false})
+      Topics.update_topic(user_faculty, topic2, %{visible: false})
 
       retrieved_topics = Topics.list_user_topics(student, section)
       assert length(retrieved_topics) == 0

@@ -20,18 +20,18 @@ defmodule App.SubmissionsTest do
     student2 = ATest.user_fixture(%{net_id: "student2"})
     student_notreg = ATest.user_fixture(%{net_id: "student_notreg"})
     role = role_fixture(%{role: "student"})
-    App.Accounts.create_section__role(user_faculty, submitter, section, role)
-    App.Accounts.create_section__role(user_faculty, student, section, role)
-    App.Accounts.create_section__role(user_faculty, student2, section, role)
+    {:ok, submitter_role} = App.Accounts.create_section__role(user_faculty, submitter, section, role)
+    {:ok, student_role} = App.Accounts.create_section__role(user_faculty, student, section, role)
+    {:ok, student2_role} = App.Accounts.create_section__role(user_faculty, student2, section, role)
 
-    [topic: topic, section: section, user_faculty: user_faculty, submitter: submitter, student: student, student2: student2, student_notreg: student_notreg]
+    [topic: topic, section: section, user_faculty: user_faculty, submitter: submitter, student: student, student2: student2, student_notreg: student_notreg, submitter_role: submitter_role, student_role: student_role, student2_role: student2_role]
   end
 
   describe "submissions" do
     alias App.Submissions.Submission
 
-    @valid_attrs %{description: "some description", image_url: "some image_url", slug: "some slug", title: "some title", allow_ranking: true, hidden: true}
-    @update_attrs %{description: "some updated description", image_url: "some updated image_url", slug: "some updated slug", title: "some updated title", allow_ranking: false, hidden: false}
+    @valid_attrs %{description: "some description", image_url: "some image_url", slug: "some slug", title: "some title", allow_ranking: true, visible: true}
+    @update_attrs %{description: "some updated description", image_url: "some updated image_url", slug: "some updated slug", title: "some updated title", allow_ranking: false, visible: false}
     @invalid_attrs %{description: nil, image_url: nil, slug: nil, title: nil, allow_ranking: nil, hidden: nil}
 
     def role_fixture(attrs \\ %{}) do
@@ -82,10 +82,72 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.title == submission.title
     end
 
-    test "list_user_submissions/1 returns all submissions by the given user", context do
+    test "list_user_submissions/1 returns user-visible submissions for the given topic", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      student = context[:student]
+
+      retrieved_submissions = Submissions.list_user_submissions(student, context[:topic])
+      assert length(retrieved_submissions) == 1
+
+      retrieved_submission = List.first(retrieved_submissions)
+      assert retrieved_submission.id == submission.id
+      assert retrieved_submission.description == submission.description
+      assert retrieved_submission.image_url == submission.image_url
+      assert retrieved_submission.slug == submission.slug
+      assert retrieved_submission.title == submission.title
+    end
+
+    test "list_user_submissions/1 returns no submissions for invalid roles", context do
+      submission_fixture(context[:submitter], context[:topic])
+      student = context[:student]
+      student2 = context[:student]
+      student_notreg = context[:student_notreg]
+      user_faculty = context[:user_faculty]
+
+      retrieved_submissions = Submissions.list_user_submissions(student, context[:topic])
+      assert length(retrieved_submissions) == 1
+      retrieved_submissions = Submissions.list_user_submissions(student2, context[:topic])
+      assert length(retrieved_submissions) == 1
+
+      retrieved_submissions = Submissions.list_user_submissions(student_notreg, context[:topic])
+      assert length(retrieved_submissions) == 0
+
+      {:ok, current_time} = DateTime.now("Etc/UTC")
+      params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, -7200, :second)}
+      App.Accounts.update_section__role(user_faculty, context[:student_role], params)
+      params = %{role: "student", valid_from: DateTime.add(current_time, 7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      App.Accounts.update_section__role(user_faculty, context[:student2_role], params)
+
+      retrieved_submissions = Submissions.list_user_submissions(student, context[:topic])
+      assert length(retrieved_submissions) == 0
+      retrieved_submissions = Submissions.list_user_submissions(student2, context[:topic])
+      assert length(retrieved_submissions) == 0
+    end
+
+    test "list_user_submissions/1 returns no hidden submissions for the given topic", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      student = context[:student]
+      user_faculty = context[:user_faculty]
+      topic = context[:topic]
+
+      {:ok, topic} = App.Topics.update_topic(user_faculty, topic, %{show_user_submissions: false})
+
+      retrieved_submissions = Submissions.list_user_submissions(student, context[:topic])
+      assert length(retrieved_submissions) == 0
+
+      {:ok, topic} = App.Topics.update_topic(user_faculty, topic, %{show_user_submissions: true})
+      retrieved_submissions = Submissions.list_user_submissions(student, topic)
+      assert length(retrieved_submissions) == 1
+
+      Submissions.update_submission(user_faculty, submission, %{visible: false})
+      retrieved_submissions = Submissions.list_user_submissions(student, topic)
+      assert length(retrieved_submissions) == 0
+    end
+
+    test "list_user_own_submissions/1 returns all submissions by the given user", context do
       submission = submission_fixture(context[:submitter], context[:topic])
       submission2 = submission_fixture(context[:student], context[:topic], %{slug: "student slug"})
-      retrieved_submissions = Submissions.list_user_submissions(context[:submitter])
+      retrieved_submissions = Submissions.list_user_own_submissions(context[:submitter])
       assert length(retrieved_submissions) == 1
       retrieved_submission = List.first(retrieved_submissions)
       assert retrieved_submission.id == submission.id
@@ -93,7 +155,7 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.image_url == submission.image_url
       assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
-      retrieved_submissions = Submissions.list_user_submissions(context[:student])
+      retrieved_submissions = Submissions.list_user_own_submissions(context[:student])
       assert length(retrieved_submissions) == 1
       retrieved_submission = List.first(retrieved_submissions)
       assert retrieved_submission.id == submission2.id
@@ -103,15 +165,15 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.title == submission2.title
     end
 
-    test "list_user_submissions/2 returns all submissions by the given user for the given topic", context do
+    test "list_user_own_submissions/2 returns all submissions by the given user for the given topic", context do
       submission = submission_fixture(context[:submitter], context[:topic])
       submission2 = submission_fixture(context[:student], context[:topic], %{slug: "student slug"})
       {:ok, topic2} = App.Topics.create_topic(context[:user_faculty], context[:section], %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2100-04-17T14:00:00Z", description: "some other description", opened_at: "2010-04-17T14:00:00Z", slug: "some other slug", sort: "some other sort", title: "some other title", user_submission_limit: 42})
-      retrieved_submissions = Submissions.list_user_submissions(context[:submitter], topic2)
+      retrieved_submissions = Submissions.list_user_own_submissions(context[:submitter], topic2)
       assert length(retrieved_submissions) == 0
-      retrieved_submissions = Submissions.list_user_submissions(context[:student], topic2)
+      retrieved_submissions = Submissions.list_user_own_submissions(context[:student], topic2)
       assert length(retrieved_submissions) == 0
-      retrieved_submissions = Submissions.list_user_submissions(context[:submitter], context[:topic])
+      retrieved_submissions = Submissions.list_user_own_submissions(context[:submitter], context[:topic])
       assert length(retrieved_submissions) == 1
       retrieved_submission = List.first(retrieved_submissions)
       assert retrieved_submission.id == submission.id
@@ -119,7 +181,7 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.image_url == submission.image_url
       assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
-      retrieved_submissions = Submissions.list_user_submissions(context[:student], context[:topic])
+      retrieved_submissions = Submissions.list_user_own_submissions(context[:student], context[:topic])
       assert length(retrieved_submissions) == 1
       retrieved_submission = List.first(retrieved_submissions)
       assert retrieved_submission.id == submission2.id

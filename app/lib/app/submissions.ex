@@ -36,15 +36,69 @@ defmodule App.Submissions do
   end
 
   @doc """
+  Returns the list of submissions visible to a given user for a given topic.
+
+  ## Examples
+
+      iex> list_user_submissions(user, topic)
+      [%Submission{}, ...]
+
+  """
+  def list_user_submissions(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic, inherit_course_role \\ true) do
+    tid = topic.id
+    uid = user.id
+    sid = topic.section_id
+    allowed_section_roles = ["student", "defunct_student", "guest"]
+
+    query = from r in App.Accounts.Section_Role,
+              join: s in App.Courses.Section,
+              on: r.section_id == s.id,
+              join: c in App.Courses.Course,
+              on: s.course_id == c.id,
+              join: t in App.Topics.Topic,
+              on: t.section_id == s.id,
+              join: su in Submission,
+              on: su.topic_id == t.id,
+              where: r.user_id == ^uid,
+              where: r.valid_from <= from_now(0, "day"),
+              where: r.valid_to >= from_now(0, "day"),
+              where: r.role in ^allowed_section_roles,
+              where: c.allow_read == true,
+              where: s.id == ^sid,
+              where: t.visible,
+              where: t.show_user_submissions,
+              where: su.visible,
+              where: t.id == ^tid,
+              select: su
+
+    query = if inherit_course_role do
+      section = App.Courses.get_section!(sid)
+      course = App.Courses.get_course!(section.course_id)
+      allowed_course_roles = ["administrator", "owner"]
+      auth_role = App.Accounts.get_current_course__role(user, course)
+      if Enum.member?(allowed_course_roles, auth_role) do
+        from s in Submission,
+          where: s.topic_id == ^tid
+      else
+        query
+      end
+    else
+      query
+    end
+
+    Repo.all(query)
+  end
+
+  @doc """
   Returns the list of submissions by a given user.
 
   ## Examples
 
-      iex> list_user_submissions(user)
+      iex> list_user_own_submissions(user)
       [%Submission{}, ...]
 
   """
-  def list_user_submissions(%App.Accounts.User{} = user) do
+  def list_user_own_submissions(%App.Accounts.User{} = user) do
     uid = user.id
     Repo.all(from s in Submission, where: s.user_id == ^uid)
   end
@@ -54,11 +108,11 @@ defmodule App.Submissions do
 
   ## Examples
 
-      iex> list_user_submissions(user, topic)
+      iex> list_user_own_submissions(user, topic)
       [%Submission{}, ...]
 
   """
-  def list_user_submissions(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic) do
+  def list_user_own_submissions(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic) do
     tid = topic.id
     uid = user.id
     Repo.all(from s in Submission, where: s.topic_id == ^tid, where: s.user_id == ^uid)
@@ -164,13 +218,13 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     admin_roles = ["administrator", "owner"]
-    auth_role = App.Accounts.get_current_section__role(user, section)
+    auth_role = App.Accounts.get_current_course__role(user, course)
     {:ok, current_time} = DateTime.now("Etc/UTC")
     authorized = Enum.member?(admin_roles, auth_role) or user.id == submission.user_id
 
     #Only allow admins to hide/unhide submissions or allow them to be ranked
     unless Enum.member?(admin_roles, auth_role) do
-      if Map.get(attrs, :hidden), do: attrs = Map.delete(attrs, :hidden)
+      if Map.get(attrs, :visible), do: attrs = Map.delete(attrs, :visible)
       if Map.get(attrs, :allow_ranking), do: attrs = Map.delete(attrs, :allow_ranking)
     end
 
