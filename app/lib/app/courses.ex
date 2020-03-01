@@ -372,6 +372,61 @@ defmodule App.Courses do
   end
 
   @doc """
+  Returns the list of sections for a given course.
+
+  ## Examples
+
+      iex> list_sections(course)
+      [%Section{}, ...]
+
+  """
+  def list_sections(%Course{} = course) do
+    cid = course.id
+    query = from s in Section,
+              where: s.course_id == ^cid,
+              select: s
+    Repo.all(query)
+  end
+
+  @doc """
+  Returns the list of sections for which a user had a valid section role for a given course.
+
+  ## Examples
+
+      iex> list_user_sections(course, user)
+      [%Course{}, ...]
+
+  """
+  def list_user_sections(%Course{} = course, %App.Accounts.User{} = user, inherit_course_role \\ true) do
+    allowed_course_roles = ["administrator", "owner"]
+    auth_role = App.Accounts.get_current_course__role(user, course)
+    uid = user.id
+    cid = course.id
+    allowed_section_roles = ["student", "defunct_student", "guest"]
+    {:ok, current_time} = DateTime.now("Etc/UTC")
+    query = from r in App.Accounts.Section_Role,
+              left_join: s in Section,
+              on: r.section_id == s.id,
+              left_join: c in Course,
+              on: s.course_id == c.id,
+              where: r.user_id == ^uid,
+              where: r.valid_from <= from_now(0, "day"),
+              where: r.valid_to >= from_now(0, "day"),
+              where: r.role in ^allowed_section_roles,
+              where: c.allow_read == true,
+              where: s.course_id == ^cid,
+              select: s
+    query = if inherit_course_role and Enum.member?(allowed_course_roles, auth_role) do
+      from s in Section,
+        where: s.course_id == ^cid,
+        select: s
+    else
+        query
+    end
+    Repo.all(query)
+  end
+
+  @doc """
   Gets a single section.
 
   Raises `Ecto.NoResultsError` if the Section does not exist.
