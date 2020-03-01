@@ -404,9 +404,6 @@ defmodule App.CoursesTest do
       section = section_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
       course = Courses.get_course!(section.course_id)
-      semester = Courses.get_semester!(course.semester_id)
-      params = %{department: "some department", name: "empty course", number: 42, allow_write: true, allow_read: true}
-      {:ok, course2} = Courses.create_course(user_faculty, semester, params)
       section_list = Courses.list_user_sections(course, user_faculty)
       retrieved_section = List.first(section_list)
       assert retrieved_section.id == section.id
@@ -420,9 +417,7 @@ defmodule App.CoursesTest do
       section = section_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
       user_student = ATest.user_fixture(%{is_faculty: false, net_id: "student net id"})
-      user_student2 = ATest.user_fixture(%{is_faculty: false, net_id: "other student net id"})
       course = Courses.get_course!(section.course_id)
-      semester = Courses.get_semester!(course.semester_id)
       {:ok, current_time} = DateTime.now("Etc/UTC")
       #No role returns no sections
       section_list = Courses.list_user_sections(course, user_student)
@@ -443,12 +438,12 @@ defmodule App.CoursesTest do
       assert retrieved_section.title == section.title
       #Yet to begin role returns no sections
       params = %{role: "student", valid_from: DateTime.add(current_time, 7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
-      App.Accounts.update_section__role(user_faculty, section_role, params)
+      {:ok, section_role} = App.Accounts.update_section__role(user_faculty, section_role, params)
       section_list = Courses.list_user_sections(course, user_student)
       assert length(section_list) == 0
       #Invalid role returns no sections
       params = %{role: "invalid role", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
-      {:ok, section_role} = App.Accounts.update_section__role(user_faculty, section_role, params)
+      App.Accounts.update_section__role(user_faculty, section_role, params)
       section_list = Courses.list_user_sections(course, user_student)
       assert length(section_list) == 0
     end
