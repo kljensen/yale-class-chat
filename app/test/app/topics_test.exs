@@ -10,9 +10,9 @@ defmodule App.TopicsTest do
   describe "topics" do
     alias App.Topics.Topic
 
-    @valid_attrs %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2100-04-17T14:00:00Z", description: "some description", opened_at: "2010-04-17T14:00:00Z", slug: "some slug", sort: "some sort", title: "some title", user_submission_limit: 42, allow_ranking: true, show_user_submissions: true}
-    @update_attrs %{allow_submission_comments: false, allow_submission_voting: false, allow_submissions: false, anonymous: false, closed_at: "2101-05-18T15:01:01Z", description: "some updated description", opened_at: "2011-05-18T15:01:01Z", slug: "some updated slug", sort: "some updated sort", title: "some updated title", user_submission_limit: 43, allow_ranking: false, show_user_submissions: false}
-    @invalid_attrs %{allow_submission_comments: nil, allow_submission_voting: nil, allow_submissions: nil, anonymous: nil, closed_at: nil, description: nil, opened_at: nil, slug: nil, sort: nil, title: nil, user_submission_limit: nil, allow_ranking: nil, show_user_submissions: nil}
+    @valid_attrs %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2100-04-17T14:00:00Z", description: "some description", opened_at: "2010-04-17T14:00:00Z", slug: "some slug", sort: "some sort", title: "some title", user_submission_limit: 42, allow_ranking: true, show_user_submissions: true, visible: true}
+    @update_attrs %{allow_submission_comments: false, allow_submission_voting: false, allow_submissions: false, anonymous: false, closed_at: "2101-05-18T15:01:01Z", description: "some updated description", opened_at: "2011-05-18T15:01:01Z", slug: "some updated slug", sort: "some updated sort", title: "some updated title", user_submission_limit: 43, allow_ranking: false, show_user_submissions: false, visible: false}
+    @invalid_attrs %{allow_submission_comments: nil, allow_submission_voting: nil, allow_submissions: nil, anonymous: nil, closed_at: nil, description: nil, opened_at: nil, slug: nil, sort: nil, title: nil, user_submission_limit: nil, allow_ranking: nil, show_user_submissions: nil, visible: nil}
 
     def topic_fixture(attrs \\ %{}) do
       params =
@@ -72,6 +72,9 @@ defmodule App.TopicsTest do
       assert %{sort: ["can't be blank"]} = errors_on(changeset)
       assert %{title: ["can't be blank"]} = errors_on(changeset)
       assert %{user_submission_limit: ["can't be blank"]} = errors_on(changeset)
+      assert %{allow_ranking: ["can't be blank"]} = errors_on(changeset)
+      assert %{show_user_submissions: ["can't be blank"]} = errors_on(changeset)
+      assert %{visible: ["can't be blank"]} = errors_on(changeset)
     end
 
     test "create_topic/3 by unauthorized user returns error" do
