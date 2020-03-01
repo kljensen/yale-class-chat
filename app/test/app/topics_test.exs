@@ -28,11 +28,187 @@ defmodule App.TopicsTest do
       topic
     end
 
+    defp multi_topic_setup() do
+      topic = topic_fixture()
+      section = Courses.get_section!(topic.section_id)
+      course = Courses.get_course!(section.course_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      params = %{crn: "some other crn", title: "some other title"}
+      {:ok, section2} = Courses.create_section(user_faculty, course, params)
+      params =
+        %{slug: "some other slug"}
+        |> Enum.into(@valid_attrs)
+      {:ok, topic2} = Topics.create_topic(user_faculty, section2, params)
+
+      [topic: topic, section: section, course: course, user_faculty: user_faculty, section2: section2, topic2: topic2]
+    end
+
+    defp topic_user_setup() do
+      setupvars = multi_topic_setup()
+      user_faculty = setupvars[:user_faculty]
+      user_faculty2 = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id 2"})
+      student = ATest.user_fixture(%{is_faculty: false, net_id: "student net id"})
+      student_notreg = ATest.user_fixture(%{is_faculty: false, net_id: "student net id 2"})
+      {:ok, current_time} = DateTime.now("Etc/UTC")
+
+      params = %{role: "administrator", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      Accounts.create_course__role(user_faculty, user_faculty2, setupvars[:course], params)
+
+      params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      {:ok, student_section_role} = App.Accounts.create_section__role(user_faculty, student, setupvars[:section], params)
+      {:ok, student_section2_role} = App.Accounts.create_section__role(user_faculty, student, setupvars[:section2], params)
+
+      Enum.concat(setupvars, [user_faculty2: user_faculty2, student: student, student_notreg: student_notreg, student_section_role: student_section_role, student_section2_role: student_section2_role])
+    end
+
     test "list_topics/0 returns all topics" do
       topic = topic_fixture()
       retrieved_topics = Topics.list_topics()
       retrieved_1 = List.first(retrieved_topics)
       assert retrieved_1.id == topic.id
+    end
+
+    test "list_topics/2 returns all topics in a given section" do
+      setupvars = multi_topic_setup()
+      topic = setupvars[:topic]
+      topic2 = setupvars[:topic2]
+      section = setupvars[:section]
+      section2 = setupvars[:section2]
+
+      retrieved_topics = Topics.list_topics()
+      assert length(retrieved_topics) == 2
+      retrieved_topics = Topics.list_topics(section)
+      assert length(retrieved_topics) == 1
+      retrieved_1 = List.first(retrieved_topics)
+      assert retrieved_1.id == topic.id
+      retrieved_topics = Topics.list_topics(section2)
+      assert length(retrieved_topics) == 1
+      retrieved_2 = List.first(retrieved_topics)
+      assert retrieved_2.id == topic2.id
+    end
+
+    test "list_user_topics/3 returns all topics in a section to a user with a valid course role" do
+      setupvars = topic_user_setup()
+      topic = setupvars[:topic]
+      topic2 = setupvars[:topic2]
+      section = setupvars[:section]
+      section2 = setupvars[:section2]
+      user_faculty = setupvars[:user_faculty]
+      user_faculty2 = setupvars[:user_faculty2]
+
+      retrieved_topics = Topics.list_user_topics(user_faculty, section)
+      assert length(retrieved_topics) == 1
+      retrieved_topic = List.first(retrieved_topics)
+      assert retrieved_topic.id == topic.id
+      retrieved_topics = Topics.list_user_topics(user_faculty, section2)
+      assert length(retrieved_topics) == 1
+      retrieved_topic = List.first(retrieved_topics)
+      assert retrieved_topic.id == topic2.id
+      retrieved_topics = Topics.list_user_topics(user_faculty2, section)
+      assert length(retrieved_topics) == 1
+      retrieved_topic = List.first(retrieved_topics)
+      assert retrieved_topic.id == topic.id
+      retrieved_topics = Topics.list_user_topics(user_faculty2, section2)
+      assert length(retrieved_topics) == 1
+      retrieved_topic = List.first(retrieved_topics)
+      assert retrieved_topic.id == topic2.id
+    end
+
+    test "list_user_topics/3 returns all topics visible to a user with a valid section role" do
+      setupvars = topic_user_setup()
+      topic = setupvars[:topic]
+      topic2 = setupvars[:topic2]
+      section = setupvars[:section]
+      section2 = setupvars[:section2]
+      student = setupvars[:student]
+
+      retrieved_topics = Topics.list_user_topics(student, section)
+      assert length(retrieved_topics) == 1
+      retrieved_topic = List.first(retrieved_topics)
+      assert retrieved_topic.id == topic.id
+      retrieved_topics = Topics.list_user_topics(student, section2)
+      assert length(retrieved_topics) == 1
+      retrieved_topic = List.first(retrieved_topics)
+      assert retrieved_topic.id == topic2.id
+    end
+
+    test "list_user_topics/3 returns no topics to a user with an invalid section role" do
+      setupvars = topic_user_setup()
+      topic = setupvars[:topic]
+      section = setupvars[:section]
+      section2 = setupvars[:section2]
+      student = setupvars[:student]
+      student_notreg = setupvars[:student_notreg]
+      user_faculty = setupvars[:user_faculty]
+
+      retrieved_topics = Topics.list_user_topics(student_notreg, section)
+      assert length(retrieved_topics) == 0
+      retrieved_topics = Topics.list_user_topics(student_notreg, section2)
+      assert length(retrieved_topics) == 0
+
+      retrieved_topics = Topics.list_user_topics(student, section)
+      assert length(retrieved_topics) == 1
+      retrieved_topics = Topics.list_user_topics(student, section2)
+      assert length(retrieved_topics) == 1
+
+      {:ok, current_time} = DateTime.now("Etc/UTC")
+      params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, -7200, :second)}
+      App.Accounts.update_section__role(user_faculty, setupvars[:student_section_role], params)
+      params = %{role: "student", valid_from: DateTime.add(current_time, 7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      App.Accounts.update_section__role(user_faculty, setupvars[:student_section2_role], params)
+
+      retrieved_topics = Topics.list_user_topics(student, section)
+      assert length(retrieved_topics) == 0
+      retrieved_topics = Topics.list_user_topics(student, section2)
+      assert length(retrieved_topics) == 0
+    end
+
+    test "list_user_topics/3 returns all topics in a section to a user with a valid course role even if topics hidden" do
+      setupvars = topic_user_setup()
+      topic = setupvars[:topic]
+      topic2 = setupvars[:topic2]
+      section = setupvars[:section]
+      section2 = setupvars[:section2]
+      user_faculty = setupvars[:user_faculty]
+      user_faculty2 = setupvars[:user_faculty2]
+
+      {:ok, topic} = Topics.update_topic(user_faculty, topic, %{visible: false})
+      {:ok, topic2} = Topics.update_topic(user_faculty, topic2, %{visible: false})
+
+      retrieved_topics = Topics.list_user_topics(user_faculty, section)
+      assert length(retrieved_topics) == 1
+      retrieved_topic = List.first(retrieved_topics)
+      assert retrieved_topic.id == topic.id
+      retrieved_topics = Topics.list_user_topics(user_faculty, section2)
+      assert length(retrieved_topics) == 1
+      retrieved_topic = List.first(retrieved_topics)
+      assert retrieved_topic.id == topic2.id
+      retrieved_topics = Topics.list_user_topics(user_faculty2, section)
+      assert length(retrieved_topics) == 1
+      retrieved_topic = List.first(retrieved_topics)
+      assert retrieved_topic.id == topic.id
+      retrieved_topics = Topics.list_user_topics(user_faculty2, section2)
+      assert length(retrieved_topics) == 1
+      retrieved_topic = List.first(retrieved_topics)
+      assert retrieved_topic.id == topic2.id
+    end
+
+    test "list_user_topics/3 returns no hidden topics to a user with a valid section role" do
+      setupvars = topic_user_setup()
+      topic = setupvars[:topic]
+      topic2 = setupvars[:topic2]
+      section = setupvars[:section]
+      section2 = setupvars[:section2]
+      student = setupvars[:student]
+      user_faculty = setupvars[:user_faculty]
+
+      {:ok, topic} = Topics.update_topic(user_faculty, topic, %{visible: false})
+      {:ok, topic2} = Topics.update_topic(user_faculty, topic2, %{visible: false})
+
+      retrieved_topics = Topics.list_user_topics(student, section)
+      assert length(retrieved_topics) == 0
+      retrieved_topics = Topics.list_user_topics(student, section2)
+      assert length(retrieved_topics) == 0
     end
 
     test "get_topic!/1 returns the topic with given id" do
