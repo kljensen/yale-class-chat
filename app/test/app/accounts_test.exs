@@ -2,6 +2,7 @@ defmodule App.AccountsTest do
   use App.DataCase
 
   alias App.Accounts
+  alias App.Courses
   alias App.CoursesTest, as: CTest
 
   describe "users" do
@@ -80,14 +81,14 @@ defmodule App.AccountsTest do
     @invalid_attrs %{role: nil, valid_from: nil, valid_to: nil}
 
     def course__role_fixture(attrs \\ %{}) do
-      params = 
+      params =
         attrs
         |> Enum.into(@valid_attrs)
-      
+
       user = user_fixture()
       course = CTest.course_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
-      
+
       {:ok, course__role} =
         Accounts.create_course__role(user_faculty, user, course, params)
 
@@ -95,7 +96,7 @@ defmodule App.AccountsTest do
     end
 
 
-    test "list_course_roles/0 returns all course_roles" do     
+    test "list_course_roles/0 returns all course_roles" do
       course__role = course__role_fixture()
       course_role_list = Accounts.list_course_roles()
       retrieved_course_role = List.last(course_role_list)
@@ -112,7 +113,7 @@ defmodule App.AccountsTest do
       user = user_fixture()
       course = CTest.course_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
-      
+
       assert {:ok, %Course_Role{} = course__role} = Accounts.create_course__role(user_faculty, user, course, @valid_attrs)
       assert course__role.role == "some role"
       assert course__role.valid_from == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
@@ -132,7 +133,15 @@ defmodule App.AccountsTest do
       course = CTest.course_fixture()
       user_faculty = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
 
-      assert {:error, "unauthorized"} = Accounts.create_course__role(user_faculty, user, course, @invalid_attrs)
+      assert {:error, "unauthorized"} = Accounts.create_course__role(user_faculty, user, course, @valid_attrs)
+    end
+
+    test "create_course__role/4 on non-writeable course returns error" do
+      user = user_fixture()
+      course = CTest.course_fixture(%{allow_write: false})
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      Courses.update_course(user_faculty, course, %{allow_write: false})
+      assert {:error, "course write not allowed"} = Accounts.create_course__role(user_faculty, user, course, @valid_attrs)
     end
 
     test "update_course__role/3 with valid data updates the course__role" do
@@ -167,6 +176,18 @@ defmodule App.AccountsTest do
       assert course__role.valid_to == retrieved_course_role.valid_to
     end
 
+    test "update_course__role/3 on non-writeable course returns error" do
+      course__role = course__role_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      course = Courses.get_course!(course__role.course_id)
+      Courses.update_course(user_faculty, course, %{allow_write: false})
+      assert {:error, "course write not allowed"} = Accounts.update_course__role(user_faculty, course__role, @invalid_attrs)
+      retrieved_course_role = Accounts.get_course__role!(course__role.id)
+      assert course__role.id == retrieved_course_role.id
+      assert course__role.valid_from == retrieved_course_role.valid_from
+      assert course__role.valid_to == retrieved_course_role.valid_to
+    end
+
     test "delete_course__role/1 deletes the course__role" do
       course__role = course__role_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
@@ -183,7 +204,20 @@ defmodule App.AccountsTest do
       retrieved_course_role = Accounts.get_course__role!(course__role.id)
       assert course__role.id == retrieved_course_role.id
       assert course__role.valid_from == retrieved_course_role.valid_from
-      assert course__role.valid_to == retrieved_course_role.valid_to    
+      assert course__role.valid_to == retrieved_course_role.valid_to
+    end
+
+    test "delete_course__role/1 on non-writeable course returns error" do
+      course__role = course__role_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      course = Courses.get_course!(course__role.course_id)
+      Courses.update_course(user_faculty, course, %{allow_write: false})
+
+      assert {:error, "course write not allowed"} = Accounts.delete_course__role(user_faculty, course__role)
+      retrieved_course_role = Accounts.get_course__role!(course__role.id)
+      assert course__role.id == retrieved_course_role.id
+      assert course__role.valid_from == retrieved_course_role.valid_from
+      assert course__role.valid_to == retrieved_course_role.valid_to
     end
 
     test "change_course__role/1 returns a course__role changeset" do
@@ -200,10 +234,10 @@ defmodule App.AccountsTest do
     @invalid_attrs %{role: nil, valid_from: nil, valid_to: nil}
 
     def section__role_fixture(attrs \\ %{}) do
-      params = 
+      params =
         attrs
         |> Enum.into(@valid_attrs)
-      
+
       user = user_fixture()
       section = CTest.section_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
@@ -252,7 +286,17 @@ defmodule App.AccountsTest do
       section = CTest.section_fixture()
       user_noauth = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
 
-      assert {:error, "unauthorized"} = Accounts.create_section__role(user_noauth, user, section, @invalid_attrs)
+      assert {:error, "unauthorized"} = Accounts.create_section__role(user_noauth, user, section, @valid_attrs)
+    end
+
+    test "create_section__role/4 with non-writeable course returns error" do
+      user = user_fixture()
+      section = CTest.section_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      course = Courses.get_course!(section.course_id)
+      Courses.update_course(user_faculty, course, %{allow_write: false})
+
+      assert {:error, "course write not allowed"} = Accounts.create_section__role(user_faculty, user, section, @valid_attrs)
     end
 
     test "update_section__role/3 with valid data updates the section__role" do
@@ -268,7 +312,7 @@ defmodule App.AccountsTest do
       section__role = section__role_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
       assert {:error, %Ecto.Changeset{}} = Accounts.update_section__role(user_faculty, section__role, @invalid_attrs)
-      retrieved_section_role = Accounts.get_section__role!(section__role.id) 
+      retrieved_section_role = Accounts.get_section__role!(section__role.id)
       assert section__role.id == retrieved_section_role.id
       assert section__role.valid_from == retrieved_section_role.valid_from
       assert section__role.valid_to == retrieved_section_role.valid_to
@@ -276,10 +320,24 @@ defmodule App.AccountsTest do
 
     test "update_section__role/3 by unauthorized user returns error" do
       section__role = section__role_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      section = Courses.get_section!(section__role.section_id)
+      course = Courses.get_course!(section.course_id)
+      Courses.update_course(user_faculty, course, %{allow_write: false})
+
+      assert {:error, "course write not allowed"} = Accounts.update_section__role(user_faculty, section__role, @valid_attrs)
+      retrieved_section_role = Accounts.get_section__role!(section__role.id)
+      assert section__role.id == retrieved_section_role.id
+      assert section__role.valid_from == retrieved_section_role.valid_from
+      assert section__role.valid_to == retrieved_section_role.valid_to
+    end
+
+    test "update_section__role/3 with non-writeable course returns error" do
+      section__role = section__role_fixture()
       user_noauth = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
 
       assert {:error, "unauthorized"} = Accounts.update_section__role(user_noauth, section__role, @invalid_attrs)
-      retrieved_section_role = Accounts.get_section__role!(section__role.id) 
+      retrieved_section_role = Accounts.get_section__role!(section__role.id)
       assert section__role.id == retrieved_section_role.id
       assert section__role.valid_from == retrieved_section_role.valid_from
       assert section__role.valid_to == retrieved_section_role.valid_to
@@ -296,7 +354,21 @@ defmodule App.AccountsTest do
       section__role = section__role_fixture()
       user_noauth = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
       assert {:error, "unauthorized"} = Accounts.delete_section__role(user_noauth, section__role)
-      retrieved_section_role = Accounts.get_section__role!(section__role.id) 
+      retrieved_section_role = Accounts.get_section__role!(section__role.id)
+      assert section__role.id == retrieved_section_role.id
+      assert section__role.valid_from == retrieved_section_role.valid_from
+      assert section__role.valid_to == retrieved_section_role.valid_to
+    end
+
+    test "delete_section__role/3 by unauthorized user returns error" do
+      section__role = section__role_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      section = Courses.get_section!(section__role.section_id)
+      course = Courses.get_course!(section.course_id)
+      Courses.update_course(user_faculty, course, %{allow_write: false})
+
+      assert {:error, "course write not allowed"} = Accounts.delete_section__role(user_faculty, section__role)
+      retrieved_section_role = Accounts.get_section__role!(section__role.id)
       assert section__role.id == retrieved_section_role.id
       assert section__role.valid_from == retrieved_section_role.valid_from
       assert section__role.valid_to == retrieved_section_role.valid_to
