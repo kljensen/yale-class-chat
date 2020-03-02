@@ -25,6 +25,11 @@ case $ACTION in
         docker-compose exec app /app/run.sh sighup-beam
         docker-compose exec tests /app/run.sh sighup-beam
         ;;
+    reup)
+        # Bring down all processes in development, then bring back up
+        docker-compose down
+        docker-compose up
+        ;;
     *)
         echo "Invalid action!"
         exit
