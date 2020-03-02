@@ -479,6 +479,144 @@ defmodule App.SubmissionsTest do
       assert retrieved_comment.title == comment.title
     end
 
+    test "list_comments/1 returns all comments for the given submission", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      submission2 = submission_fixture(context[:submitter], context[:topic], %{slug: "some other slug"})
+      comment = comment_fixture(context[:student], submission)
+      comment2 = comment_fixture(context[:student], submission2)
+
+      retrieved_comments = Submissions.list_comments(submission2)
+      assert length(retrieved_comments) == 1
+      retrieved_comment = List.first(retrieved_comments)
+      assert retrieved_comment.id == comment2.id
+      assert retrieved_comment.description == comment2.description
+      assert retrieved_comment.title == comment2.title
+      retrieved_comments = Submissions.list_comments(submission)
+      assert length(retrieved_comments) == 1
+      retrieved_comment = List.first(retrieved_comments)
+      assert retrieved_comment.id == comment.id
+      assert retrieved_comment.description == comment.description
+      assert retrieved_comment.title == comment.title
+    end
+
+    test "list_user_comments/3 returns all comments for the given submission", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      submission2 = submission_fixture(context[:submitter], context[:topic], %{slug: "some other slug"})
+      comment = comment_fixture(context[:student], submission)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      student = context[:student]
+
+      retrieved_comments = Submissions.list_user_comments(student, submission2)
+      assert length(retrieved_comments) == 0
+      retrieved_comments = Submissions.list_user_comments(student, submission)
+      assert length(retrieved_comments) == 1
+      retrieved_comment = List.first(retrieved_comments)
+      assert retrieved_comment.id == comment.id
+      assert retrieved_comment.description == comment.description
+      assert retrieved_comment.title == comment.title
+
+      retrieved_comments = Submissions.list_user_comments(user_faculty, submission2)
+      assert length(retrieved_comments) == 0
+      retrieved_comments = Submissions.list_user_comments(user_faculty, submission)
+      assert length(retrieved_comments) == 1
+      retrieved_comment = List.first(retrieved_comments)
+      assert retrieved_comment.id == comment.id
+      assert retrieved_comment.description == comment.description
+      assert retrieved_comment.title == comment.title
+    end
+
+    test "list_user_comments/3 returns no comments if no valid role", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      comment_fixture(context[:student], submission)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      user_faculty2 = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id 2"})
+      student = context[:student]
+      course = Courses.get_course!(context[:section].course_id)
+      {:ok, current_time} = DateTime.now("Etc/UTC")
+
+      params = %{role: "administrator", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, -7200, :second)}
+      {:ok, course_role} = Accounts.create_course__role(user_faculty, user_faculty2, course, params)
+      params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, -7200, :second)}
+      Accounts.update_section__role(user_faculty, context[:student_role], params)
+
+      retrieved_comments = Submissions.list_user_comments(student, submission)
+      assert length(retrieved_comments) == 0
+      retrieved_comments = Submissions.list_user_comments(user_faculty2, submission)
+      assert length(retrieved_comments) == 0
+
+      params = %{role: "administrator", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      {:ok, course_role} = Accounts.update_course__role(user_faculty, course_role, params)
+      params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      Accounts.update_section__role(user_faculty, context[:student_role], params)
+
+      retrieved_comments = Submissions.list_user_comments(student, submission)
+      assert length(retrieved_comments) == 1
+      retrieved_comments = Submissions.list_user_comments(user_faculty2, submission)
+      assert length(retrieved_comments) == 1
+
+      params = %{role: "administrator", valid_from: DateTime.add(current_time, 7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      Accounts.update_course__role(user_faculty, course_role, params)
+      params = %{role: "student", valid_from: DateTime.add(current_time, 7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      Accounts.update_section__role(user_faculty, context[:student_role], params)
+
+      retrieved_comments = Submissions.list_user_comments(student, submission)
+      assert length(retrieved_comments) == 0
+      retrieved_comments = Submissions.list_user_comments(user_faculty2, submission)
+      assert length(retrieved_comments) == 0
+
+    end
+
+    test "list_user_own_comments/1 returns all comments by the given user", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      submission2 = submission_fixture(context[:submitter], context[:topic], %{slug: "some other slug"})
+      comment = comment_fixture(context[:student], submission)
+      comment2 = comment_fixture(context[:student], submission2)
+      student = context[:student]
+      student2 = context[:student2]
+
+      retrieved_comments = Submissions.list_user_own_comments(student)
+      assert length(retrieved_comments) == 2
+      retrieved_comment = List.first(retrieved_comments)
+      assert retrieved_comment.id == comment.id
+      assert retrieved_comment.description == comment.description
+      assert retrieved_comment.title == comment.title
+      retrieved_comment = List.last(retrieved_comments)
+      assert retrieved_comment.id == comment2.id
+      assert retrieved_comment.description == comment2.description
+      assert retrieved_comment.title == comment2.title
+
+      retrieved_comments = Submissions.list_user_own_comments(student2)
+      assert length(retrieved_comments) == 0
+    end
+
+    test "list_user_own_comments/2 returns all comments by the given user for the given submission", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      submission2 = submission_fixture(context[:submitter], context[:topic], %{slug: "some other slug"})
+      comment = comment_fixture(context[:student], submission)
+      comment2 = comment_fixture(context[:student], submission2)
+      student = context[:student]
+      student2 = context[:student2]
+
+      retrieved_comments = Submissions.list_user_own_comments(student, submission)
+      assert length(retrieved_comments) == 1
+      retrieved_comment = List.first(retrieved_comments)
+      assert retrieved_comment.id == comment.id
+      assert retrieved_comment.description == comment.description
+      assert retrieved_comment.title == comment.title
+
+      retrieved_comments = Submissions.list_user_own_comments(student, submission2)
+      assert length(retrieved_comments) == 1
+      retrieved_comment = List.first(retrieved_comments)
+      assert retrieved_comment.id == comment2.id
+      assert retrieved_comment.description == comment2.description
+      assert retrieved_comment.title == comment2.title
+
+      retrieved_comments = Submissions.list_user_own_comments(student2, submission)
+      assert length(retrieved_comments) == 0
+      retrieved_comments = Submissions.list_user_own_comments(student2, submission2)
+      assert length(retrieved_comments) == 0
+    end
+
     test "get_comment!/1 returns the comment with given id", context do
       submission = submission_fixture(context[:submitter], context[:topic])
       comment = comment_fixture(context[:student], submission)
@@ -751,6 +889,136 @@ defmodule App.SubmissionsTest do
       retrieved_rating = List.first(retrieved_ratings)
       assert retrieved_rating.id == rating.id
       assert retrieved_rating.score == rating.score
+    end
+
+    test "list_ratings/1 returns all ratings for the given submission", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      submission2 = submission_fixture(context[:submitter], context[:topic], %{slug: "some other slug"})
+      rating = rating_fixture(context[:student], submission)
+      rating2 = rating_fixture(context[:student], submission2)
+
+      retrieved_ratings = Submissions.list_ratings(submission2)
+      assert length(retrieved_ratings) == 1
+      retrieved_rating = List.first(retrieved_ratings)
+      assert retrieved_rating.id == rating2.id
+      assert retrieved_rating.score == rating2.score
+      retrieved_ratings = Submissions.list_ratings(submission)
+      assert length(retrieved_ratings) == 1
+      retrieved_rating = List.first(retrieved_ratings)
+      assert retrieved_rating.id == rating.id
+      assert retrieved_rating.score == rating.score
+    end
+
+    test "list_user_ratings/3 returns all ratings for the given submission", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      submission2 = submission_fixture(context[:submitter], context[:topic], %{slug: "some other slug"})
+      rating = rating_fixture(context[:student], submission)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      student = context[:student]
+
+      retrieved_ratings = Submissions.list_user_ratings(student, submission2)
+      assert length(retrieved_ratings) == 0
+      retrieved_ratings = Submissions.list_user_ratings(student, submission)
+      assert length(retrieved_ratings) == 1
+      retrieved_rating = List.first(retrieved_ratings)
+      assert retrieved_rating.id == rating.id
+      assert retrieved_rating.score == rating.score
+
+      retrieved_ratings = Submissions.list_user_ratings(user_faculty, submission2)
+      assert length(retrieved_ratings) == 0
+      retrieved_ratings = Submissions.list_user_ratings(user_faculty, submission)
+      assert length(retrieved_ratings) == 1
+      retrieved_rating = List.first(retrieved_ratings)
+      assert retrieved_rating.id == rating.id
+      assert retrieved_rating.score == rating.score
+    end
+
+    test "list_user_ratings/3 returns no ratings if no valid role", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      rating_fixture(context[:student], submission)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      user_faculty2 = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id 2"})
+      student = context[:student]
+      course = Courses.get_course!(context[:section].course_id)
+      {:ok, current_time} = DateTime.now("Etc/UTC")
+
+      params = %{role: "administrator", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, -7200, :second)}
+      {:ok, course_role} = Accounts.create_course__role(user_faculty, user_faculty2, course, params)
+      params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, -7200, :second)}
+      Accounts.update_section__role(user_faculty, context[:student_role], params)
+
+      retrieved_ratings = Submissions.list_user_ratings(student, submission)
+      assert length(retrieved_ratings) == 0
+      retrieved_ratings = Submissions.list_user_ratings(user_faculty2, submission)
+      assert length(retrieved_ratings) == 0
+
+      params = %{role: "administrator", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      {:ok, course_role} = Accounts.update_course__role(user_faculty, course_role, params)
+      params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      Accounts.update_section__role(user_faculty, context[:student_role], params)
+
+      retrieved_ratings = Submissions.list_user_ratings(student, submission)
+      assert length(retrieved_ratings) == 1
+      retrieved_ratings = Submissions.list_user_ratings(user_faculty2, submission)
+      assert length(retrieved_ratings) == 1
+
+      params = %{role: "administrator", valid_from: DateTime.add(current_time, 7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      Accounts.update_course__role(user_faculty, course_role, params)
+      params = %{role: "student", valid_from: DateTime.add(current_time, 7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      Accounts.update_section__role(user_faculty, context[:student_role], params)
+
+      retrieved_ratings = Submissions.list_user_ratings(student, submission)
+      assert length(retrieved_ratings) == 0
+      retrieved_ratings = Submissions.list_user_ratings(user_faculty2, submission)
+      assert length(retrieved_ratings) == 0
+
+    end
+
+    test "list_user_own_ratings/1 returns all ratings by the given user", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      submission2 = submission_fixture(context[:submitter], context[:topic], %{slug: "some other slug"})
+      rating = rating_fixture(context[:student], submission)
+      rating2 = rating_fixture(context[:student], submission2)
+      student = context[:student]
+      student2 = context[:student2]
+
+      retrieved_ratings = Submissions.list_user_own_ratings(student)
+      assert length(retrieved_ratings) == 2
+      retrieved_rating = List.first(retrieved_ratings)
+      assert retrieved_rating.id == rating.id
+      assert retrieved_rating.score == rating.score
+      retrieved_rating = List.last(retrieved_ratings)
+      assert retrieved_rating.id == rating2.id
+      assert retrieved_rating.score == rating2.score
+
+      retrieved_ratings = Submissions.list_user_own_ratings(student2)
+      assert length(retrieved_ratings) == 0
+    end
+
+    test "list_user_own_ratings/2 returns all ratings by the given user for the given submission", context do
+      submission = submission_fixture(context[:submitter], context[:topic])
+      submission2 = submission_fixture(context[:submitter], context[:topic], %{slug: "some other slug"})
+      rating = rating_fixture(context[:student], submission)
+      rating2 = rating_fixture(context[:student], submission2)
+      student = context[:student]
+      student2 = context[:student2]
+
+      retrieved_ratings = Submissions.list_user_own_ratings(student, submission)
+      assert length(retrieved_ratings) == 1
+      retrieved_rating = List.first(retrieved_ratings)
+      assert retrieved_rating.id == rating.id
+      assert retrieved_rating.score == rating.score
+
+      retrieved_ratings = Submissions.list_user_own_ratings(student, submission2)
+      assert length(retrieved_ratings) == 1
+      retrieved_rating = List.first(retrieved_ratings)
+      assert retrieved_rating.id == rating2.id
+      assert retrieved_rating.score == rating2.score
+
+      retrieved_ratings = Submissions.list_user_own_ratings(student2, submission)
+      assert length(retrieved_ratings) == 0
+      retrieved_ratings = Submissions.list_user_own_ratings(student2, submission2)
+      assert length(retrieved_ratings) == 0
     end
 
     test "get_rating!/1 returns the rating with given id", context do

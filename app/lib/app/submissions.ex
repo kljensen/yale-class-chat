@@ -367,7 +367,7 @@ defmodule App.Submissions do
               where: r.role in ^allowed_section_roles,
               where: c.allow_read == true,
               where: t.visible,
-              where: t.show_user_comments,
+              where: t.show_user_submissions,
               where: su.visible,
               where: su.id == ^suid,
               select: co
@@ -585,6 +585,106 @@ defmodule App.Submissions do
   """
   def list_ratings do
     Repo.all(Rating)
+  end
+
+  @doc """
+  Returns the list of ratings for a given submission.
+
+  ## Examples
+
+      iex> list_ratings(submission)
+      [%Rating{}, ...]
+
+  """
+  def list_ratings(%Submission{} = submission) do
+    suid = submission.id
+    Repo.all(from ra in Rating, where: ra.submission_id == ^suid)
+  end
+
+  @doc """
+  Returns the list of ratings visible to a given user for a given submission.
+
+  ## Examples
+
+      iex> list_user_ratings(user, submission)
+      [%Rating{}, ...]
+
+  """
+  def list_user_ratings(%App.Accounts.User{} = user, %Submission{} = submission, inherit_course_role \\ true) do
+    tid = submission.topic_id
+    topic = App.Topics.get_topic!(tid)
+    uid = user.id
+    sid = topic.section_id
+    suid = submission.id
+    allowed_section_roles = ["student", "defunct_student", "guest"]
+
+    query = from r in App.Accounts.Section_Role,
+              join: s in App.Courses.Section,
+              on: r.section_id == s.id,
+              join: c in App.Courses.Course,
+              on: s.course_id == c.id,
+              join: t in App.Topics.Topic,
+              on: t.section_id == s.id,
+              join: su in Submission,
+              on: su.topic_id == t.id,
+              join: ra in Rating,
+              on: ra.submission_id == su.id,
+              where: r.user_id == ^uid,
+              where: r.valid_from <= from_now(0, "day"),
+              where: r.valid_to >= from_now(0, "day"),
+              where: r.role in ^allowed_section_roles,
+              where: c.allow_read == true,
+              where: t.visible,
+              where: t.show_user_submissions,
+              where: su.visible,
+              where: su.id == ^suid,
+              select: ra
+
+    query = if inherit_course_role do
+      section = App.Courses.get_section!(sid)
+      course = App.Courses.get_course!(section.course_id)
+      allowed_course_roles = ["administrator", "owner"]
+      auth_role = App.Accounts.get_current_course__role(user, course)
+      if Enum.member?(allowed_course_roles, auth_role) do
+        from ra in Rating,
+          where: ra.submission_id == ^suid
+      else
+        query
+      end
+    else
+      query
+    end
+
+    Repo.all(query)
+  end
+
+  @doc """
+  Returns the list of ratings by a given user.
+
+  ## Examples
+
+      iex> list_user_own_ratings(user)
+      [%Rating{}, ...]
+
+  """
+  def list_user_own_ratings(%App.Accounts.User{} = user) do
+    uid = user.id
+    Repo.all(from ra in Rating, where: ra.user_id == ^uid)
+  end
+
+  @doc """
+  Returns the list of ratings by a given user for a given submission.
+
+  ## Examples
+
+      iex> list_user_own_ratings(user, submission)
+      [%Rating{}, ...]
+
+  """
+  def list_user_own_ratings(%App.Accounts.User{} = user, %Submission{} = submission) do
+    suid = submission.id
+    uid = user.id
+    Repo.all(from ra in Rating, where: ra.submission_id == ^suid, where: ra.user_id == ^uid)
   end
 
   @doc """
