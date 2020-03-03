@@ -57,7 +57,7 @@ defmodule App.Courses do
     end
   end
 
-  defp do_create_semester(attrs \\ %{}) do
+  defp do_create_semester(attrs) do
     %Semester{}
     |> Semester.changeset(attrs)
     |> Repo.insert()
@@ -152,7 +152,6 @@ defmodule App.Courses do
   """
   def list_user_courses(%App.Accounts.User{} = user) do
     uid = user.id
-    {:ok, current_time} = DateTime.now("Etc/UTC")
     query = from r in App.Accounts.Course_Role,
               left_join: c in Course,
               on: r.course_id == c.id,
@@ -192,7 +191,6 @@ defmodule App.Courses do
   def list_user_courses(%App.Courses.Semester{} = semester, %App.Accounts.User{} = user) do
     uid = user.id
     sid = semester.id
-    {:ok, current_time} = DateTime.now("Etc/UTC")
     query = from r in App.Accounts.Course_Role,
               left_join: c in Course,
               on: r.course_id == c.id,
@@ -254,7 +252,7 @@ defmodule App.Courses do
     end
   end
 
-  defp do_create_course(%App.Courses.Semester{} = semester, attrs \\ %{}) do
+  defp do_create_course(%App.Courses.Semester{} = semester, attrs) do
     %Course{}
     |> Course.changeset(attrs)
     |> Ecto.Changeset.put_assoc(:semester, semester)
@@ -357,7 +355,6 @@ defmodule App.Courses do
   """
   def list_user_sections(%App.Accounts.User{} = user) do
     uid = user.id
-    {:ok, current_time} = DateTime.now("Etc/UTC")
     query = from r in App.Accounts.Section_Role,
               left_join: s in Section,
               on: r.section_id == s.id,
@@ -403,7 +400,6 @@ defmodule App.Courses do
     uid = user.id
     cid = course.id
     allowed_section_roles = ["student", "defunct_student", "guest"]
-    {:ok, current_time} = DateTime.now("Etc/UTC")
     query = from r in App.Accounts.Section_Role,
               left_join: s in Section,
               on: r.section_id == s.id,

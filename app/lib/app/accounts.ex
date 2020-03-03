@@ -201,7 +201,7 @@ defmodule App.Accounts do
     end
   end
 
-  defp do_create_course__role(%App.Accounts.User{} = user, %App.Courses.Course{} = course, attrs \\ %{}) do
+  defp do_create_course__role(%App.Accounts.User{} = user, %App.Courses.Course{} = course, attrs) do
     %Course_Role{}
     |> Course_Role.changeset(attrs)
     |> Ecto.Changeset.put_assoc(:user, user)
@@ -336,11 +336,13 @@ defmodule App.Accounts do
     sid = section.id
     course_role = nil
 
-    if inherit_course_role == true do
-      cid = section.course_id
-      course = App.Courses.get_course!(cid)
-      course_role = get_current_course__role(user, course)
-    end
+    course_role = if inherit_course_role == true do
+                    cid = section.course_id
+                    course = App.Courses.get_course!(cid)
+                    course_role = get_current_course__role(user, course)
+                  else
+                    nil
+                  end
 
     if course_role == nil do
       query = from u_r in "section_roles",
@@ -381,7 +383,7 @@ defmodule App.Accounts do
     end
   end
 
-  defp do_create_section__role(%App.Accounts.User{} = user, %App.Courses.Section{} = section, attrs \\ %{}) do
+  defp do_create_section__role(%App.Accounts.User{} = user, %App.Courses.Section{} = section, attrs) do
     %Section_Role{}
     |> Section_Role.changeset(attrs)
     |> Ecto.Changeset.put_assoc(:user, user)

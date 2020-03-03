@@ -170,10 +170,22 @@ defmodule App.Submissions do
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
     #Only allow admins to hide/unhide submissions or allow them to be ranked
-    unless Enum.member?(admin_roles, auth_role) do
-      if Map.get(attrs, :hidden), do: attrs = Map.delete(attrs, :hidden)
-      if Map.get(attrs, :allow_ranking), do: attrs = Map.delete(attrs, :allow_ranking)
-    end
+    attrs = if Enum.member?(admin_roles, auth_role) do
+              attrs
+            else
+              attrstmp = attrs
+              attrstmp = if Map.get(attrstmp, :visible) do
+                attrstmp = Map.delete(attrstmp, :visible)
+              else
+                attrstmp
+              end
+              attrstmp = if Map.get(attrstmp, :allow_ranking) do
+                attrstmp = Map.delete(attrstmp, :allow_ranking)
+              else
+                attrstmp
+              end
+              attrstmp
+            end
 
     cond do
       count_user_submissions(user, topic) >= [topic.user_submission_limit] ->
@@ -193,7 +205,7 @@ defmodule App.Submissions do
     end
   end
 
-  defp do_create_submission(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic, attrs \\ %{}) do
+  defp do_create_submission(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic, attrs) do
     %Submission{}
     |> Submission.changeset(attrs)
     |> Ecto.Changeset.put_assoc(:topic, topic)
@@ -223,10 +235,22 @@ defmodule App.Submissions do
     authorized = Enum.member?(admin_roles, auth_role) or user.id == submission.user_id
 
     #Only allow admins to hide/unhide submissions or allow them to be ranked
-    unless Enum.member?(admin_roles, auth_role) do
-      if Map.get(attrs, :visible), do: attrs = Map.delete(attrs, :visible)
-      if Map.get(attrs, :allow_ranking), do: attrs = Map.delete(attrs, :allow_ranking)
-    end
+    attrs = if Enum.member?(admin_roles, auth_role) do
+              attrs
+            else
+              attrstmp = attrs
+              attrstmp = if Map.get(attrstmp, :visible) do
+                attrstmp = Map.delete(attrstmp, :visible)
+              else
+                attrstmp
+              end
+              attrstmp = if Map.get(attrstmp, :allow_ranking) do
+                attrstmp = Map.delete(attrstmp, :allow_ranking)
+              else
+                attrstmp
+              end
+              attrstmp
+            end
 
     cond do
       Date.compare(current_time, topic.opened_at) == :lt ->
@@ -471,7 +495,7 @@ defmodule App.Submissions do
     end
   end
 
-  defp do_create_comment(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
+  defp do_create_comment(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs) do
     %Comment{}
     |> Comment.changeset(attrs)
     |> Ecto.Changeset.put_assoc(:user, user)
@@ -739,7 +763,7 @@ defmodule App.Submissions do
     end
   end
 
-  defp do_create_rating(user, submission, attrs \\ %{}) do
+  defp do_create_rating(user, submission, attrs) do
     %Rating{}
     |> Rating.changeset(attrs)
     |> Ecto.Changeset.put_assoc(:user, user)
