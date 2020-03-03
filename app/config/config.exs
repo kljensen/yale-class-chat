@@ -13,7 +13,7 @@ config :app,
 # Configures the endpoint
 config :app, AppWeb.Endpoint,
   url: [host: "0.0.0.0"],
-  secret_key_base: "mhsbG/cyuym5OCkDzoFKsmBgVCKr2ViT98bg0qzKSRTnMtlsdm8Pe2D3yke2zd29",
+  secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: AppWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: App.PubSub, adapter: Phoenix.PubSub.PG2],
   live_view: [
