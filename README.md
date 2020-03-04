@@ -27,6 +27,7 @@ MOCKCAS_PORT=9002
 CAS_BASE_URL=http://localhost:9002/cas
 CAS_SERVICE_VALIDATE_BASE_URL=http://mockcas:4000/cas
 CAS_CALLBACK_URL=http://localhost:9001/auth/cas/callback
+SECRET_KEY_BASE=SuperSecretKeyBase
 ```
 
 Run `./admin.sh up` to bring up the app. The app will

@@ -15,7 +15,8 @@ defmodule AppWeb.SemesterController do
   end
 
   def create(conn, %{"semester" => semester_params}) do
-    case Courses.create_semester(semester_params) do
+    user = conn.assigns.current_user
+    case Courses.create_semester(user, semester_params) do
       {:ok, semester} ->
         conn
         |> put_flash(:info, "Semester created successfully.")
@@ -23,6 +24,12 @@ defmodule AppWeb.SemesterController do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
+
+      {:error, error} ->
+        changeset = Courses.change_semester(%Semester{})
+        conn
+        |> put_flash(:error, error)
+        |> render("new.html", changeset: changeset)
     end
   end
 

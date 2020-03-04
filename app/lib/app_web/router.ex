@@ -15,6 +15,7 @@ defmodule AppWeb.Router do
 
   pipeline :auth do
     plug AppWeb.Plug.Auth
+    plug AppWeb.Plug.SetCurrentUser
   end
 
   scope "/auth", AppWeb do
@@ -30,6 +31,12 @@ defmodule AppWeb.Router do
     pipe_through [:browser]
 
     get "/", PageController, :index
+  end
+
+  scope "/", AppWeb do
+    pipe_through [:browser, :auth]
+
+    #get "/", PageController, :index
     resources "/comments", CommentController
     resources "/courses", CourseController
     resources "/ratings", RatingController
@@ -37,7 +44,7 @@ defmodule AppWeb.Router do
     resources "/semesters", SemesterController
     resources "/submissions", SubmissionController
     resources "/topics", TopicController
-    resources "/users", UserController
+    resources "/users", UserController#, only: [:edit, :show, :update]
     resources "/course_roles", Course_RoleController
     resources "/section_roles", Section_RoleController
   end
@@ -46,7 +53,6 @@ defmodule AppWeb.Router do
     pipe_through [:browser, :auth]
 
     get "/", SecretController, :index
-    resources "/users", UserController
   end
 
   # Other scopes may use custom stacks.

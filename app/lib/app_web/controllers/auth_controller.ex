@@ -22,7 +22,10 @@ defmodule AppWeb.AuthController do
   end
 
   def callback(%{assigns: %{ueberauth_auth: %{uid: uid}}} = conn, _params) do
+    {ok, user} = App.Accounts.create_user_on_login(uid)
+
     conn
+    |> clear_flash()
     |> put_flash(:info, "Successfully authenticated.")
     |> put_session(:uid, uid)
     |> redirect(to: "/")
@@ -32,7 +35,7 @@ defmodule AppWeb.AuthController do
     conn
     |> put_flash(:info, "You have been logged out!")
     |> configure_session(drop: true)
-    |> redirect(external: "https://apr-test.ebc.edu.mx/casad/logout")
+    |> redirect(to: "/")
   end
 
 

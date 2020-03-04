@@ -5,7 +5,8 @@ defmodule AppWeb.CourseController do
   alias App.Courses.Course
 
   def index(conn, _params) do
-    courses = Courses.list_courses()
+    user = conn.assigns.current_user
+    courses = Courses.list_user_courses(user)
     render(conn, "index.html", courses: courses)
   end
 

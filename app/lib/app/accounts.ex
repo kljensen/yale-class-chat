@@ -74,6 +74,29 @@ defmodule App.Accounts do
   end
 
   @doc """
+  Creates a user upon login.
+
+  ## Examples
+
+      iex> create_user(%{field: value})
+      {:ok, %User{}}
+
+      iex> create_user(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_user_on_login(net_id) do
+    # Get required fields
+    display_name = net_id
+    email = net_id <> "@connect.yale.edu"
+    is_faculty = false
+    attrs = %{display_name: display_name, email: email, net_id: net_id, is_faculty: is_faculty}
+    %User{}
+    |> User.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
   Updates a user.
 
   ## Examples
