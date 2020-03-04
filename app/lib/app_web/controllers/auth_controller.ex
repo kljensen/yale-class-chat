@@ -15,7 +15,7 @@ defmodule AppWeb.AuthController do
     |> Ueberauth.Strategy.CAS.handle_request!
   end
 
-  def callback(%{assigns: %{ueberauth_failure: fails}} = conn, _params) do
+  def callback(%{assigns: %{ueberauth_failure: _fails}} = conn, _params) do
     conn
     |> put_flash(:error, "Failed to authenticate.")
     |> redirect(to: "/")

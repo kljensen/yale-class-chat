@@ -27,7 +27,7 @@ defmodule AppWeb.Router do
   end
 
   scope "/", AppWeb do
-    pipe_through :browser
+    pipe_through [:browser]
 
     get "/", PageController, :index
     resources "/comments", CommentController
@@ -46,6 +46,7 @@ defmodule AppWeb.Router do
     pipe_through [:browser, :auth]
 
     get "/", SecretController, :index
+    resources "/users", UserController
   end
 
   # Other scopes may use custom stacks.
