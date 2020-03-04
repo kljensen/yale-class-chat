@@ -27,6 +27,7 @@ services:
       - CAS_BASE_URL=${CAS_BASE_URL}
       - CAS_SERVICE_VALIDATE_BASE_URL=${CAS_SERVICE_VALIDATE_BASE_URL}
       - CAS_CALLBACK_URL=${CAS_CALLBACK_URL}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
     volumes:
       - type: bind
         source: ./app
@@ -55,6 +56,7 @@ services:
       - CAS_BASE_URL=${CAS_BASE_URL}
       - CAS_SERVICE_VALIDATE_BASE_URL=${CAS_SERVICE_VALIDATE_BASE_URL}
       - CAS_CALLBACK_URL=${CAS_CALLBACK_URL}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
     volumes:
       - type: bind
         source: ./app
