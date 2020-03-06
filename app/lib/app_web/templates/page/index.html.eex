@@ -1,6 +1,5 @@
 <section class="phx-hero">
   <h1><%= gettext "Welcome to %{name}!", name: "Yale Class Chat" %></h1>
-  <p>Current user = <%= @current_user %></p>
 </section>
 <section class="row">
   <article class="column">

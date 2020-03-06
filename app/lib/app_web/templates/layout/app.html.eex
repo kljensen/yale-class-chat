@@ -16,7 +16,7 @@
             <%= if is_nil(@conn.private.plug_session["uid"]) do %>
                 <li><a href="/auth/cas">Log In</a></li>
             <% else %>
-              <li><a href="/auth/cas/logout">Log Out</a></li>
+              <li><%= link @conn.private.plug_session["uid"], to: Routes.user_path(@conn, :show, @conn.assigns.current_user) %></li>
             <% end %>
           </ul>
         </nav>

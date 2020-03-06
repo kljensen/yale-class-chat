@@ -28,7 +28,16 @@ defmodule AppWeb.UserController do
 
   def show(conn, %{"id" => id}) do
     user = unless id == "new", do: user = Accounts.get_user!(id)
-    render(conn, "show.html", user: user)
+    current_user = conn.assigns.current_user
+    case user.id == current_user.id do
+      true ->
+        render(conn, "show.html", user: user)
+      false ->
+        conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+    end
   end
 
   def edit(conn, %{"id" => id}) do

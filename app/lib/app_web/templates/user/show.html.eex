@@ -20,3 +20,4 @@
 </ul>
 
 <span><%= link "Edit", to: Routes.user_path(@conn, :edit, @user) %></span>
+<span><%= link "Log Out", to: Routes.auth_path(@conn, :delete, @user) %></span>
