@@ -101,9 +101,8 @@ defmodule AppWeb.SectionControllerTest do
         |> init_test_session(uid: "faculty net id")
         |> delete(Routes.section_path(conn, :delete, section))
       assert redirected_to(conn) == Routes.course_section_path(conn, :index, course_id)
-      assert_error_sent 404, fn ->
-        get(conn, Routes.section_path(conn, :show, section))
-      end
+      conn = get(conn, Routes.section_path(conn, :show, section))
+      assert html_response(conn, 404) =~ "Not Found"
     end
   end
 

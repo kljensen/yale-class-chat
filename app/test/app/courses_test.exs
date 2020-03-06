@@ -236,6 +236,26 @@ defmodule App.CoursesTest do
       assert retrieved_course.number == course.number
     end
 
+    test "get_user_course/1 returns the course with given id if user can view" do
+      course = course_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      assert {:ok, retrieved_course} = Courses.get_user_course(user_faculty, course.id)
+      assert retrieved_course.id == course.id
+      assert retrieved_course.department == course.department
+      assert retrieved_course.name == course.name
+      assert retrieved_course.number == course.number
+    end
+
+    test "get_user_course/1 returns error if user cannot view or course does not exist" do
+      course = course_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      user = ATest.user_fixture(%{is_faculty: false, net_id: "student net id"})
+      assert {:error, message} = Courses.get_user_course(user, course.id)
+      assert message = "forbidden"
+      assert {:error, message} = Courses.get_user_course(user, course.id + 1)
+      assert message = "not found"
+    end
+
     test "create_course/3 with valid data creates a course" do
       semester = semester_fixture()
       user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
@@ -489,6 +509,25 @@ defmodule App.CoursesTest do
       assert retrieved_section.id == section.id
       assert retrieved_section.crn == section.crn
       assert retrieved_section.title == section.title
+    end
+
+    test "get_user_section/1 returns the section with given id if user can view" do
+      section = section_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      assert {:ok, retrieved_section} = Courses.get_user_section(user_faculty, section.id)
+      assert retrieved_section.id == section.id
+      assert retrieved_section.crn == section.crn
+      assert retrieved_section.title == section.title
+    end
+
+    test "get_user_section/1 returns error if user cannot view or section does not exist" do
+      section = section_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      user = ATest.user_fixture(%{is_faculty: false, net_id: "student net id"})
+      assert {:error, message} = Courses.get_user_section(user, section.id)
+      assert message = "forbidden"
+      assert {:error, message} = Courses.get_user_section(user, section.id + 1)
+      assert message = "not found"
     end
 
     test "create_section/3 with valid data creates a section" do

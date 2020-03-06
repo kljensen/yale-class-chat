@@ -491,33 +491,37 @@ defmodule App.Courses do
   """
   def get_user_section(%App.Accounts.User{} = user, section_id, inherit_course_role \\ true) do
     allowed_course_roles = ["administrator", "owner"]
-    section = get_section!(section_id)
-    course = get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_course__role(user, course)
-    uid = user.id
-    cid = course.id
-    allowed_section_roles = ["student", "defunct_student", "guest"]
-    query = from r in App.Accounts.Section_Role,
-              left_join: s in Section,
-              on: r.section_id == s.id,
-              left_join: c in Course,
-              on: s.course_id == c.id,
-              where: r.user_id == ^uid,
-              where: r.valid_from <= from_now(0, "day"),
-              where: r.valid_to >= from_now(0, "day"),
-              where: r.role in ^allowed_section_roles,
-              where: c.allow_read == true,
-              where: s.course_id == ^cid,
-              where: s.id == ^section_id,
-              select: s
-    query = if inherit_course_role and Enum.member?(allowed_course_roles, auth_role) do
-      from s in Section,
-        where: s.id == ^section_id,
-        select: s
+    section = Repo.get(Section, section_id)
+    query = if !is_nil(section) do
+      course = Repo.get(Course, section.course_id)
+      auth_role = App.Accounts.get_current_course__role(user, course)
+      uid = user.id
+      cid = course.id
+      allowed_section_roles = ["student", "defunct_student", "guest"]
+      query = from r in App.Accounts.Section_Role,
+                left_join: s in Section,
+                on: r.section_id == s.id,
+                left_join: c in Course,
+                on: s.course_id == c.id,
+                where: r.user_id == ^uid,
+                where: r.valid_from <= from_now(0, "day"),
+                where: r.valid_to >= from_now(0, "day"),
+                where: r.role in ^allowed_section_roles,
+                where: c.allow_read == true,
+                where: s.course_id == ^cid,
+                where: s.id == ^section_id,
+                select: s
+      query = if inherit_course_role and Enum.member?(allowed_course_roles, auth_role) do
+        from s in Section,
+          where: s.id == ^section_id,
+          select: s
+      else
+          query
+      end
     else
-        query
+      nil
     end
-    result = Repo.one(query)
+    result = if !is_nil(query), do: Repo.one(query)
 
     if is_nil(result) do
       query = from s in Section, where: s.id == ^section_id
