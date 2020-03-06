@@ -131,7 +131,7 @@ defmodule App.DatabaseSeeder do
           crn = to_string(semester.id) <> to_string(course.id) <> Map.get(z, :title)
           attrs = Map.put(z, :crn, crn)
           {:ok, section} = Courses.create_section(creator, course, attrs)
-          submitter = Accounts.get_user_by!(Map.get(Enum.random(@user_list), :net_id))
+          submitter = Accounts.get_user_by!(Map.get(Enum.random(@student_list), :net_id))
           for a <- @topic_list do
             slug = Map.get(section, :crn) <> to_string(Map.get(a, :title))
             attrs = Map.put(a, :slug, slug)
@@ -144,26 +144,35 @@ defmodule App.DatabaseSeeder do
 
   def insert_submissions do
     creator = Accounts.get_user_by!("prof1")
-    prof2 = Accounts.get_user_by!("prof2")
-    submitter1 = Accounts.get_user_by!("")
     for x <- @semester_list do
       {:ok, semester} = Courses.create_semester(creator, x)
       for y <- @course_list do
         {:ok, course} = Courses.create_course(creator, semester, y)
-        for u <- @prof_list, do: Accounts.create_course__role(creator, u, course, %{role: "administrator"})
+        course_role_attrs = %{role: "administrator", valid_from: "2010-04-17T14:00:00Z", valid_to: "2100-04-17T14:00:00Z"}
+        for u <- @prof_list do
+          user = Accounts.get_user_by!(u.net_id)
+          if u.net_id != creator.net_id, do: Accounts.create_course__role(creator, user, course, course_role_attrs)
+        end
         for z <- @section_list do
           crn = to_string(semester.id) <> to_string(course.id) <> Map.get(z, :title)
           attrs = Map.put(z, :crn, crn)
           {:ok, section} = Courses.create_section(creator, course, attrs)
-          for u <- @student_list, do: Accounts.create_section__role(creator, u, section, %{role: "student"})
+          section_role_attrs = %{role: "student", valid_from: "2010-04-17T14:00:00Z", valid_to: "2100-04-17T14:00:00Z"}
+          for u <- @student_list do
+            user = Accounts.get_user_by!(u.net_id)
+            Accounts.create_section__role(creator, user, section, section_role_attrs)
+          end
           for a <- @topic_list do
             slug = Map.get(section, :crn) <> to_string(Map.get(a, :title))
             attrs = Map.put(a, :slug, slug)
             topic_writer = Accounts.get_user_by!(Map.get(Enum.random(@prof_list), :net_id))
             {:ok, topic} = Topics.create_topic(topic_writer, section, attrs)
-            for b <- @
-
-
+            Enum.each(1..5, fn x ->
+                submitter = Accounts.get_user_by!(Map.get(Enum.random(@student_list), :net_id))
+                slug = to_string(topic.id) <> to_string(x)
+                attrs = %{description: Enum.random(@random_description_list), image_url: "some image_url", slug: slug, title: Enum.random(@random_title_list), allow_ranking: true, visible: true}
+                Submissions.create_submission(submitter, topic, attrs)
+            end)
           end
         end
       end
@@ -172,46 +181,142 @@ defmodule App.DatabaseSeeder do
 
   def insert_comments do
     creator = Accounts.get_user_by!("prof1")
-    prof2 = Accounts.get_user_by!("prof2")
-    submitter1 = Accounts.get_user_by!("")
     for x <- @semester_list do
       {:ok, semester} = Courses.create_semester(creator, x)
       for y <- @course_list do
         {:ok, course} = Courses.create_course(creator, semester, y)
-        for u <- @prof_list, do: Accounts.create_course__role(creator, u, course, %{role: "administrator"})
+        course_role_attrs = %{role: "administrator", valid_from: "2010-04-17T14:00:00Z", valid_to: "2100-04-17T14:00:00Z"}
+        for u <- @prof_list do
+          user = Accounts.get_user_by!(u.net_id)
+          if u.net_id != creator.net_id, do: Accounts.create_course__role(creator, user, course, course_role_attrs)
+        end
         for z <- @section_list do
           crn = to_string(semester.id) <> to_string(course.id) <> Map.get(z, :title)
           attrs = Map.put(z, :crn, crn)
           {:ok, section} = Courses.create_section(creator, course, attrs)
-          for u <- @student_list, do: Accounts.create_section__role(creator, u, section, %{role: "student"})
+          section_role_attrs = %{role: "student", valid_from: "2010-04-17T14:00:00Z", valid_to: "2100-04-17T14:00:00Z"}
+          for u <- @student_list do
+            user = Accounts.get_user_by!(u.net_id)
+            Accounts.create_section__role(creator, user, section, section_role_attrs)
+          end
           for a <- @topic_list do
             slug = Map.get(section, :crn) <> to_string(Map.get(a, :title))
             attrs = Map.put(a, :slug, slug)
             topic_writer = Accounts.get_user_by!(Map.get(Enum.random(@prof_list), :net_id))
             {:ok, topic} = Topics.create_topic(topic_writer, section, attrs)
-            Enum.each(1..x, fn
-              _ ->
+            Enum.each(1..5, fn b ->
                 submitter = Accounts.get_user_by!(Map.get(Enum.random(@student_list), :net_id))
-                attrs = %{description: Enum.random(@random_description_list), image_url: "some image_url", slug: "some slug", title: Enum.random(@random_description_list), allow_ranking: true, visible: true}
-                Submissions.create_submission(submitter, topic, attrs)
+                slug = to_string(topic.id) <> to_string(b)
+                attrs = %{description: Enum.random(@random_description_list), image_url: "some image_url", slug: slug, title: Enum.random(@random_title_list), allow_ranking: true, visible: true}
+                {:ok, submission} = Submissions.create_submission(submitter, topic, attrs)
+
+                Enum.each(1..5, fn c ->
+                  student = Accounts.get_user_by!(Map.get(Enum.random(@student_list), :net_id))
+                  attrs = %{description: Enum.random(@random_description_list), title: Enum.random(@random_title_list)}
+                  Submissions.create_comment(student, submission, attrs)
+              end)
             end)
-
-
           end
         end
       end
     end
   end
 
+  def insert_ratings do
+    creator = Accounts.get_user_by!("prof1")
+    for x <- @semester_list do
+      {:ok, semester} = Courses.create_semester(creator, x)
+      for y <- @course_list do
+        {:ok, course} = Courses.create_course(creator, semester, y)
+        course_role_attrs = %{role: "administrator", valid_from: "2010-04-17T14:00:00Z", valid_to: "2100-04-17T14:00:00Z"}
+        for u <- @prof_list do
+          user = Accounts.get_user_by!(u.net_id)
+          if u.net_id != creator.net_id, do: Accounts.create_course__role(creator, user, course, course_role_attrs)
+        end
+        for z <- @section_list do
+          crn = to_string(semester.id) <> to_string(course.id) <> Map.get(z, :title)
+          attrs = Map.put(z, :crn, crn)
+          {:ok, section} = Courses.create_section(creator, course, attrs)
+          section_role_attrs = %{role: "student", valid_from: "2010-04-17T14:00:00Z", valid_to: "2100-04-17T14:00:00Z"}
+          for u <- @student_list do
+            user = Accounts.get_user_by!(u.net_id)
+            Accounts.create_section__role(creator, user, section, section_role_attrs)
+          end
+          for a <- @topic_list do
+            slug = Map.get(section, :crn) <> to_string(Map.get(a, :title))
+            attrs = Map.put(a, :slug, slug)
+            topic_writer = Accounts.get_user_by!(Map.get(Enum.random(@prof_list), :net_id))
+            {:ok, topic} = Topics.create_topic(topic_writer, section, attrs)
+            Enum.each(1..5, fn b ->
+                submitter = Accounts.get_user_by!(Map.get(Enum.random(@student_list), :net_id))
+                slug = to_string(topic.id) <> to_string(b)
+                attrs = %{description: Enum.random(@random_description_list), image_url: "some image_url", slug: slug, title: Enum.random(@random_title_list), allow_ranking: true, visible: true}
+                {:ok, submission} = Submissions.create_submission(submitter, topic, attrs)
 
-  #def insert_link do
-  #  Repo.insert! %Link{
-  #    title: (@titles_list |> Enum.random()),
-  #    url: (@urls_list |> Enum.random())
-  #  }
-  #end
+                Enum.each(1..5, fn d ->
+                  student = Accounts.get_user_by!(Map.get(Enum.random(@student_list), :net_id))
+                  attrs = %{score: Enum.random(0..5)}
+                  Submissions.create_rating(student, submission, attrs)
+              end)
+            end)
+          end
+        end
+      end
+    end
+  end
+
+  def insert_comments_and_ratings do
+    creator = Accounts.get_user_by!("prof1")
+    for x <- @semester_list do
+      {:ok, semester} = Courses.create_semester(creator, x)
+      for y <- @course_list do
+        {:ok, course} = Courses.create_course(creator, semester, y)
+        course_role_attrs = %{role: "administrator", valid_from: "2010-04-17T14:00:00Z", valid_to: "2100-04-17T14:00:00Z"}
+        for u <- @prof_list do
+          user = Accounts.get_user_by!(u.net_id)
+          if u.net_id != creator.net_id, do: Accounts.create_course__role(creator, user, course, course_role_attrs)
+        end
+        for z <- @section_list do
+          crn = to_string(semester.id) <> to_string(course.id) <> Map.get(z, :title)
+          attrs = Map.put(z, :crn, crn)
+          {:ok, section} = Courses.create_section(creator, course, attrs)
+          section_role_attrs = %{role: "student", valid_from: "2010-04-17T14:00:00Z", valid_to: "2100-04-17T14:00:00Z"}
+          for u <- @student_list do
+            user = Accounts.get_user_by!(u.net_id)
+            Accounts.create_section__role(creator, user, section, section_role_attrs)
+          end
+          for a <- @topic_list do
+            slug = Map.get(section, :crn) <> to_string(Map.get(a, :title))
+            attrs = Map.put(a, :slug, slug)
+            topic_writer = Accounts.get_user_by!(Map.get(Enum.random(@prof_list), :net_id))
+            {:ok, topic} = Topics.create_topic(topic_writer, section, attrs)
+            Enum.each(1..5, fn b ->
+              submitter = Accounts.get_user_by!(Map.get(Enum.random(@student_list), :net_id))
+              slug = to_string(topic.id) <> to_string(b)
+              attrs = %{description: Enum.random(@random_description_list), image_url: "some image_url", slug: slug, title: Enum.random(@random_title_list), allow_ranking: true, visible: true}
+              {:ok, submission} = Submissions.create_submission(submitter, topic, attrs)
+
+              Enum.each(1..5, fn c ->
+                student = Accounts.get_user_by!(Map.get(Enum.random(@student_list), :net_id))
+                attrs = %{description: Enum.random(@random_description_list), title: Enum.random(@random_title_list)}
+                Submissions.create_comment(student, submission, attrs)
+              end)
+              Enum.each(1..5, fn d ->
+                student = Accounts.get_user_by!(Map.get(Enum.random(@student_list), :net_id))
+                attrs = %{score: Enum.random(0..5)}
+                Submissions.create_rating(student, submission, attrs)
+              end)
+            end)
+          end
+        end
+      end
+    end
+  end
 
   def clear do
+    Repo.delete_all(App.Accounts.User)
+    Repo.delete_all(App.Accounts.Course_Role)
+    Repo.delete_all(App.Accounts.Section_Role)
     Repo.delete_all(App.Courses.Semester)
     Repo.delete_all(App.Courses.Course)
     Repo.delete_all(App.Courses.Section)
@@ -227,4 +332,8 @@ App.DatabaseSeeder.insert_users()
 #App.DatabaseSeeder.insert_semesters()
 #App.DatabaseSeeder.insert_courses()
 #App.DatabaseSeeder.insert_sections()
-App.DatabaseSeeder.insert_topics()
+#App.DatabaseSeeder.insert_topics()
+#App.DatabaseSeeder.insert_submissions()
+#App.DatabaseSeeder.insert_comments()
+#App.DatabaseSeeder.insert_ratings()
+App.DatabaseSeeder.insert_comments_and_ratings()
