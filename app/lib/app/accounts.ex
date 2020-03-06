@@ -204,10 +204,10 @@ defmodule App.Accounts do
 
   ## Examples
 
-      iex> create_course__role(%{field: value})
+      iex> create_course__role(user_auth, user, course, %{field: value})
       {:ok, %Course_Role{}}
 
-      iex> create_course__role(%{field: bad_value})
+      iex> create_course__role(user_auth, user, course, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
