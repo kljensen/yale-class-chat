@@ -9,7 +9,7 @@ defmodule App.AccountsTest do
     alias App.Accounts.User
 
     @valid_attrs %{display_name: "some display_name", email: "some_email@yale.edu", net_id: "some net_id"}
-    @update_attrs %{display_name: "some updated display_name", email: "some_updated_email@yale.edu", net_id: "some updated net_id"}
+    @update_attrs %{display_name: "some updated display_name", email: "some_updated_email@yale.edu"}
     @invalid_attrs %{display_name: nil, email: nil, net_id: nil}
 
     def user_fixture(attrs \\ %{}) do
@@ -52,7 +52,6 @@ defmodule App.AccountsTest do
       assert {:ok, %User{} = user} = Accounts.update_user(user, @update_attrs)
       assert user.display_name == "some updated display_name"
       assert user.email == "some_updated_email@yale.edu"
-      assert user.net_id == "some updated net_id"
     end
 
     test "update_user/2 with invalid data returns error changeset" do

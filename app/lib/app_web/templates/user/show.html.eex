@@ -1,10 +1,10 @@
-<h1>Show User</h1>
+<h1>Profile</h1>
 
 <ul>
 
   <li>
     <strong>Net ID:</strong>
-    <%= @user.net_id %>
+    <%= @user.net_id %> <i>(cannot be changed)</i>
   </li>
 
   <li>

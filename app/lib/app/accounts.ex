@@ -109,6 +109,14 @@ defmodule App.Accounts do
 
   """
   def update_user(%User{} = user, attrs) do
+    attrstmp = attrs
+    attrstmp = if Map.get(attrstmp, :net_id) do
+      attrstmp = Map.delete(attrstmp, :net_id)
+    else
+      attrstmp
+    end
+    attrs = attrstmp
+
     user
     |> User.changeset(attrs)
     |> Repo.update()
