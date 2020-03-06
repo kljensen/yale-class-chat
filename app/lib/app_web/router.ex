@@ -59,7 +59,7 @@ defmodule AppWeb.Router do
 
 
     resources "/semesters", SemesterController
-    resources "/users", UserController, only: [:edit, :show, :update, :index] #Remove index once testing done
+    resources "/users", UserController, only: [:edit, :show, :update]
     resources "/topics", TopicController, only: [:edit, :show, :update, :index, :delete]
     resources "/submissions", SubmissionController, only: [:edit, :show, :update, :index, :delete]
     resources "/comments", CommentController, only: [:edit, :show, :update, :index, :delete]
