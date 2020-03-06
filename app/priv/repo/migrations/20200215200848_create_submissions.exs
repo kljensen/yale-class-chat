@@ -4,7 +4,7 @@ defmodule App.Repo.Migrations.CreateSubmissions do
   def change do
     create table(:submissions) do
       add :title, :string
-      add :description, :string
+      add :description, :text
       add :slug, :string
       add :image_url, :string
       add :allow_ranking, :boolean, default: false, null: false
