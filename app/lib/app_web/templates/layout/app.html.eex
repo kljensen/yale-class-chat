@@ -21,7 +21,7 @@
           </ul>
         </nav>
         <a href="/" class="phx-logo">
-          <img src="<%= Routes.static_path(@conn, "/images/yale-som.png") %>" alt="Yale SOM Logo"/>
+          <img src="<%= Routes.static_path(@conn, "/images/yale-som.jpg") %>" alt="Yale SOM Logo"/>
         </a>
       </section>
     </header>
