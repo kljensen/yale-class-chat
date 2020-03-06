@@ -1,4 +1,4 @@
-<h1>Show Course</h1>
+<h1>Course Details</h1>
 
 <ul>
 
@@ -43,4 +43,5 @@
 </ul>
 
 <span><%= link "Edit", to: Routes.course_path(@conn, :edit, @course) %></span>
+<span><%= link "Sections", to: Routes.course_section_path(@conn, :index, @course) %></span>
 <span><%= link "Back", to: Routes.course_path(@conn, :index) %></span>
