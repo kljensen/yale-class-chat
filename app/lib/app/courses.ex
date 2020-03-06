@@ -219,6 +219,45 @@ defmodule App.Courses do
   def get_course!(id), do: Repo.get!(Course, id)
 
   @doc """
+  Gets a single course if user is able to view.
+
+  ## Examples
+
+      iex> get_user_course(user, 123)
+      {:ok, %Course{}}
+
+      iex> get_user_course(invaliduser, 123)
+      {:error, message}
+
+  """
+  def get_user_course(%App.Accounts.User{} = user, course_id) do
+    uid = user.id
+    query = from r in App.Accounts.Course_Role,
+              left_join: c in Course,
+              on: r.course_id == c.id,
+              where: r.user_id == ^uid,
+              where: r.valid_from <= from_now(0, "day"),
+              where: r.valid_to >= from_now(0, "day"),
+              where: c.id == ^course_id,
+              select: c
+    result = Repo.one(query)
+
+    if is_nil(result) do
+      query = from c in Course, where: c.id == ^course_id
+      message = if Repo.exists?(query) do
+                  "forbidden"
+                else
+                  "not found"
+                end
+      {:error, message}
+    else
+      {:ok, result}
+    end
+  end
+
+
+
+  @doc """
   Creates a course.
 
   ## Examples
@@ -437,6 +476,61 @@ defmodule App.Courses do
 
   """
   def get_section!(id), do: Repo.get!(Section, id)
+
+  @doc """
+  Gets a single section if user is able to view.
+
+  ## Examples
+
+      iex> get_user_section(user, 123)
+      {:ok, %Section{}}
+
+      iex> get_user_section(invaliduser, 123)
+      {:error, message}
+
+  """
+  def get_user_section(%App.Accounts.User{} = user, section_id, inherit_course_role \\ true) do
+    allowed_course_roles = ["administrator", "owner"]
+    section = get_section!(section_id)
+    course = get_course!(section.course_id)
+    auth_role = App.Accounts.get_current_course__role(user, course)
+    uid = user.id
+    cid = course.id
+    allowed_section_roles = ["student", "defunct_student", "guest"]
+    query = from r in App.Accounts.Section_Role,
+              left_join: s in Section,
+              on: r.section_id == s.id,
+              left_join: c in Course,
+              on: s.course_id == c.id,
+              where: r.user_id == ^uid,
+              where: r.valid_from <= from_now(0, "day"),
+              where: r.valid_to >= from_now(0, "day"),
+              where: r.role in ^allowed_section_roles,
+              where: c.allow_read == true,
+              where: s.course_id == ^cid,
+              where: s.id == ^section_id,
+              select: s
+    query = if inherit_course_role and Enum.member?(allowed_course_roles, auth_role) do
+      from s in Section,
+        where: s.id == ^section_id,
+        select: s
+    else
+        query
+    end
+    result = Repo.one(query)
+
+    if is_nil(result) do
+      query = from s in Section, where: s.id == ^section_id
+      message = if Repo.exists?(query) do
+                  "forbidden"
+                else
+                  "not found"
+                end
+      {:error, message}
+    else
+      {:ok, result}
+    end
+  end
 
   @doc """
   Creates a section.

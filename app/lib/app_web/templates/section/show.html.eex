@@ -15,4 +15,4 @@
 </ul>
 
 <span><%= link "Edit", to: Routes.section_path(@conn, :edit, @section) %></span>
-<span><%= link "Back", to: Routes.section_path(@conn, :index) %></span>
+<span><%= link "Back", to: Routes.course_section_path(@conn, :index, @section.course_id) %></span>

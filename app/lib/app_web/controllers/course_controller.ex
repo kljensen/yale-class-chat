@@ -16,7 +16,8 @@ defmodule AppWeb.CourseController do
   end
 
   def create(conn, %{"semester" => semester, "course" => course_params}) do
-    case Courses.create_course(semester, course_params) do
+    user = conn.assigns.current_user
+    case Courses.create_course(user, semester, course_params) do
       {:ok, course} ->
         conn
         |> put_flash(:info, "Course created successfully.")
@@ -28,14 +29,46 @@ defmodule AppWeb.CourseController do
   end
 
   def show(conn, %{"id" => id}) do
-    course = Courses.get_course!(id)
-    render(conn, "show.html", course: course)
+    user = conn.assigns.current_user
+    case Courses.get_user_course(user, id) do
+      {:ok, course} ->
+        render(conn, "show.html", course: course)
+      {:error, message} ->
+        case message do
+          "forbidden" ->
+            conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+          "not found" ->
+            conn
+            |> put_status(:not_found)
+            |> put_view(AppWeb.ErrorView)
+            |> render("404.html")
+        end
+    end
   end
 
   def edit(conn, %{"id" => id}) do
-    course = Courses.get_course!(id)
-    changeset = Courses.change_course(course)
-    render(conn, "edit.html", course: course, changeset: changeset)
+    user = conn.assigns.current_user
+    case Courses.get_user_course(user, id) do
+      {:ok, course} ->
+        changeset = Courses.change_course(course)
+        render(conn, "edit.html", course: course, changeset: changeset)
+      {:error, message} ->
+        case message do
+          "forbidden" ->
+            conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+          "not found" ->
+            conn
+            |> put_status(:not_found)
+            |> put_view(AppWeb.ErrorView)
+            |> render("404.html")
+        end
+    end
   end
 
   def update(conn, %{"id" => id, "course" => course_params}) do
@@ -50,6 +83,12 @@ defmodule AppWeb.CourseController do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", course: course, changeset: changeset)
+
+      {:error, message} ->
+        conn
+        |> put_status(:forbidden)
+        |> put_view(AppWeb.ErrorView)
+        |> render("403.html")
     end
   end
 
