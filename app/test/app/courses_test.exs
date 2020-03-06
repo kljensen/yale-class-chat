@@ -248,7 +248,6 @@ defmodule App.CoursesTest do
 
     test "get_user_course/1 returns error if user cannot view or course does not exist" do
       course = course_fixture()
-      user_faculty = Accounts.get_user_by!("faculty net id")
       user = ATest.user_fixture(%{is_faculty: false, net_id: "student net id"})
       assert {:error, message} = Courses.get_user_course(user, course.id)
       assert message = "forbidden"
@@ -522,7 +521,6 @@ defmodule App.CoursesTest do
 
     test "get_user_section/1 returns error if user cannot view or section does not exist" do
       section = section_fixture()
-      user_faculty = Accounts.get_user_by!("faculty net id")
       user = ATest.user_fixture(%{is_faculty: false, net_id: "student net id"})
       assert {:error, message} = Courses.get_user_section(user, section.id)
       assert message = "forbidden"

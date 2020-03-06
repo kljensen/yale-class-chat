@@ -2,7 +2,6 @@ defmodule AppWeb.CourseControllerTest do
   use AppWeb.ConnCase
 
   alias App.Courses
-  alias App.Accounts
   alias App.AccountsTest, as: ATest
   import Plug.Test
 
@@ -35,7 +34,7 @@ defmodule AppWeb.CourseControllerTest do
 
   describe "new course" do
     test "renders form", %{conn: conn} do
-      user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
+      _user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
       conn = conn
         |> init_test_session(uid: "faculty net id")
         |> get(Routes.course_path(conn, :new))

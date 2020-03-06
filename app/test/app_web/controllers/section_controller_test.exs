@@ -2,7 +2,6 @@ defmodule AppWeb.SectionControllerTest do
   use AppWeb.ConnCase
 
   alias App.Courses
-  alias App.AccountsTest, as: ATest
   import Plug.Test
 
   @create_attrs %{crn: "some crn", title: "some title"}
