@@ -46,9 +46,10 @@ defmodule AppWeb.CourseControllerTest do
     test "redirects to show when data is valid", %{conn: conn} do
       _user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
       semester = App.CoursesTest.semester_fixture()
+      attrs = Map.merge(@create_attrs, %{semester_id: semester.id})
       conn = conn
         |> init_test_session(uid: "faculty net id")
-        |> post(Routes.course_path(conn, :create), semester: semester, course: @create_attrs)
+        |> post(Routes.course_path(conn, :create), course: attrs)
 
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == Routes.course_path(conn, :show, id)
@@ -60,9 +61,10 @@ defmodule AppWeb.CourseControllerTest do
     test "renders errors when data is invalid", %{conn: conn} do
       _user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
       semester = App.CoursesTest.semester_fixture()
+      attrs = Map.merge(@invalid_attrs, %{semester_id: semester.id})
       conn = conn
         |> init_test_session(uid: "faculty net id")
-        |> post(Routes.course_path(conn, :create), semester: semester, course: @invalid_attrs)
+        |> post(Routes.course_path(conn, :create), course: attrs)
       assert html_response(conn, 200) =~ "New Course"
     end
   end

@@ -12,11 +12,15 @@ defmodule AppWeb.CourseController do
 
   def new(conn, _params) do
     changeset = Courses.change_course(%Course{})
-    render(conn, "new.html", [changeset: changeset])
+    list = Courses.list_semester_names()
+    semesters = Enum.map(list, fn [value, key] -> {:"#{key}", value} end)
+    render(conn, "new.html", [changeset: changeset, semesters: semesters])
   end
 
-  def create(conn, %{"semester" => semester, "course" => course_params}) do
+  def create(conn, %{"course" => course_params}) do
     user = conn.assigns.current_user
+    semester_id = Map.get(course_params, "semester_id")
+    semester = Courses.get_semester!(semester_id)
     case Courses.create_course(user, semester, course_params) do
       {:ok, course} ->
         conn
@@ -24,7 +28,9 @@ defmodule AppWeb.CourseController do
         |> redirect(to: Routes.course_path(conn, :show, course))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
+        list = Courses.list_semester_names()
+        semesters = Enum.map(list, fn [value, key] -> {:"#{key}", value} end)
+        render(conn, "new.html", [changeset: changeset, semesters: semesters])
     end
   end
 
@@ -32,7 +38,8 @@ defmodule AppWeb.CourseController do
     user = conn.assigns.current_user
     case Courses.get_user_course(user, id) do
       {:ok, course} ->
-        render(conn, "show.html", course: course)
+        semester = Courses.get_semester!(course.semester_id)
+        render(conn, "show.html", course: course, semester: semester)
       {:error, message} ->
         case message do
           "forbidden" ->
@@ -54,7 +61,9 @@ defmodule AppWeb.CourseController do
     case Courses.get_user_course(user, id) do
       {:ok, course} ->
         changeset = Courses.change_course(course)
-        render(conn, "edit.html", course: course, changeset: changeset)
+        semester = Courses.get_semester!(course.semester_id)
+        semesters = [{:"#{semester.name}", semester.id}]
+        render(conn, "edit.html", course: course, changeset: changeset, semesters: semesters)
       {:error, message} ->
         case message do
           "forbidden" ->
@@ -82,7 +91,9 @@ defmodule AppWeb.CourseController do
         |> redirect(to: Routes.course_path(conn, :show, course))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", course: course, changeset: changeset)
+        semester = Courses.get_semester!(course.semester_id)
+        semesters = [{:"#{semester.name}", semester.id}]
+        render(conn, "edit.html", course: course, changeset: changeset, semesters: semesters)
 
       {:error, message} ->
         conn

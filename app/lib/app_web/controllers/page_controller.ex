@@ -3,9 +3,14 @@ defmodule AppWeb.PageController do
 
   def index(conn, _params) do
     uid = get_session(conn, :uid)
+    current_user = if !is_nil(uid) do
+                      net_id = uid
+                      App.Accounts.get_user_by!(net_id)
+                    else
+                      nil
+                    end
     is_faculty = if !is_nil(uid) do
-                    net_id = uid
-                    App.Accounts.get_user_by!(net_id).is_faculty
+                    current_user.is_faculty
                   else
                     false
                   end
@@ -15,6 +20,6 @@ defmodule AppWeb.PageController do
     #net_id = if !is_nil(uid) do
     #            current_user.net_id
     #          end
-    render(conn, "index.html", [current_user: uid, is_faculty: is_faculty])
+    render(conn, "index.html", [current_user: current_user, is_faculty: is_faculty])
   end
 end

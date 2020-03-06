@@ -38,6 +38,28 @@ defmodule App.Courses do
   def get_semester!(id), do: Repo.get!(Semester, id)
 
   @doc """
+  Gets a single semester by name.
+
+  Raises `Ecto.NoResultsError` if the Semester does not exist.
+
+  ## Examples
+
+      iex> get_semester_by!(Fall 2019)
+      %Semester{}
+
+      iex> get_semester!(Never 9999)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_semester_by!(name), do: Repo.get_by!(Semester, name: name)
+
+  def list_semester_names do
+    query = from s in Semester,
+              select: [s.id, s.name]
+    Repo.all(query)
+  end
+
+  @doc """
   Creates a semester.
 
   ## Examples

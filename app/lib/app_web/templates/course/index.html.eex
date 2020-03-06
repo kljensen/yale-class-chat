@@ -3,9 +3,10 @@
 <table>
   <thead>
     <tr>
+      <th>Semester</th>
       <th>Name</th>
-      <th>Department</th>
-      <th>Number</th>
+      <th>Viewing</th>
+      <th>Participating</th>
 
       <th></th>
     </tr>
@@ -13,10 +14,10 @@
   <tbody>
 <%= for course <- @courses do %>
     <tr>
-      <td><%= course.name %></td>
-      <td><%= course.department %></td>
-      <td><%= course.number %></td>
-
+      <td><%= course.semester_id %></td>
+      <td><%= course.department <> to_string(course.number) <> ": " <> course.name %></td>
+      <td><%= if course.allow_read do %>Allowed<% else %>Not Allowed<% end%></td>
+      <td><%= if course.allow_write do %>Allowed<% else %>Not Allowed<% end%></td>
       <td>
         <span><%= link "Show", to: Routes.course_path(@conn, :show, course) %></span>
         <span><%= link "Edit", to: Routes.course_path(@conn, :edit, course) %></span>

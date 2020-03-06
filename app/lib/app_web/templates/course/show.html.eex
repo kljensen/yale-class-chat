@@ -17,6 +17,29 @@
     <%= @course.number %>
   </li>
 
+  <li>
+    <strong>Student viewing:</strong>
+    <%= if @course.allow_read do %>
+      Allowed
+    <%= else %>
+      Not allowed
+    <%= end %>
+  </li>
+
+  <li>
+    <strong>Student participation:</strong>
+    <%= if @course.allow_write do %>
+      Allowed
+    <%= else %>
+      Not allowed
+    <%= end %>
+  </li>
+
+  <li>
+    <strong>Semester:</strong>
+    <%= @semester.name %>
+  </li>
+
 </ul>
 
 <span><%= link "Edit", to: Routes.course_path(@conn, :edit, @course) %></span>

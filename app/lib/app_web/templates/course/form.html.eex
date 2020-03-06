@@ -17,6 +17,18 @@
   <%= number_input f, :number %>
   <%= error_tag f, :number %>
 
+  <%= label f, :allow_read %>
+  <%= checkbox f, :allow_read %>
+  <%= error_tag f, :allow_read %>
+
+  <%= label f, :allow_write %>
+  <%= checkbox f, :allow_write %>
+  <%= error_tag f, :allow_write %>
+
+  <%= label f, :semester_id %>
+  <%= select f, :semester_id, @semesters %>
+  <%= error_tag f, :semester_id %>
+
   <div>
     <%= submit "Save" %>
   </div>
