@@ -13,11 +13,12 @@
       <section class="container">
         <nav role="navigation">
           <ul>
+            <li><a href="/auth/cas">Log In</a></li>
             <li><a href="/auth/cas/logout">Log Out</a></li>
           </ul>
         </nav>
         <a href="/" class="phx-logo">
-          <img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" alt="Phoenix Framework Logo"/>
+          <img src="<%= Routes.static_path(@conn, "/images/yale-som.png") %>" alt="Yale SOM Logo"/>
         </a>
       </section>
     </header>

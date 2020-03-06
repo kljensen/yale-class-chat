@@ -55,6 +55,12 @@ defmodule AppWeb.SemesterController do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", semester: semester, changeset: changeset)
+
+      {:error, error} ->
+        changeset = Courses.change_semester(%Semester{})
+        conn
+        |> put_flash(:error, error)
+        |> render("new.html", changeset: changeset)
     end
   end
 

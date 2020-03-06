@@ -12,7 +12,7 @@ defmodule AppWeb.CourseController do
 
   def new(conn, _params) do
     changeset = Courses.change_course(%Course{})
-    render(conn, "new.html", changeset: changeset)
+    render(conn, "new.html", [changeset: changeset])
   end
 
   def create(conn, %{"semester" => semester, "course" => course_params}) do
@@ -40,8 +40,9 @@ defmodule AppWeb.CourseController do
 
   def update(conn, %{"id" => id, "course" => course_params}) do
     course = Courses.get_course!(id)
+    user = conn.assigns.current_user
 
-    case Courses.update_course(course, course_params) do
+    case Courses.update_course(user, course, course_params) do
       {:ok, course} ->
         conn
         |> put_flash(:info, "Course updated successfully.")
@@ -54,7 +55,8 @@ defmodule AppWeb.CourseController do
 
   def delete(conn, %{"id" => id}) do
     course = Courses.get_course!(id)
-    {:ok, _course} = Courses.delete_course(course)
+    user = conn.assigns.current_user
+    {:ok, _course} = Courses.delete_course(user, course)
 
     conn
     |> put_flash(:info, "Course deleted successfully.")

@@ -37,23 +37,36 @@ defmodule AppWeb.Router do
     pipe_through [:browser, :auth]
 
     #get "/", PageController, :index
-    resources "/comments", CommentController
-    resources "/courses", CourseController
-    resources "/ratings", RatingController
-    resources "/sections", SectionController
+    resources "/courses", CourseController do
+      resources "/sections", SectionController, except: [:show]
+      resources "/course_roles", Course_RoleController
+      resources "/topics", TopicController, only: [:new, :create]
+    end
+
+    resources "/sections", SectionController, only: [:show] do
+      resources "/topics", TopicController, except: [:show, :new, :create]
+      resources "/section_roles", Section_RoleController
+    end
+
+    resources "/topics", TopicController, only: [:show] do
+      resources "/submissions", SubmissionController, except: [:show]
+    end
+
+    resources "/submissions", SubmissionController, only: [:show] do
+      resources "/comments", CommentController
+      resources "/ratings", RatingController
+    end
+
+
     resources "/semesters", SemesterController
-    resources "/submissions", SubmissionController
-    resources "/topics", TopicController
-    resources "/users", UserController#, only: [:edit, :show, :update]
-    resources "/course_roles", Course_RoleController
-    resources "/section_roles", Section_RoleController
+    resources "/users", UserController, only: [:edit, :show, :update, :index] #Remove index once testing done
+    resources "/topics", TopicController, only: [:edit, :show, :update, :index, :delete]
+    resources "/submissions", SubmissionController, only: [:edit, :show, :update, :index, :delete]
+    resources "/comments", CommentController, only: [:edit, :show, :update, :index, :delete]
+    resources "/ratings", RatingController, only: [:edit, :show, :update, :index, :delete]
+
   end
 
-  scope "/secret", AppWeb do
-    pipe_through [:browser, :auth]
-
-    get "/", SecretController, :index
-  end
 
   # Other scopes may use custom stacks.
   # scope "/api", AppWeb do

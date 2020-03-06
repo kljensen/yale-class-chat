@@ -3,6 +3,9 @@ defmodule AppWeb.CourseControllerTest do
   @moduletag :skip
 
   alias App.Courses
+  alias App.Accounts
+  alias App.AccountsTest, as: ATest
+  import Plug.Test
 
   def fixture(:semester) do
     semester = App.CoursesTest.semester_fixture()
@@ -15,20 +18,28 @@ defmodule AppWeb.CourseControllerTest do
 
   def fixture(:course) do
     semester = App.CoursesTest.semester_fixture()
-    {:ok, course} = Courses.create_course(semester, @create_attrs)
+    user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
+    {:ok, course} = Courses.create_course(user_faculty, semester, @create_attrs)
     course
   end
 
   describe "index" do
     test "lists all courses", %{conn: conn} do
-      conn = get(conn, Routes.course_path(conn, :index))
+      course = fixture(:course)
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> get(conn, Routes.course_path(conn, :index))
+
       assert html_response(conn, 200) =~ "Listing Courses"
     end
   end
 
   describe "new course" do
     test "renders form", %{conn: conn} do
-      conn = get(conn, Routes.course_path(conn, :new))
+      user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> get(Routes.course_path(conn, :new))
       assert html_response(conn, 200) =~ "New Course"
     end
   end
