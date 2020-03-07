@@ -3,18 +3,25 @@ defmodule AppWeb.TopicController do
 
   alias App.Topics
   alias App.Topics.Topic
+  alias App.Courses
 
-  def index(conn, _params) do
-    topics = Topics.list_topics()
-    render(conn, "index.html", topics: topics)
+  def index(conn, %{"section_id" => section_id}) do
+    section = Courses.get_section!(section_id)
+    user = conn.assigns.current_user
+
+    topics = Topics.list_user_topics(user, section)
+    render(conn, "index.html", topics: topics, section: section)
   end
 
-  def new(conn, _params) do
+  def new(conn, %{"course_id" => course_id}) do
+    course = Courses.get_course!(course_id)
+    user = conn.assigns.current_user
     changeset = Topics.change_topic(%Topic{})
-    render(conn, "new.html", changeset: changeset)
+    render(conn, "new.html", changeset: changeset, course: course)
   end
 
   def create(conn, %{"topic" => topic_params}) do
+    section_id = Map.get(topic_params, "section_id")
     case Topics.create_topic(topic_params) do
       {:ok, topic} ->
         conn
@@ -22,7 +29,9 @@ defmodule AppWeb.TopicController do
         |> redirect(to: Routes.topic_path(conn, :show, topic))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
+        section = Courses.get_section!(section_id)
+        user = conn.assigns.current_user
+        render(conn, "new.html", changeset: changeset, section: section)
     end
   end
 

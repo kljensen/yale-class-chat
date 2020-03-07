@@ -1,6 +1,5 @@
 defmodule AppWeb.TopicControllerTest do
   use AppWeb.ConnCase
-  @moduletag :skip
 
   alias App.Topics
 

@@ -19,7 +19,7 @@ defmodule AppWeb.SectionController do
 
   def create(conn, %{"section" => section_params}) do
     user = conn.assigns.current_user
-    course_id = semester_id = Map.get(section_params, "course_id")
+    course_id = Map.get(section_params, "course_id")
     course = Courses.get_course!(course_id)
     case Courses.create_section(user, course, section_params) do
       {:ok, section} ->
