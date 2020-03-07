@@ -40,8 +40,6 @@ defmodule AppWeb.UserController do
   end
 
   def edit(conn, %{"id" => id}) do
-    IO.inspect "Current user ID: " <> to_string(conn.assigns.current_user.id)
-    IO.inspect "Passed user ID: " <> id
     case id == to_string(conn.assigns.current_user.id) do
       true ->
         user = Accounts.get_user!(id)
