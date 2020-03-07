@@ -55,7 +55,7 @@ defmodule AppWeb.CourseControllerTest do
       assert redirected_to(conn) == Routes.course_path(conn, :show, id)
 
       conn = get(conn, Routes.course_path(conn, :show, id))
-      assert html_response(conn, 200) =~ "Show Course"
+      assert html_response(conn, 200) =~ "Course Details"
     end
 
     test "renders errors when data is invalid", %{conn: conn} do

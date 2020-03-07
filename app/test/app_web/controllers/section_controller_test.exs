@@ -38,9 +38,10 @@ defmodule AppWeb.SectionControllerTest do
   describe "create section" do
     test "redirects to show when data is valid", %{conn: conn} do
       course = App.CoursesTest.course_fixture()
+      attrs = Map.merge(@create_attrs, %{course_id: course.id})
       conn = conn
         |> init_test_session(uid: "faculty net id")
-        |> post(Routes.section_path(conn, :create), course: course, section: @create_attrs)
+        |> post(Routes.section_path(conn, :create), section: attrs)
 
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == Routes.section_path(conn, :show, id)
@@ -51,10 +52,10 @@ defmodule AppWeb.SectionControllerTest do
 
     test "renders errors when data is invalid", %{conn: conn} do
       course = App.CoursesTest.course_fixture()
-      #user_faculty = App.Accounts.get_user_by("faculty net id")
+      attrs = Map.merge(@invalid_attrs, %{course_id: course.id})
       conn = conn
         |> init_test_session(uid: "faculty net id")
-        |> post(Routes.section_path(conn, :create), course: course, section: @invalid_attrs)
+        |> post(Routes.section_path(conn, :create), section: attrs)
       assert html_response(conn, 200) =~ "New Section"
     end
   end

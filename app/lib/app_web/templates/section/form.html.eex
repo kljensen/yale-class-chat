@@ -13,6 +13,8 @@
   <%= text_input f, :crn %>
   <%= error_tag f, :crn %>
 
+  <%= hidden_input f, :course_id, value: @course.id %>
+
   <div>
     <%= submit "Save" %>
   </div>

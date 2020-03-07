@@ -17,8 +17,10 @@ defmodule AppWeb.SectionController do
     render(conn, "new.html", changeset: changeset, course: course)
   end
 
-  def create(conn, %{"course" => course, "section" => section_params}) do
+  def create(conn, %{"section" => section_params}) do
     user = conn.assigns.current_user
+    course_id = semester_id = Map.get(section_params, "course_id")
+    course = Courses.get_course!(course_id)
     case Courses.create_section(user, course, section_params) do
       {:ok, section} ->
         conn
@@ -56,8 +58,9 @@ defmodule AppWeb.SectionController do
     case Courses.get_user_section(user, id) do
       {:ok, section} ->
         section = Courses.get_section!(id)
+        course = Courses.get_course!(section.course_id)
         changeset = Courses.change_section(section)
-        render(conn, "edit.html", section: section, changeset: changeset)
+        render(conn, "edit.html", section: section, changeset: changeset, course: course)
       {:error, message} ->
         case message do
           "forbidden" ->
@@ -85,7 +88,8 @@ defmodule AppWeb.SectionController do
         |> redirect(to: Routes.section_path(conn, :show, section))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", section: section, changeset: changeset)
+        course = Courses.get_course!(section.course_id)
+        render(conn, "edit.html", section: section, changeset: changeset, course: course)
     end
   end
 

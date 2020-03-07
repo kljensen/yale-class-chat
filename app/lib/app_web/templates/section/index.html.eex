@@ -26,3 +26,4 @@
 </table>
 
 <span><%= link "New Section", to: Routes.course_section_path(@conn, :new, @course.id) %></span>
+<span><%= link "Back", to: Routes.course_path(@conn, :show, @course) %></span>
