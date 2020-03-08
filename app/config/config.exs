@@ -38,6 +38,9 @@ config :ueberauth, Ueberauth,
 # Use UTC for timestamps
 config :app, App.Repo, migration_timestamps: [type: :utc_datetime_usec]
 
+# Load tzdata time zone library
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"

@@ -60,7 +60,9 @@ defmodule App.MixProject do
       {:ueberauth, "~> 0.6"},
       # Using Phoenix LiveView for front-end
       {:phoenix_live_view, "~> 0.8.0"},
-      {:floki, ">= 0.0.0"}
+      {:floki, ">= 0.0.0"},
+      # Using tzdata for time zone conversions
+      {:tzdata, "~> 1.0.1"}
     ]
   end
 
