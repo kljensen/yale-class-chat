@@ -18,11 +18,13 @@
   <%= error_tag f, :slug %>
 
   <%= label f, :opened_at %>
-  <%= datetime_select f, :opened_at %>
+  <%= datetime_select f, :opened_at, default: {{@current_time.year, @current_time.month, @current_time.day},
+{@current_time.hour, @current_time.minute, @current_time.second}} %>
   <%= error_tag f, :opened_at %>
 
   <%= label f, :closed_at %>
-  <%= datetime_select f, :closed_at %>
+  <%= datetime_select f, :closed_at, default: {{@current_time.year, @current_time.month + 1, @current_time.day},
+{@current_time.hour, @current_time.minute, @current_time.second}} %>
   <%= error_tag f, :closed_at %>
 
   <%= label f, :allow_submissions %>
@@ -48,6 +50,12 @@
   <%= label f, :sort %>
   <%= text_input f, :sort %>
   <%= error_tag f, :sort %>
+
+  <%= if String.starts_with?(@action, "/courses") do %>
+    <%= label f, "Post topic to sections" %>
+    <%= multiple_select f, :sections, @sections, selected: @selected_sections %>
+    <%= error_tag f, :sections %>
+  <% end %>
 
   <div>
     <%= submit "Save" %>

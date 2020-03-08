@@ -43,5 +43,9 @@
 </ul>
 
 <span><%= link "Edit", to: Routes.course_path(@conn, :edit, @course) %></span>
-<span><%= link "Sections", to: Routes.course_section_path(@conn, :index, @course) %></span>
 <span><%= link "Back", to: Routes.course_path(@conn, :index) %></span>
+
+<h2>Administration</h2>
+<span><%= link "View Sections", to: Routes.course_section_path(@conn, :index, @course) %></span>
+<span><%= link "Create Section", to: Routes.course_section_path(@conn, :new, @course) %></span>
+<span><%= link "Create Topic", to: Routes.course_topic_path(@conn, :new, @course) %></span>

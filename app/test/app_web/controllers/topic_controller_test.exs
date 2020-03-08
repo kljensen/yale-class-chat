@@ -2,33 +2,53 @@ defmodule AppWeb.TopicControllerTest do
   use AppWeb.ConnCase
 
   alias App.Topics
+  import Plug.Test
 
-  @create_attrs %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2010-04-17T14:00:00Z", description: "some description", opened_at: "2010-04-17T14:00:00Z", slug: "some slug", sort: "some sort", title: "some title", user_submission_limit: 42}
-  @update_attrs %{allow_submission_comments: false, allow_submission_voting: false, allow_submissions: false, anonymous: false, closed_at: "2011-05-18T15:01:01Z", description: "some updated description", opened_at: "2011-05-18T15:01:01Z", slug: "some updated slug", sort: "some updated sort", title: "some updated title", user_submission_limit: 43}
-  @invalid_attrs %{allow_submission_comments: nil, allow_submission_voting: nil, allow_submissions: nil, anonymous: nil, closed_at: nil, description: nil, opened_at: nil, slug: nil, sort: nil, title: nil, user_submission_limit: nil}
+  @create_attrs %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, description: "some description", opened_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, slug: "some slug", sort: "some sort", title: "some title", user_submission_limit: 42}
+  @update_attrs %{allow_submission_comments: false, allow_submission_voting: false, allow_submissions: false, anonymous: false, closed_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, description: "some updated description", opened_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, slug: "some updated slug", sort: "some updated sort", title: "some updated title", user_submission_limit: 43}
+  @invalid_attrs %{allow_submission_comments: nil, allow_submission_voting: nil, allow_submissions: nil, anonymous: nil, closed_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, description: nil, opened_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, slug: nil, sort: nil, title: nil, user_submission_limit: nil}
 
   def fixture(:topic) do
-    {:ok, topic} = Topics.create_topic(@create_attrs)
+    section = AppWeb.SectionControllerTest.fixture(:section)
+    user_faculty = App.Accounts.get_user_by!("faculty net id")
+    {:ok, topic} = Topics.create_topic(user_faculty, section, @create_attrs)
     topic
   end
 
   describe "index" do
-    test "lists all topics", %{conn: conn} do
-      conn = get(conn, Routes.topic_path(conn, :index))
+    setup [:create_section]
+
+    test "lists all topics", %{conn: conn, section: section} do
+      user_faculty = App.Accounts.get_user_by!("faculty net id")
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> get(Routes.section_topic_path(conn, :index, section))
       assert html_response(conn, 200) =~ "Listing Topics"
     end
   end
 
   describe "new topic" do
-    test "renders form", %{conn: conn} do
-      conn = get(conn, Routes.topic_path(conn, :new))
+    setup [:create_section]
+
+    test "renders form", %{conn: conn, section: section} do
+      course = App.Courses.get_course!(section.course_id)
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> get(Routes.course_topic_path(conn, :new, course))
       assert html_response(conn, 200) =~ "New Topic"
     end
   end
 
   describe "create topic" do
-    test "redirects to show when data is valid", %{conn: conn} do
-      conn = post(conn, Routes.topic_path(conn, :create), topic: @create_attrs)
+    setup [:create_section]
+
+    test "redirects to show when data is valid", %{conn: conn, section: section} do
+      course = App.Courses.get_course!(section.course_id)
+      section_ids = [Integer.to_string(section.id)]
+      attrs = Map.merge(@create_attrs, %{section_ids: section_ids})
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> post(Routes.course_topic_path(conn, :create, course), topic: attrs)
 
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == Routes.topic_path(conn, :show, id)
@@ -37,8 +57,13 @@ defmodule AppWeb.TopicControllerTest do
       assert html_response(conn, 200) =~ "Show Topic"
     end
 
-    test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, Routes.topic_path(conn, :create), topic: @invalid_attrs)
+    test "renders errors when data is invalid", %{conn: conn, section: section} do
+      course = App.Courses.get_course!(section.course_id)
+      section_ids = [Integer.to_string(section.id)]
+      attrs = Map.merge(@invalid_attrs, %{section_ids: section_ids})
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> post(Routes.course_topic_path(conn, :create, course), topic: attrs)
       assert html_response(conn, 200) =~ "New Topic"
     end
   end
@@ -47,7 +72,9 @@ defmodule AppWeb.TopicControllerTest do
     setup [:create_topic]
 
     test "renders form for editing chosen topic", %{conn: conn, topic: topic} do
-      conn = get(conn, Routes.topic_path(conn, :edit, topic))
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> get(Routes.topic_path(conn, :edit, topic))
       assert html_response(conn, 200) =~ "Edit Topic"
     end
   end
@@ -56,7 +83,9 @@ defmodule AppWeb.TopicControllerTest do
     setup [:create_topic]
 
     test "redirects when data is valid", %{conn: conn, topic: topic} do
-      conn = put(conn, Routes.topic_path(conn, :update, topic), topic: @update_attrs)
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> put(Routes.topic_path(conn, :update, topic), topic: @update_attrs)
       assert redirected_to(conn) == Routes.topic_path(conn, :show, topic)
 
       conn = get(conn, Routes.topic_path(conn, :show, topic))
@@ -64,7 +93,9 @@ defmodule AppWeb.TopicControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn, topic: topic} do
-      conn = put(conn, Routes.topic_path(conn, :update, topic), topic: @invalid_attrs)
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> put(Routes.topic_path(conn, :update, topic), topic: @invalid_attrs)
       assert html_response(conn, 200) =~ "Edit Topic"
     end
   end
@@ -73,7 +104,9 @@ defmodule AppWeb.TopicControllerTest do
     setup [:create_topic]
 
     test "deletes chosen topic", %{conn: conn, topic: topic} do
-      conn = delete(conn, Routes.topic_path(conn, :delete, topic))
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> delete(Routes.topic_path(conn, :delete, topic))
       assert redirected_to(conn) == Routes.topic_path(conn, :index)
       assert_error_sent 404, fn ->
         get(conn, Routes.topic_path(conn, :show, topic))
@@ -84,5 +117,10 @@ defmodule AppWeb.TopicControllerTest do
   defp create_topic(_) do
     topic = fixture(:topic)
     {:ok, topic: topic}
+  end
+
+  defp create_section(_) do
+    section = AppWeb.SectionControllerTest.fixture(:section)
+    {:ok, section: section}
   end
 end
