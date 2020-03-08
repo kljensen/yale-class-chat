@@ -7,7 +7,9 @@ defmodule AppWeb.CourseController do
   def index(conn, _params) do
     user = conn.assigns.current_user
     courses = Courses.list_user_courses(user)
-    render(conn, "index.html", courses: courses)
+    list = Courses.list_semester_names()
+    semesters = Map.new(Enum.map(list, fn [key, value] -> {:"#{key}", value} end))
+    render(conn, "index.html", courses: courses, semesters: semesters)
   end
 
   def new(conn, _params) do

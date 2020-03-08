@@ -14,7 +14,7 @@
   <tbody>
 <%= for course <- @courses do %>
     <tr>
-      <td><%= course.semester_id %></td>
+      <td><%= Map.get(@semesters, :"#{course.semester_id}") %></td>
       <td><%= course.department <> to_string(course.number) <> ": " <> course.name %></td>
       <td><%= if course.allow_read do %>Allowed<% else %>Not Allowed<% end%></td>
       <td><%= if course.allow_write do %>Allowed<% else %>Not Allowed<% end%></td>
