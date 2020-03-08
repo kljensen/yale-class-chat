@@ -21,7 +21,5 @@ defmodule App.Repo.Migrations.CreateTopics do
 
       timestamps()
     end
-
-    create unique_index(:topics, [:slug])
   end
 end
