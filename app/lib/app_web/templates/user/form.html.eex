@@ -10,7 +10,7 @@
   <%= error_tag f, :display_name %>
 
   <%= label f, :email %>
-  <%= text_input f, :email %>
+  <%= email_input f, :email %>
   <%= error_tag f, :email %>
 
   <div>

@@ -6,12 +6,17 @@
   </article>
 </section>
 
+<%= if !is_nil(@current_user) do %>
 <section class="row">
   <article class="column">
     <h2>Quick Links</h2>
     <ul>
       <li>
+        <%= if @current_user.is_faculty do %>
         <%= link "My Courses", to: Routes.course_path(@conn, :index) %>
+        <%= else %>
+        <%= link "My Courses", to: Routes.user_section_path(@conn, :index) %>
+        <%= end %>
       </li>
     </ul>
   </article>
@@ -30,3 +35,4 @@
     </ul>
   </article>
 </section>
+<%= end %>
