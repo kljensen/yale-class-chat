@@ -104,10 +104,11 @@ defmodule AppWeb.TopicControllerTest do
     setup [:create_topic]
 
     test "deletes chosen topic", %{conn: conn, topic: topic} do
+      section = App.Courses.get_section!(topic.section_id)
       conn = conn
         |> init_test_session(uid: "faculty net id")
         |> delete(Routes.topic_path(conn, :delete, topic))
-      assert redirected_to(conn) == Routes.topic_path(conn, :index)
+      assert redirected_to(conn) == Routes.section_topic_path(conn, :index, section)
       assert_error_sent 404, fn ->
         get(conn, Routes.topic_path(conn, :show, topic))
       end

@@ -4,10 +4,7 @@ defmodule AppWeb.PageViewTest do
 
   test "renders index.html", %{conn: conn} do
     links = [
-      Routes.course_path(conn, :index),
-      Routes.submission_path(conn, :index),
-      Routes.comment_path(conn, :index),
-      Routes.rating_path(conn, :index)
+      Routes.course_path(conn, :index)
     ]
 
     content = render_to_string(

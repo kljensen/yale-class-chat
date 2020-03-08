@@ -13,20 +13,6 @@
       <li>
         <%= link "My Courses", to: Routes.course_path(@conn, :index) %>
       </li>
-      <%= if @is_faculty do %>
-        <li>
-          <%= link "My Topics", to: Routes.topic_path(@conn, :index) %>
-        </li>
-      <% end %>
-      <li>
-        <%= link "My Submissions", to: Routes.submission_path(@conn, :index) %>
-      </li>
-      <li>
-        <%= link "My Comments", to: Routes.comment_path(@conn, :index) %>
-      </li>
-      <li>
-        <%= link "My Ratings", to: Routes.rating_path(@conn, :index) %>
-      </li>
     </ul>
   </article>
   <article class="column">

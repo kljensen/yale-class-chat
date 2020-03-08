@@ -83,13 +83,15 @@ defmodule AppWeb.TopicController do
 
   def edit(conn, %{"id" => id}) do
     topic = Topics.get_topic!(id)
+    section = Courses.get_section!(topic.section_id)
     changeset = Topics.change_topic(topic)
     {:ok, current_time} = DateTime.now("America/New_York")
-    render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time)
+    render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time, section: section)
   end
 
   def update(conn, %{"id" => id, "topic" => topic_params}) do
     topic = Topics.get_topic!(id)
+    section = Courses.get_section!(topic.section_id)
     user = conn.assigns.current_user
 
     case Topics.update_topic(user, topic, topic_params) do
@@ -100,17 +102,18 @@ defmodule AppWeb.TopicController do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:ok, current_time} = DateTime.now("America/New_York")
-        render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time)
+        render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time, section: section)
     end
   end
 
   def delete(conn, %{"id" => id}) do
     topic = Topics.get_topic!(id)
+    section = Courses.get_section!(topic.section_id)
     user = conn.assigns.current_user
     {:ok, _topic} = Topics.delete_topic(user, topic)
 
     conn
     |> put_flash(:info, "Topic deleted successfully.")
-    |> redirect(to: Routes.topic_path(conn, :index))
+    |> redirect(to: Routes.section_topic_path(conn, :index, section))
   end
 end
