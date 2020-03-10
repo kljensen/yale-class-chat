@@ -1,5 +1,5 @@
 <h1>New Section  role</h1>
 
-<%= render "form.html", Map.put(assigns, :action, Routes.section__role_path(@conn, :create)) %>
+<%= render "form.html", Map.put(assigns, :action, Routes.section_section__role_path(@conn, :create, @section)) %>
 
-<span><%= link "Back", to: Routes.section__role_path(@conn, :index) %></span>
+<span><%= link "Back", to: Routes.section_section__role_path(@conn, :index, @section) %></span>

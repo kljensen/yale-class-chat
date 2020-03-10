@@ -74,8 +74,6 @@ defmodule AppWeb.TopicController do
 
           {:error, message} ->
             changeset = Topics.change_topic(%Topic{})
-            IO.inspect "Message: "
-            IO.inspect message
             conn
             |> put_flash(:error, message)
             |> render("new.html", changeset: changeset, course: course, sections: sections, selected_sections: selected_sections, current_time: current_time)

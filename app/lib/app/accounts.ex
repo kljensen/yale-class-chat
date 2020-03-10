@@ -46,6 +46,21 @@ defmodule App.Accounts do
     end
   end
 
+  def list_users_for_section__roles(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
+    uid = user.id
+    cid = section.course_id
+    course = App.Courses.get_course!(cid)
+    allowed_roles = ["administrator", "owner"]
+    auth_role = get_current_course__role(user, course)
+    if Enum.member?(allowed_roles, auth_role) do
+      query = from u in "users",
+                select: [u.id, u.net_id]
+      Repo.all(query)
+    else
+      []
+    end
+  end
+
   @doc """
   Gets a single user.
 
@@ -506,6 +521,82 @@ defmodule App.Accounts do
   """
   def list_section_roles do
     Repo.all(Section_Role)
+  end
+
+  @doc """
+  Returns the list of section_roles for a given user.
+
+  ## Examples
+
+      iex> list_user_all_section_roles(user)
+      [%Section_Role{}, ...]
+
+  """
+  def list_user_all_section_roles(%App.Accounts.User{} = user) do
+    uid = user.id
+    query = from u_r in Section_Role,
+              where: u_r.user_id == ^uid,
+              select: u_r
+    Repo.all(query)
+  end
+
+  @doc """
+  Returns the list of section_roles for a given user in a given section.
+
+  ## Examples
+
+      iex> list_user_section_section_roles(user, section)
+      [%Section_Role{}, ...]
+
+  """
+  def list_user_section_section_roles(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
+    uid = user.id
+    cid = section.id
+    query = from u_r in Section_Role,
+              where: u_r.user_id == ^uid and u_r.section_id == ^cid,
+              select: u_r
+    Repo.all(query)
+  end
+
+  @doc """
+  Returns the list of section_roles in a given section.
+
+  ## Examples
+
+      iex> list_section_all_section_roles(user, section)
+      [%Section_Role{}, ...]
+
+  """
+  def list_section_all_section_roles(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
+    uid = user.id
+    cid = section.id
+    allowed_roles = ["administrator", "owner"]
+    auth_role = get_current_section__role(user, section)
+    if Enum.member?(allowed_roles, auth_role) do
+      query = from u_r in Section_Role,
+                where: u_r.section_id == ^cid,
+                select: u_r
+      Repo.all(query)
+    else
+      []
+    end
+  end
+
+  def list_section__role_users(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
+    uid = user.id
+    cid = section.id
+    allowed_roles = ["administrator", "owner"]
+    auth_role = get_current_section__role(user, section)
+    if Enum.member?(allowed_roles, auth_role) do
+      query = from u_r in Section_Role,
+                left_join: u in "users",
+                on: u_r.user_id == u.id,
+                where: u_r.section_id == ^cid,
+                select: [u.id, u.net_id]
+      Repo.all(query)
+    else
+      []
+    end
   end
 
   @doc """
