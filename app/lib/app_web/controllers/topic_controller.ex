@@ -48,8 +48,6 @@ defmodule AppWeb.TopicController do
     topic_params = Map.put(topic_params, "opened_at", opened_at)
     topic_params = Map.put(topic_params, "closed_at", opened_at)
 
-    section_ids = topic_params["section_ids"]
-
     case section_ids do
       nil ->
         changeset = Topics.change_topic(%Topic{})
@@ -59,7 +57,7 @@ defmodule AppWeb.TopicController do
       _ ->
         section_id = List.first(section_ids)
         section = Courses.get_section!(section_id)
-        case Topics.create_topic(user, section, topic_params) do
+        case IO.inspect(Topics.create_topic(user, section, topic_params)) do
           {:ok, topic} ->
             for section_id <- section_ids do
                             section_id = String.to_integer(section_id)
@@ -72,6 +70,14 @@ defmodule AppWeb.TopicController do
 
           {:error, %Ecto.Changeset{} = changeset} ->
             render(conn, "new.html", changeset: changeset, course: course, sections: sections, selected_sections: selected_sections, current_time: current_time)
+
+          {:error, message} ->
+            changeset = Topics.change_topic(%Topic{})
+            IO.inspect "Message: "
+            IO.inspect message
+            conn
+            |> put_flash(:error, message)
+            |> render("new.html", changeset: changeset, course: course, sections: sections, selected_sections: selected_sections, current_time: current_time)
         end
     end
   end
