@@ -23,4 +23,4 @@
   </tbody>
 </table>
 
-<span><%= link "New Rating", to: Routes.rating_path(@conn, :new) %></span>
+<span><%= link "New Rating", to: Routes.submission_rating_path(@conn, :new, @submission) %></span>

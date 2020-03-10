@@ -10,4 +10,4 @@
 </ul>
 
 <span><%= link "Edit", to: Routes.rating_path(@conn, :edit, @rating) %></span>
-<span><%= link "Back", to: Routes.rating_path(@conn, :index) %></span>
+<span><%= link "Back", to: Routes.submission_rating_path(@conn, :index, @submission) %></span>
