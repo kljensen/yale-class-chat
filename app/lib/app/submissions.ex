@@ -473,10 +473,12 @@ defmodule App.Submissions do
   """
   def create_comment(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
     allowed_roles = ["student"]
+    allowed_course_roles = ["administrator", "owner"]
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_section__role(user, section)
+    course_role = App.Accounts.get_current_course__role(user, section)
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
@@ -488,7 +490,7 @@ defmodule App.Submissions do
         {:error, "topic closed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
-      Enum.member?(allowed_roles, auth_role) == false ->
+      Enum.member?(allowed_roles, auth_role)  == false && Enum.member?(allowed_course_roles, course_role) == false ->
         {:error, "unauthorized"}
       true ->
         do_create_comment(user, submission, attrs)
@@ -741,10 +743,12 @@ defmodule App.Submissions do
   """
   def create_rating(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
     allowed_roles = ["student"]
+    allowed_course_roles = ["administrator", "owner"]
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_section__role(user, section)
+    course_role = App.Accounts.get_current_course__role(user, section)
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
@@ -756,8 +760,8 @@ defmodule App.Submissions do
         {:error, "topic closed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
-      Enum.member?(allowed_roles, auth_role) == false ->
-        {:error, "unauthorized"}#
+        Enum.member?(allowed_roles, auth_role)  == false && Enum.member?(allowed_course_roles, course_role) == false ->
+        {:error, "unauthorized"}
       true ->
         do_create_rating(user, submission, attrs)
     end

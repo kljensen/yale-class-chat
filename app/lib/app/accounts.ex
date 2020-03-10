@@ -206,6 +206,84 @@ defmodule App.Accounts do
     List.first(results)
   end
 
+  def get_current_course__role(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
+    {:ok, current_time} = DateTime.now("Etc/UTC")
+    uid = user.id
+    cid = section.course_id
+    query = from u_r in "course_roles",
+              where: u_r.user_id == ^uid and u_r.course_id == ^cid  and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
+              select: u_r.role
+
+    results = Repo.all(query)
+    List.first(results)
+  end
+
+  def get_current_course__role(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic) do
+    {:ok, current_time} = DateTime.now("Etc/UTC")
+    uid = user.id
+    sid = topic.section_id
+    query = from u_r in "course_roles",
+              left_join: s in "sections",
+              on: s.course_id == u_r.course_id,
+              where: s.id == ^sid and u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
+              select: u_r.role
+
+    results = Repo.all(query)
+    List.first(results)
+  end
+
+  def get_current_course__role(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission) do
+    {:ok, current_time} = DateTime.now("Etc/UTC")
+    uid = user.id
+    tid = submission.topic_id
+    query = from u_r in "course_roles",
+              left_join: s in "sections",
+              on: s.course_id == u_r.course_id,
+              left_join: t in "topics",
+              on: t.section_id == s.id,
+              where: t.id == ^tid and u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
+              select: u_r.role
+
+    results = Repo.all(query)
+    List.first(results)
+  end
+
+  def get_current_course__role(%App.Accounts.User{} = user, %App.Submissions.Comment{} = comment) do
+    {:ok, current_time} = DateTime.now("Etc/UTC")
+    uid = user.id
+    suid = comment.submission_id
+    query = from u_r in "course_roles",
+              left_join: s in "sections",
+              on: s.course_id == u_r.course_id,
+              left_join: t in "topics",
+              on: t.section_id == s.id,
+              left_join: su in "submissions",
+              on: su.topic_id == t.id,
+              where: su.id == ^suid and u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
+              select: u_r.role
+
+    results = Repo.all(query)
+    List.first(results)
+  end
+
+  def get_current_course__role(%App.Accounts.User{} = user, %App.Submissions.Rating{} = rating) do
+    {:ok, current_time} = DateTime.now("Etc/UTC")
+    uid = user.id
+    suid = rating.submission_id
+    query = from u_r in "course_roles",
+              left_join: s in "sections",
+              on: s.course_id == u_r.course_id,
+              left_join: t in "topics",
+              on: t.section_id == s.id,
+              left_join: su in "submissions",
+              on: su.topic_id == t.id,
+              where: su.id == ^suid and u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
+              select: u_r.role
+
+    results = Repo.all(query)
+    List.first(results)
+  end
+
 
   @doc """
   Creates a course__role.
