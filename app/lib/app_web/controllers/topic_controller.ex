@@ -4,6 +4,7 @@ defmodule AppWeb.TopicController do
   alias App.Topics
   alias App.Topics.Topic
   alias App.Courses
+  alias App.Submissions
 
   def index(conn, %{"section_id" => section_id}) do
     section = Courses.get_section!(section_id)
@@ -84,7 +85,9 @@ defmodule AppWeb.TopicController do
 
   def show(conn, %{"id" => id}) do
     topic = Topics.get_topic!(id)
-    render(conn, "show.html", topic: topic)
+    user = conn.assigns.current_user
+    submissions = Submissions.list_user_submissions(user, topic)
+    render(conn, "show.html", topic: topic, submissions: submissions)
   end
 
   def edit(conn, %{"id" => id}) do

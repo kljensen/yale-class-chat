@@ -1,28 +1,7 @@
-<h1>Show Submission</h1>
-
-<ul>
-
-  <li>
-    <strong>Title:</strong>
-    <%= @submission.title %>
-  </li>
-
-  <li>
-    <strong>Description:</strong>
-    <%= @submission.description %>
-  </li>
-
-  <li>
-    <strong>Slug:</strong>
-    <%= @submission.slug %>
-  </li>
-
-  <li>
-    <strong>Image url:</strong>
-    <%= @submission.image_url %>
-  </li>
-
-</ul>
+<h1><%= @submission.title %></h1>
+<span><i>Submitted in response to: <%= @topic.title %></i><span>
+<img src="<%= @submission.image_url %>">
+<span><%= @submission.description %></span>
 
 <span><%= link "Edit", to: Routes.submission_path(@conn, :edit, @submission) %></span>
-<span><%= link "Back", to: Routes.submission_path(@conn, :index) %></span>
+<span><%= link "Back", to: Routes.topic_submission_path(@conn, :index, @topic) %></span>

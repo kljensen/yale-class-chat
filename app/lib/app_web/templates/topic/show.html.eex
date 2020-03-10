@@ -51,8 +51,19 @@
     </ul>
   </article>
 </section>
+<h2>Administration</h2>
 <section class="row">
     <article class="column"><span><%= link "Edit Topic", to: Routes.topic_path(@conn, :edit, @topic) %></span></article>
     <article class="column"><span><%= link "Post New Submission", to: Routes.topic_submission_path(@conn, :new, @topic) %></span></article>
     <article class="column"><span><%= link "Back", to: Routes.section_topic_path(@conn, :index, @topic.section_id) %></span></article>
 </section>
+<h2>Submissions</h2>
+<%= for submission <- @submissions do %>
+    <h2><%= submission.title %></h2>
+      <span><%= submission.description %></span>
+      <section class="row">
+      <article class="column"><span><%= link "Show", to: Routes.submission_path(@conn, :show, submission) %></span></article>
+      <article class="column"><span><%= link "Edit", to: Routes.submission_path(@conn, :edit, submission) %></span></article>
+      <article class="column"><span><%= link "Delete", to: Routes.submission_path(@conn, :delete, submission), method: :delete, data: [confirm: "Are you sure?"] %></span></article>
+    </section>
+<% end %>
