@@ -25,4 +25,4 @@
   </tbody>
 </table>
 
-<span><%= link "New Comment", to: Routes.comment_path(@conn, :new) %></span>
+<span><%= link "New Comment", to: Routes.submission_comment_path(@conn, :new, @submission) %></span>

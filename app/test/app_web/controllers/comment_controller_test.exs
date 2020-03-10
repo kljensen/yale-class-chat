@@ -1,34 +1,43 @@
 defmodule AppWeb.CommentControllerTest do
   use AppWeb.ConnCase
-  @moduletag :skip
   alias App.Submissions
+  import Plug.Test
+
+  setup [:create_submission]
 
   @create_attrs %{description: "some description", title: "some title"}
   @update_attrs %{description: "some updated description", title: "some updated title"}
   @invalid_attrs %{description: nil, title: nil}
 
-  def fixture(:comment) do
-    {:ok, comment} = Submissions.create_comment(@create_attrs)
+  def fixture(:comment, submission) do
+    user_faculty = App.Accounts.get_user_by!("faculty net id")
+    {:ok, comment} = Submissions.create_comment(user_faculty, submission, @create_attrs)
     comment
   end
 
   describe "index" do
-    test "lists all comments", %{conn: conn} do
-      conn = get(conn, Routes.comment_path(conn, :index))
+    test "lists all comments", %{conn: conn, submission: submission} do
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> get(Routes.submission_comment_path(conn, :index, submission))
       assert html_response(conn, 200) =~ "Listing Comments"
     end
   end
 
   describe "new comment" do
-    test "renders form", %{conn: conn} do
-      conn = get(conn, Routes.comment_path(conn, :new))
+    test "renders form", %{conn: conn, submission: submission} do
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> get(Routes.submission_comment_path(conn, :new, submission))
       assert html_response(conn, 200) =~ "New Comment"
     end
   end
 
   describe "create comment" do
-    test "redirects to show when data is valid", %{conn: conn} do
-      conn = post(conn, Routes.comment_path(conn, :create), comment: @create_attrs)
+    test "redirects to show when data is valid", %{conn: conn, submission: submission} do
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> post(Routes.submission_comment_path(conn, :create, submission), comment: @create_attrs)
 
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == Routes.comment_path(conn, :show, id)
@@ -37,8 +46,10 @@ defmodule AppWeb.CommentControllerTest do
       assert html_response(conn, 200) =~ "Show Comment"
     end
 
-    test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, Routes.comment_path(conn, :create), comment: @invalid_attrs)
+    test "renders errors when data is invalid", %{conn: conn, submission: submission} do
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> post(Routes.submission_comment_path(conn, :create, submission), comment: @invalid_attrs)
       assert html_response(conn, 200) =~ "New Comment"
     end
   end
@@ -47,7 +58,9 @@ defmodule AppWeb.CommentControllerTest do
     setup [:create_comment]
 
     test "renders form for editing chosen comment", %{conn: conn, comment: comment} do
-      conn = get(conn, Routes.comment_path(conn, :edit, comment))
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> get(Routes.comment_path(conn, :edit, comment))
       assert html_response(conn, 200) =~ "Edit Comment"
     end
   end
@@ -56,7 +69,9 @@ defmodule AppWeb.CommentControllerTest do
     setup [:create_comment]
 
     test "redirects when data is valid", %{conn: conn, comment: comment} do
-      conn = put(conn, Routes.comment_path(conn, :update, comment), comment: @update_attrs)
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> put(Routes.comment_path(conn, :update, comment), comment: @update_attrs)
       assert redirected_to(conn) == Routes.comment_path(conn, :show, comment)
 
       conn = get(conn, Routes.comment_path(conn, :show, comment))
@@ -64,7 +79,9 @@ defmodule AppWeb.CommentControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn, comment: comment} do
-      conn = put(conn, Routes.comment_path(conn, :update, comment), comment: @invalid_attrs)
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> put(Routes.comment_path(conn, :update, comment), comment: @invalid_attrs)
       assert html_response(conn, 200) =~ "Edit Comment"
     end
   end
@@ -73,16 +90,26 @@ defmodule AppWeb.CommentControllerTest do
     setup [:create_comment]
 
     test "deletes chosen comment", %{conn: conn, comment: comment} do
-      conn = delete(conn, Routes.comment_path(conn, :delete, comment))
-      assert redirected_to(conn) == Routes.comment_path(conn, :index)
+      submission = Submissions.get_submission!(comment.submission_id)
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> delete(Routes.comment_path(conn, :delete, comment))
+      assert redirected_to(conn) == Routes.submission_comment_path(conn, :index, submission)
       assert_error_sent 404, fn ->
-        get(conn, Routes.comment_path(conn, :show, comment))
+        get(conn, Routes.submission_comment_path(conn, :show, comment, submission))
       end
     end
   end
 
-  defp create_comment(_) do
-    comment = fixture(:comment)
+  defp create_comment(params) do
+    submission = params.submission
+    comment = fixture(:comment, submission)
     {:ok, comment: comment}
   end
+  defp create_submission(_) do
+    topic = AppWeb.TopicControllerTest.fixture(:topic)
+    submission = AppWeb.SubmissionControllerTest.fixture(:submission, topic)
+    {:ok, submission: submission}
+  end
+
 end
