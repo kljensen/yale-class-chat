@@ -1,10 +1,8 @@
 defmodule App.TempTest do
   use App.DataCase
 
-  alias App.Topics
   alias App.Accounts
   alias App.Courses
-  alias App.AccountsTest, as: ATest
   alias App.CoursesTest, as: CTest
   alias App.TopicsTest, as: TTest
   alias App.SubmissionsTest, as: STest

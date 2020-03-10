@@ -3,9 +3,6 @@ defmodule AppWeb.PageViewTest do
   import Phoenix.View
 
   test "renders index.html", %{conn: conn} do
-    links = [
-      Routes.course_path(conn, :index)
-    ]
 
     content = render_to_string(
       AppWeb.PageView,
@@ -16,8 +13,5 @@ defmodule AppWeb.PageViewTest do
 
     assert String.contains?(content, "Welcome")
 
-    #for link <- links do
-    #  assert String.contains?(content, link)
-    #end
   end
 end

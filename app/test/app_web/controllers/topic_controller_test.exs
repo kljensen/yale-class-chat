@@ -19,7 +19,6 @@ defmodule AppWeb.TopicControllerTest do
     setup [:create_section]
 
     test "lists all topics", %{conn: conn, section: section} do
-      user_faculty = App.Accounts.get_user_by!("faculty net id")
       conn = conn
         |> init_test_session(uid: "faculty net id")
         |> get(Routes.section_topic_path(conn, :index, section))
