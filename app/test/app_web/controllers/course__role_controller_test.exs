@@ -1,6 +1,6 @@
 defmodule AppWeb.Course_RoleControllerTest do
   use AppWeb.ConnCase
-  @moduletag :skip
+  import Plug.Test
 
   alias App.Accounts
 
@@ -8,38 +8,49 @@ defmodule AppWeb.Course_RoleControllerTest do
   @update_attrs %{role: "some updated role", valid_from: "2011-05-18T15:01:01Z", valid_to: "2011-05-18T15:01:01Z"}
   @invalid_attrs %{role: nil, valid_from: nil, valid_to: nil}
 
-  def fixture(:course__role) do
-    {:ok, course__role} = Accounts.create_course__role(@create_attrs)
+  setup [:create_course_and_student]
+
+  def fixture(:course__role, course, student) do
+    user_faculty = App.Accounts.get_user_by!("faculty net id")
+    {:ok, course__role} = Accounts.create_course__role(user_faculty, student, course, @create_attrs)
     course__role
   end
 
   describe "index" do
-    test "lists all course_roles", %{conn: conn} do
-      conn = get(conn, Routes.course__role_path(conn, :index))
+    test "lists all course_roles", %{conn: conn, course: course} do
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> get(Routes.course_course__role_path(conn, :index, course))
       assert html_response(conn, 200) =~ "Listing Course roles"
     end
   end
 
   describe "new course__role" do
-    test "renders form", %{conn: conn} do
-      conn = get(conn, Routes.course__role_path(conn, :new))
+    test "renders form", %{conn: conn, course: course} do
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> get(Routes.course_course__role_path(conn, :new, course))
       assert html_response(conn, 200) =~ "New Course  role"
     end
   end
 
   describe "create course__role" do
-    test "redirects to show when data is valid", %{conn: conn} do
-      conn = post(conn, Routes.course__role_path(conn, :create), course__role: @create_attrs)
+    test "redirects to show when data is valid", %{conn: conn, course: course} do
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> post(Routes.course_course__role_path(conn, :create, course), course__role: @create_attrs, course: course)
 
       assert %{id: id} = redirected_params(conn)
-      assert redirected_to(conn) == Routes.course__role_path(conn, :show, id)
+      assert redirected_to(conn) == Routes.course_course__role_path(conn, :show, id, course)
 
-      conn = get(conn, Routes.course__role_path(conn, :show, id))
+      conn = get(conn, Routes.course_course__role_path(conn, :show, id))
       assert html_response(conn, 200) =~ "Show Course  role"
     end
 
-    test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, Routes.course__role_path(conn, :create), course__role: @invalid_attrs)
+    test "renders errors when data is invalid", %{conn: conn, course: course} do
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> post(Routes.course_course__role_path(conn, :create, course), course__role: @invalid_attrs)
       assert html_response(conn, 200) =~ "New Course  role"
     end
   end
@@ -48,7 +59,9 @@ defmodule AppWeb.Course_RoleControllerTest do
     setup [:create_course__role]
 
     test "renders form for editing chosen course__role", %{conn: conn, course__role: course__role} do
-      conn = get(conn, Routes.course__role_path(conn, :edit, course__role))
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> get(Routes.course_course__role_path(conn, :edit, course__role))
       assert html_response(conn, 200) =~ "Edit Course  role"
     end
   end
@@ -57,15 +70,19 @@ defmodule AppWeb.Course_RoleControllerTest do
     setup [:create_course__role]
 
     test "redirects when data is valid", %{conn: conn, course__role: course__role} do
-      conn = put(conn, Routes.course__role_path(conn, :update, course__role), course__role: @update_attrs)
-      assert redirected_to(conn) == Routes.course__role_path(conn, :show, course__role)
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> put(Routes.course_course__role_path(conn, :update, course__role), course__role: @update_attrs)
+      assert redirected_to(conn) == Routes.course_course__role_path(conn, :show, course__role)
 
-      conn = get(conn, Routes.course__role_path(conn, :show, course__role))
+      conn = get(conn, Routes.course_course__role_path(conn, :show, course__role))
       assert html_response(conn, 200) =~ "some updated role"
     end
 
     test "renders errors when data is invalid", %{conn: conn, course__role: course__role} do
-      conn = put(conn, Routes.course__role_path(conn, :update, course__role), course__role: @invalid_attrs)
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> put(Routes.course_course__role_path(conn, :update, course__role), course__role: @invalid_attrs)
       assert html_response(conn, 200) =~ "Edit Course  role"
     end
   end
@@ -74,16 +91,26 @@ defmodule AppWeb.Course_RoleControllerTest do
     setup [:create_course__role]
 
     test "deletes chosen course__role", %{conn: conn, course__role: course__role} do
-      conn = delete(conn, Routes.course__role_path(conn, :delete, course__role))
-      assert redirected_to(conn) == Routes.course__role_path(conn, :index)
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> delete(Routes.course_course__role_path(conn, :delete, course__role))
+      assert redirected_to(conn) == Routes.course_course__role_path(conn, :index)
       assert_error_sent 404, fn ->
-        get(conn, Routes.course__role_path(conn, :show, course__role))
+        get(conn, Routes.course_course__role_path(conn, :show, course__role))
       end
     end
   end
 
-  defp create_course__role(_) do
-    course__role = fixture(:course__role)
+  defp create_course__role(params) do
+    course = params.course
+    student = params.student
+    course__role = fixture(:course__role, course, student)
     {:ok, course__role: course__role}
+  end
+
+  defp create_course_and_student(_) do
+    course = AppWeb.CourseControllerTest.fixture(:course)
+    student = AppWeb.UserControllerTest.fixture(:user)
+    {:ok, [course: course, student: student]}
   end
 end

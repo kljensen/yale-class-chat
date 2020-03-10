@@ -24,6 +24,29 @@ defmodule App.Accounts do
   end
 
   @doc """
+  Returns the list of users available for selection of a course role.
+
+  ## Examples
+
+      iex> list_users_for_course__roles()
+      [%User{}, ...]
+
+  """
+  def list_users_for_course__roles(%App.Accounts.User{} = user, %App.Courses.Course{} = course) do
+    uid = user.id
+    cid = course.id
+    allowed_roles = ["administrator", "owner"]
+    auth_role = get_current_course__role(user, course)
+    if Enum.member?(allowed_roles, auth_role) do
+      query = from u in "users",
+                select: [u.id, u.net_id]
+      Repo.all(query)
+    else
+      []
+    end
+  end
+
+  @doc """
   Gets a single user.
 
   Raises `Ecto.NoResultsError` if the User does not exist.
@@ -162,6 +185,82 @@ defmodule App.Accounts do
   """
   def list_course_roles do
     Repo.all(Course_Role)
+  end
+
+  @doc """
+  Returns the list of course_roles for a given user.
+
+  ## Examples
+
+      iex> list_user_all_course_roles(user)
+      [%Course_Role{}, ...]
+
+  """
+  def list_user_all_course_roles(%App.Accounts.User{} = user) do
+    uid = user.id
+    query = from u_r in Course_Role,
+              where: u_r.user_id == ^uid,
+              select: u_r
+    Repo.all(query)
+  end
+
+  @doc """
+  Returns the list of course_roles for a given user in a given course.
+
+  ## Examples
+
+      iex> list_user_course_course_roles(user, course)
+      [%Course_Role{}, ...]
+
+  """
+  def list_user_course_course_roles(%App.Accounts.User{} = user, %App.Courses.Course{} = course) do
+    uid = user.id
+    cid = course.id
+    query = from u_r in Course_Role,
+              where: u_r.user_id == ^uid and u_r.course_id == ^cid,
+              select: u_r
+    Repo.all(query)
+  end
+
+  @doc """
+  Returns the list of course_roles in a given course.
+
+  ## Examples
+
+      iex> list_course_all_course_roles(user, course)
+      [%Course_Role{}, ...]
+
+  """
+  def list_course_all_course_roles(%App.Accounts.User{} = user, %App.Courses.Course{} = course) do
+    uid = user.id
+    cid = course.id
+    allowed_roles = ["administrator", "owner"]
+    auth_role = get_current_course__role(user, course)
+    if Enum.member?(allowed_roles, auth_role) do
+      query = from u_r in Course_Role,
+                where: u_r.course_id == ^cid,
+                select: u_r
+      Repo.all(query)
+    else
+      []
+    end
+  end
+
+  def list_course__role_users(%App.Accounts.User{} = user, %App.Courses.Course{} = course) do
+    uid = user.id
+    cid = course.id
+    allowed_roles = ["administrator", "owner"]
+    auth_role = get_current_course__role(user, course)
+    if Enum.member?(allowed_roles, auth_role) do
+      query = from u_r in Course_Role,
+                left_join: u in "users",
+                on: u_r.user_id == u.id,
+                where: u_r.course_id == ^cid,
+                select: [u.id, u.net_id]
+      Repo.all(query)
+    else
+      []
+    end
   end
 
   @doc """

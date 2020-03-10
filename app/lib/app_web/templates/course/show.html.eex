@@ -37,6 +37,7 @@
 <li><%= link "Create Section", to: Routes.course_section_path(@conn, :new, @course) %></li>
 <li><%= link "Create Topic", to: Routes.course_topic_path(@conn, :new, @course) %></li>
 <li><%= link "Edit Course Details", to: Routes.course_path(@conn, :edit, @course) %></li>
+<li><%= link "View Course Roles", to: Routes.course_course__role_path(@conn, :index, @course) %></li>
 </ul>
 </article>
 </section>
