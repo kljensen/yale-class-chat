@@ -3,15 +3,17 @@ defmodule AppWeb.SubmissionController do
 
   alias App.Submissions
   alias App.Submissions.Submission
+  alias App.Topics
 
   def index(conn, _params) do
     submissions = Submissions.list_submissions()
     render(conn, "index.html", submissions: submissions)
   end
 
-  def new(conn, _params) do
+  def new(conn, %{"topic_id" => topic_id}) do
     changeset = Submissions.change_submission(%Submission{})
-    render(conn, "new.html", changeset: changeset)
+    topic = Topics.get_topic!(topic_id)
+    render(conn, "new.html", changeset: changeset, topic: topic)
   end
 
   def create(conn, %{"submission" => submission_params}) do

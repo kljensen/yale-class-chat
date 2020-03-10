@@ -98,8 +98,9 @@ defmodule App.AccountsTest do
     test "list_course_roles/0 returns all course_roles" do
       course__role = course__role_fixture()
       course_role_list = Accounts.list_course_roles()
-      retrieved_course_role = List.last(course_role_list)
-      assert course__role.id == retrieved_course_role.id
+      retrieved_course_role1 = List.first(course_role_list)
+      retrieved_course_role2 = List.last(course_role_list)
+      assert course__role.id == retrieved_course_role1.id || course__role.id == retrieved_course_role2.id
     end
 
     test "get_course__role!/1 returns the course__role with given id" do

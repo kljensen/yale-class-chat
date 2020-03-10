@@ -3,6 +3,7 @@ defmodule AppWeb.SectionController do
 
   alias App.Courses
   alias App.Courses.Section
+  alias App.Topics
 
   def index(conn, %{"course_id" => course_id}) do
     course = Courses.get_course!(course_id)
@@ -36,7 +37,9 @@ defmodule AppWeb.SectionController do
     user = conn.assigns.current_user
     case Courses.get_user_section(user, id) do
       {:ok, section} ->
-        render(conn, "show.html", section: section)
+        course = Courses.get_course!(section.course_id)
+        topics = Topics.list_user_topics(user, section)
+        render(conn, "show.html", course: course, section: section, topics: topics)
       {:error, message} ->
         case message do
           "forbidden" ->

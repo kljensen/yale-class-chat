@@ -57,7 +57,7 @@ defmodule AppWeb.TopicController do
       _ ->
         section_id = List.first(section_ids)
         section = Courses.get_section!(section_id)
-        case IO.inspect(Topics.create_topic(user, section, topic_params)) do
+        case Topics.create_topic(user, section, topic_params) do
           {:ok, topic} ->
             for section_id <- section_ids do
                             section_id = String.to_integer(section_id)

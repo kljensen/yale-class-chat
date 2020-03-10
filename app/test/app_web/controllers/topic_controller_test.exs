@@ -45,7 +45,7 @@ defmodule AppWeb.TopicControllerTest do
     test "redirects to show when data is valid", %{conn: conn, section: section} do
       course = App.Courses.get_course!(section.course_id)
       section_ids = [Integer.to_string(section.id)]
-      attrs = Map.merge(@create_attrs, %{section_ids: section_ids})
+      attrs = Map.merge(@create_attrs, %{sections: section_ids})
       conn = conn
         |> init_test_session(uid: "faculty net id")
         |> post(Routes.course_topic_path(conn, :create, course), topic: attrs)
@@ -54,7 +54,7 @@ defmodule AppWeb.TopicControllerTest do
       assert redirected_to(conn) == Routes.topic_path(conn, :show, id)
 
       conn = get(conn, Routes.topic_path(conn, :show, id))
-      assert html_response(conn, 200) =~ "Show Topic"
+      assert html_response(conn, 200) =~ "Details"
     end
 
     test "renders errors when data is invalid", %{conn: conn, section: section} do
