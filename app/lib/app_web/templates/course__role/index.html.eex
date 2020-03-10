@@ -20,9 +20,9 @@
       <td><%= course__role.valid_to %></td>
 
       <td>
-        <span><%= link "Show", to: Routes.course_course__role_path(@conn, :show, course__role, @course) %></span>
-        <span><%= link "Edit", to: Routes.course_course__role_path(@conn, :edit, course__role, @course) %></span>
-        <span><%= link "Delete", to: Routes.course_course__role_path(@conn, :delete, course__role, @course), method: :delete, data: [confirm: "Are you sure?"] %></span>
+        <span><%= link "Show", to: Routes.course_course__role_path(@conn, :show, @course, course__role) %></span>
+        <span><%= link "Edit", to: Routes.course_course__role_path(@conn, :edit, @course, course__role) %></span>
+        <span><%= link "Delete", to: Routes.course_course__role_path(@conn, :delete, @course, course__role), method: :delete, data: [confirm: "Are you sure?"] %></span>
       </td>
     </tr>
 <% end %>
