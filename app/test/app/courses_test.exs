@@ -126,7 +126,6 @@ defmodule App.CoursesTest do
       assert retrieved_course.name == course.name
       assert retrieved_course.number == course.number
     end
-<<<<<<< HEAD
 
     test "list_user_courses/1 returns all courses for which a user has a valid user role" do
       course = course_fixture()
@@ -158,39 +157,6 @@ defmodule App.CoursesTest do
       assert length(course_list) == 0
     end
 
-=======
-
-    test "list_user_courses/1 returns all courses for which a user has a valid user role" do
-      course = course_fixture()
-      user_faculty = Accounts.get_user_by!("faculty net id")
-      user_faculty2 = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id 2"})
-      course_list = Courses.list_user_courses(user_faculty)
-      assert length(course_list) == 1
-      retrieved_course = List.first(course_list)
-      assert course.id == retrieved_course.id
-      assert retrieved_course.department == course.department
-      assert retrieved_course.name == course.name
-      assert retrieved_course.number == course.number
-      course_list = Courses.list_user_courses(user_faculty2)
-      assert length(course_list) == 0
-    end
-
-    test "list_courses/1 returns all courses for a given semester" do
-      course = course_fixture()
-      user_faculty = Accounts.get_user_by!("faculty net id")
-      semester = Courses.get_semester!(course.semester_id)
-      {:ok, semester2} = Courses.create_semester(user_faculty, %{name: "empty semester"})
-      course_list = Courses.list_courses(semester)
-      retrieved_course = List.first(course_list)
-      assert course.id == retrieved_course.id
-      assert retrieved_course.department == course.department
-      assert retrieved_course.name == course.name
-      assert retrieved_course.number == course.number
-      course_list = Courses.list_courses(semester2)
-      assert length(course_list) == 0
-    end
-
->>>>>>> dev
     test "list_user_courses/2 returns all courses in a semester for which a user has a valid course role" do
       course = course_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
@@ -268,7 +234,6 @@ defmodule App.CoursesTest do
       assert retrieved_course.department == course.department
       assert retrieved_course.name == course.name
       assert retrieved_course.number == course.number
-<<<<<<< HEAD
     end
 
     test "get_user_course/1 returns the course with given id if user can view" do
@@ -288,8 +253,6 @@ defmodule App.CoursesTest do
       assert message = "forbidden"
       assert {:error, message} = Courses.get_user_course(user, course.id + 1)
       assert message = "not found"
-=======
->>>>>>> dev
     end
 
     test "create_course/3 with valid data creates a course" do
@@ -547,7 +510,6 @@ defmodule App.CoursesTest do
       assert retrieved_section.title == section.title
     end
 
-<<<<<<< HEAD
     test "get_user_section/1 returns the section with given id if user can view" do
       section = section_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
@@ -566,8 +528,6 @@ defmodule App.CoursesTest do
       assert message = "not found"
     end
 
-=======
->>>>>>> dev
     test "create_section/3 with valid data creates a section" do
       course = course_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
@@ -628,7 +588,6 @@ defmodule App.CoursesTest do
     end
 
     test "update_section/3 on non-writeable course returns error" do
-<<<<<<< HEAD
       section = section_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
       course = Courses.get_course!(section.course_id)
@@ -640,19 +599,6 @@ defmodule App.CoursesTest do
     test "delete_section/2 deletes the section" do
       section = section_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
-=======
-      section = section_fixture()
-      user_faculty = Accounts.get_user_by!("faculty net id")
-      course = Courses.get_course!(section.course_id)
-      Courses.update_course(user_faculty, course, %{allow_write: false})
-
-      assert {:error, "course write not allowed"} = Courses.update_section(user_faculty, section, @update_attrs)
-    end
-
-    test "delete_section/2 deletes the section" do
-      section = section_fixture()
-      user_faculty = Accounts.get_user_by!("faculty net id")
->>>>>>> dev
 
       assert {:ok, %Section{}} = Courses.delete_section(user_faculty, section)
       assert_raise Ecto.NoResultsError, fn -> Courses.get_section!(section.id) end

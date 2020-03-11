@@ -26,10 +26,6 @@ defmodule App.Topics.Topic do
     topic
     |> cast(attrs, [:title, :description, :slug, :opened_at, :closed_at, :allow_submissions, :allow_submission_voting, :anonymous, :allow_submission_comments, :user_submission_limit, :sort, :allow_ranking, :show_user_submissions, :visible])
     |> validate_required([:title, :description, :slug, :opened_at, :closed_at, :allow_submissions, :allow_submission_voting, :anonymous, :allow_submission_comments, :user_submission_limit, :sort, :allow_ranking, :show_user_submissions, :visible])
-<<<<<<< HEAD
-=======
-    |> unique_constraint(:slug)
->>>>>>> dev
     |> foreign_key_constraint(:section_id)
     |> assoc_constraint(:section)
   end

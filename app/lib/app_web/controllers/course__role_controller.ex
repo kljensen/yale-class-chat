@@ -67,7 +67,6 @@ defmodule AppWeb.Course_RoleController do
     user = conn.assigns.current_user
     list = Accounts.list_users_for_course__roles(user, course)
     user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-    IO.inspect user_list
     role_list = ["administrator", "owner"]
     render(conn, "edit.html", course__role: course__role, changeset: changeset, course: course, role_list: role_list, user_list: user_list)
   end
