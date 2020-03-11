@@ -316,6 +316,7 @@ defmodule App.Accounts do
               where: u_r.user_id == ^uid and u_r.course_id == ^cid  and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
               select: u_r.role
 
+<<<<<<< HEAD
     results = Repo.all(query)
     List.first(results)
   end
@@ -394,6 +395,8 @@ defmodule App.Accounts do
               where: su.id == ^suid and u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
               select: u_r.role
 
+=======
+>>>>>>> dev
     results = Repo.all(query)
     List.first(results)
   end
@@ -635,6 +638,7 @@ defmodule App.Accounts do
     sid = section.id
     course_role = nil
 
+<<<<<<< HEAD
     course_role = if inherit_course_role == true do
                     cid = section.course_id
                     course = App.Courses.get_course!(cid)
@@ -642,6 +646,13 @@ defmodule App.Accounts do
                   else
                     nil
                   end
+=======
+    if inherit_course_role == true do
+      cid = section.course_id
+      course = App.Courses.get_course!(cid)
+      course_role = get_current_course__role(user, course)
+    end
+>>>>>>> dev
 
     if course_role == nil do
       query = from u_r in "section_roles",

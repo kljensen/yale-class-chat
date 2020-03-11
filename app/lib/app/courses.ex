@@ -174,6 +174,10 @@ defmodule App.Courses do
   """
   def list_user_courses(%App.Accounts.User{} = user) do
     uid = user.id
+<<<<<<< HEAD
+=======
+    {:ok, current_time} = DateTime.now("Etc/UTC")
+>>>>>>> dev
     query = from r in App.Accounts.Course_Role,
               left_join: c in Course,
               on: r.course_id == c.id,
@@ -213,6 +217,10 @@ defmodule App.Courses do
   def list_user_courses(%App.Courses.Semester{} = semester, %App.Accounts.User{} = user) do
     uid = user.id
     sid = semester.id
+<<<<<<< HEAD
+=======
+    {:ok, current_time} = DateTime.now("Etc/UTC")
+>>>>>>> dev
     query = from r in App.Accounts.Course_Role,
               left_join: c in Course,
               on: r.course_id == c.id,
@@ -239,6 +247,7 @@ defmodule App.Courses do
 
   """
   def get_course!(id), do: Repo.get!(Course, id)
+<<<<<<< HEAD
 
   @doc """
   Gets a single course if user is able to view.
@@ -278,6 +287,8 @@ defmodule App.Courses do
   end
 
 
+=======
+>>>>>>> dev
 
   @doc """
   Creates a course.
@@ -416,6 +427,10 @@ defmodule App.Courses do
   """
   def list_user_sections(%App.Accounts.User{} = user) do
     uid = user.id
+<<<<<<< HEAD
+=======
+    {:ok, current_time} = DateTime.now("Etc/UTC")
+>>>>>>> dev
     query = from r in App.Accounts.Section_Role,
               left_join: s in Section,
               on: r.section_id == s.id,
@@ -461,6 +476,10 @@ defmodule App.Courses do
     uid = user.id
     cid = course.id
     allowed_section_roles = ["student", "defunct_student", "guest"]
+<<<<<<< HEAD
+=======
+    {:ok, current_time} = DateTime.now("Etc/UTC")
+>>>>>>> dev
     query = from r in App.Accounts.Section_Role,
               left_join: s in Section,
               on: r.section_id == s.id,
@@ -498,6 +517,7 @@ defmodule App.Courses do
 
   """
   def get_section!(id), do: Repo.get!(Section, id)
+<<<<<<< HEAD
 
   @doc """
   Gets a single section if user is able to view.
@@ -557,6 +577,8 @@ defmodule App.Courses do
       {:ok, result}
     end
   end
+=======
+>>>>>>> dev
 
   @doc """
   Creates a section.
