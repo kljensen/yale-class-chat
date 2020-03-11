@@ -34,6 +34,12 @@ run_migrations(){
   # Potentially Set up the database
   mix ecto.create
   mix ecto.migrate
+
+  # Seed database in dev mode
+  if [ $MIX_ENV == 'dev' ]
+  then
+    mix run priv/repo/seeds.exs
+  fi
 }
 
 setup_dialyzer (){
@@ -89,6 +95,11 @@ sighup_beam(){
   pkill -f beam --signal HUP
 }
 
+seeds(){
+  # Seed the database
+  mix run priv/repo/seeds.exs
+}
+
 ACTION=$1
 case $ACTION in
     server)
@@ -98,6 +109,11 @@ case $ACTION in
     tests)
         setup
         run_tests
+        ;;
+    dev-server)
+        setup
+        seed
+        run_server
         ;;
     iex)
         run_iex

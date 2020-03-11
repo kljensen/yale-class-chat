@@ -1,5 +1,5 @@
 <h1>New Rating</h1>
 
-<%= render "form.html", Map.put(assigns, :action, Routes.rating_path(@conn, :create)) %>
+<%= render "form.html", Map.put(assigns, :action, Routes.submission_rating_path(@conn, :create, @submission)) %>
 
-<span><%= link "Back", to: Routes.rating_path(@conn, :index) %></span>
+<span><%= link "Back", to: Routes.submission_rating_path(@conn, :index, @submission) %></span>

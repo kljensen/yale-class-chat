@@ -4,7 +4,7 @@ defmodule App.Repo.Migrations.CreateTopics do
   def change do
     create table(:topics) do
       add :title, :string
-      add :description, :string
+      add :description, :text
       add :slug, :string
       add :opened_at, :utc_datetime
       add :closed_at, :utc_datetime
@@ -21,7 +21,5 @@ defmodule App.Repo.Migrations.CreateTopics do
 
       timestamps()
     end
-
-    create unique_index(:topics, [:slug])
   end
 end

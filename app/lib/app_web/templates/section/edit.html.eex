@@ -1,5 +1,5 @@
-<h1>Edit Section</h1>
+<h1>Edit Section in <%= @course.name %></h1>
 
 <%= render "form.html", Map.put(assigns, :action, Routes.section_path(@conn, :update, @section)) %>
 
-<span><%= link "Back", to: Routes.section_path(@conn, :index) %></span>
+<span><%= link "Back", to: Routes.course_section_path(@conn, :index, @section.course_id) %></span>

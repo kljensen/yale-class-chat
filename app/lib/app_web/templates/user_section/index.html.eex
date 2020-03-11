@@ -1,4 +1,4 @@
-<h1>Listing Sections in <%= @course.name %></h1>
+<h1>My Courses</h1>
 
 <table>
   <thead>
@@ -25,5 +25,4 @@
   </tbody>
 </table>
 
-<span><%= link "New Section", to: Routes.course_section_path(@conn, :new, @course.id) %></span>
-<span><%= link "Back", to: Routes.course_path(@conn, :show, @course) %></span>
+<span><%= link "Back", to: Routes.page_path(@conn, :index) %></span>

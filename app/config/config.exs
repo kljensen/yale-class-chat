@@ -13,9 +13,12 @@ config :app,
 # Configures the endpoint
 config :app, AppWeb.Endpoint,
   url: [host: "0.0.0.0"],
-  secret_key_base: "mhsbG/cyuym5OCkDzoFKsmBgVCKr2ViT98bg0qzKSRTnMtlsdm8Pe2D3yke2zd29",
+  secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: AppWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: App.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: App.PubSub, adapter: Phoenix.PubSub.PG2],
+  live_view: [
+    signing_salt: "VsnpWBYvKilpW0z7QvGcsV2mL61aRG/B"
+  ]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -34,6 +37,9 @@ config :ueberauth, Ueberauth,
 
 # Use UTC for timestamps
 config :app, App.Repo, migration_timestamps: [type: :utc_datetime_usec]
+
+# Load tzdata time zone library
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

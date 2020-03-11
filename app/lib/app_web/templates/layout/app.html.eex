@@ -4,7 +4,7 @@
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>App · Phoenix Framework</title>
+    <title>Yale Class Chat</title>
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
     <%= csrf_meta_tag() %>
   </head>
@@ -13,11 +13,15 @@
       <section class="container">
         <nav role="navigation">
           <ul>
-            <li><a href="https://hexdocs.pm/phoenix/overview.html">Get Started</a></li>
+            <%= if is_nil(@conn.private.plug_session["uid"]) do %>
+                <li><a href="/auth/cas">Log In</a></li>
+            <% else %>
+              <li><%= link @conn.private.plug_session["uid"], to: Routes.user_path(@conn, :show, @conn.assigns.current_user) %></li>
+            <% end %>
           </ul>
         </nav>
-        <a href="https://phoenixframework.org/" class="phx-logo">
-          <img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" alt="Phoenix Framework Logo"/>
+        <a href="/" class="phx-logo">
+          <img src="<%= Routes.static_path(@conn, "/images/yale-som.jpg") %>" alt="Yale SOM Logo"/>
         </a>
       </section>
     </header>

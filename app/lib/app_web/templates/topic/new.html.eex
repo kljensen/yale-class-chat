@@ -1,5 +1,5 @@
-<h1>New Topic</h1>
+<h1>New Topic in <%= @course.name %></h1>
 
-<%= render "form.html", Map.put(assigns, :action, Routes.topic_path(@conn, :create)) %>
+<%= render "form.html", Map.put(assigns, :action, Routes.course_topic_path(@conn, :create, @course)) %>
 
-<span><%= link "Back", to: Routes.topic_path(@conn, :index) %></span>
+<span><%= link "Back", to: Routes.course_path(@conn, :show, @course) %></span>

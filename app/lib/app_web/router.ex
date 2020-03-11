@@ -4,7 +4,7 @@ defmodule AppWeb.Router do
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
-    plug :fetch_flash
+    plug :fetch_live_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
   end
@@ -15,6 +15,7 @@ defmodule AppWeb.Router do
 
   pipeline :auth do
     plug AppWeb.Plug.Auth
+    plug AppWeb.Plug.SetCurrentUser
   end
 
   scope "/auth", AppWeb do
@@ -27,26 +28,46 @@ defmodule AppWeb.Router do
   end
 
   scope "/", AppWeb do
-    pipe_through :browser
+    pipe_through [:browser]
 
     get "/", PageController, :index
-    resources "/comments", CommentController
-    resources "/courses", CourseController
-    resources "/ratings", RatingController
-    resources "/sections", SectionController
-    resources "/semesters", SemesterController
-    resources "/submissions", SubmissionController
-    resources "/topics", TopicController
-    resources "/users", UserController
-    resources "/course_roles", Course_RoleController
-    resources "/section_roles", Section_RoleController
   end
 
-  scope "/secret", AppWeb do
+  scope "/", AppWeb do
     pipe_through [:browser, :auth]
 
-    get "/", SecretController, :index
+    #get "/", PageController, :index
+    resources "/courses", CourseController do
+      resources "/sections", SectionController, only: [:index, :new]
+      resources "/course_roles", Course_RoleController
+      resources "/topics", TopicController, only: [:new, :create]
+    end
+
+    resources "/sections", SectionController, except: [:index, :new] do
+      resources "/topics", TopicController, except: [:show, :new, :create]
+      resources "/section_roles", Section_RoleController
+    end
+
+    resources "/topics", TopicController, only: [:show] do
+      resources "/submissions", SubmissionController, except: [:show]
+    end
+
+    resources "/submissions", SubmissionController, only: [:show] do
+      resources "/comments", CommentController
+      resources "/ratings", RatingController
+    end
+
+
+    resources "/semesters", SemesterController
+    resources "/users", UserController, only: [:edit, :show, :update]
+    resources "/topics", TopicController, only: [:edit, :show, :update, :delete]
+    resources "/submissions", SubmissionController, only: [:edit, :show, :update, :delete]
+    resources "/comments", CommentController, only: [:edit, :show, :update, :delete]
+    resources "/ratings", RatingController, only: [:edit, :show, :update, :delete]
+
+    get "/mysections", UserSectionController, :index
   end
+
 
   # Other scopes may use custom stacks.
   # scope "/api", AppWeb do

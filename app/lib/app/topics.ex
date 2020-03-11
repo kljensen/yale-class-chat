@@ -128,7 +128,7 @@ defmodule App.Topics do
     end
   end
 
-  defp do_create_topic(%App.Courses.Section{} = section, attrs \\ %{}) do
+  defp do_create_topic(%App.Courses.Section{} = section, attrs) do
     %Topic{}
     |> Topic.changeset(attrs)
     |> Ecto.Changeset.put_assoc(:section, section)

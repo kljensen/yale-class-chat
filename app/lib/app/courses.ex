@@ -38,6 +38,28 @@ defmodule App.Courses do
   def get_semester!(id), do: Repo.get!(Semester, id)
 
   @doc """
+  Gets a single semester by name.
+
+  Raises `Ecto.NoResultsError` if the Semester does not exist.
+
+  ## Examples
+
+      iex> get_semester_by!(Fall 2019)
+      %Semester{}
+
+      iex> get_semester!(Never 9999)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_semester_by!(name), do: Repo.get_by!(Semester, name: name)
+
+  def list_semester_names do
+    query = from s in Semester,
+              select: [s.id, s.name]
+    Repo.all(query)
+  end
+
+  @doc """
   Creates a semester.
 
   ## Examples
@@ -57,7 +79,7 @@ defmodule App.Courses do
     end
   end
 
-  defp do_create_semester(attrs \\ %{}) do
+  defp do_create_semester(attrs) do
     %Semester{}
     |> Semester.changeset(attrs)
     |> Repo.insert()
@@ -152,7 +174,10 @@ defmodule App.Courses do
   """
   def list_user_courses(%App.Accounts.User{} = user) do
     uid = user.id
+<<<<<<< HEAD
+=======
     {:ok, current_time} = DateTime.now("Etc/UTC")
+>>>>>>> dev
     query = from r in App.Accounts.Course_Role,
               left_join: c in Course,
               on: r.course_id == c.id,
@@ -192,7 +217,10 @@ defmodule App.Courses do
   def list_user_courses(%App.Courses.Semester{} = semester, %App.Accounts.User{} = user) do
     uid = user.id
     sid = semester.id
+<<<<<<< HEAD
+=======
     {:ok, current_time} = DateTime.now("Etc/UTC")
+>>>>>>> dev
     query = from r in App.Accounts.Course_Role,
               left_join: c in Course,
               on: r.course_id == c.id,
@@ -219,6 +247,48 @@ defmodule App.Courses do
 
   """
   def get_course!(id), do: Repo.get!(Course, id)
+<<<<<<< HEAD
+
+  @doc """
+  Gets a single course if user is able to view.
+
+  ## Examples
+
+      iex> get_user_course(user, 123)
+      {:ok, %Course{}}
+
+      iex> get_user_course(invaliduser, 123)
+      {:error, message}
+
+  """
+  def get_user_course(%App.Accounts.User{} = user, course_id) do
+    uid = user.id
+    query = from r in App.Accounts.Course_Role,
+              left_join: c in Course,
+              on: r.course_id == c.id,
+              where: r.user_id == ^uid,
+              where: r.valid_from <= from_now(0, "day"),
+              where: r.valid_to >= from_now(0, "day"),
+              where: c.id == ^course_id,
+              select: c
+    result = Repo.one(query)
+
+    if is_nil(result) do
+      query = from c in Course, where: c.id == ^course_id
+      message = if Repo.exists?(query) do
+                  "forbidden"
+                else
+                  "not found"
+                end
+      {:error, message}
+    else
+      {:ok, result}
+    end
+  end
+
+
+=======
+>>>>>>> dev
 
   @doc """
   Creates a course.
@@ -254,7 +324,7 @@ defmodule App.Courses do
     end
   end
 
-  defp do_create_course(%App.Courses.Semester{} = semester, attrs \\ %{}) do
+  defp do_create_course(%App.Courses.Semester{} = semester, attrs) do
     %Course{}
     |> Course.changeset(attrs)
     |> Ecto.Changeset.put_assoc(:semester, semester)
@@ -357,7 +427,10 @@ defmodule App.Courses do
   """
   def list_user_sections(%App.Accounts.User{} = user) do
     uid = user.id
+<<<<<<< HEAD
+=======
     {:ok, current_time} = DateTime.now("Etc/UTC")
+>>>>>>> dev
     query = from r in App.Accounts.Section_Role,
               left_join: s in Section,
               on: r.section_id == s.id,
@@ -403,7 +476,10 @@ defmodule App.Courses do
     uid = user.id
     cid = course.id
     allowed_section_roles = ["student", "defunct_student", "guest"]
+<<<<<<< HEAD
+=======
     {:ok, current_time} = DateTime.now("Etc/UTC")
+>>>>>>> dev
     query = from r in App.Accounts.Section_Role,
               left_join: s in Section,
               on: r.section_id == s.id,
@@ -441,6 +517,68 @@ defmodule App.Courses do
 
   """
   def get_section!(id), do: Repo.get!(Section, id)
+<<<<<<< HEAD
+
+  @doc """
+  Gets a single section if user is able to view.
+
+  ## Examples
+
+      iex> get_user_section(user, 123)
+      {:ok, %Section{}}
+
+      iex> get_user_section(invaliduser, 123)
+      {:error, message}
+
+  """
+  def get_user_section(%App.Accounts.User{} = user, section_id, inherit_course_role \\ true) do
+    allowed_course_roles = ["administrator", "owner"]
+    section = Repo.get(Section, section_id)
+    query = if !is_nil(section) do
+      course = Repo.get(Course, section.course_id)
+      auth_role = App.Accounts.get_current_course__role(user, course)
+      uid = user.id
+      cid = course.id
+      allowed_section_roles = ["student", "defunct_student", "guest"]
+      query = from r in App.Accounts.Section_Role,
+                left_join: s in Section,
+                on: r.section_id == s.id,
+                left_join: c in Course,
+                on: s.course_id == c.id,
+                where: r.user_id == ^uid,
+                where: r.valid_from <= from_now(0, "day"),
+                where: r.valid_to >= from_now(0, "day"),
+                where: r.role in ^allowed_section_roles,
+                where: c.allow_read == true,
+                where: s.course_id == ^cid,
+                where: s.id == ^section_id,
+                select: s
+      query = if inherit_course_role and Enum.member?(allowed_course_roles, auth_role) do
+        from s in Section,
+          where: s.id == ^section_id,
+          select: s
+      else
+          query
+      end
+    else
+      nil
+    end
+    result = if !is_nil(query), do: Repo.one(query)
+
+    if is_nil(result) do
+      query = from s in Section, where: s.id == ^section_id
+      message = if Repo.exists?(query) do
+                  "forbidden"
+                else
+                  "not found"
+                end
+      {:error, message}
+    else
+      {:ok, result}
+    end
+  end
+=======
+>>>>>>> dev
 
   @doc """
   Creates a section.

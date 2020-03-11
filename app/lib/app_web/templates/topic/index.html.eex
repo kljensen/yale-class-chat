@@ -43,4 +43,4 @@
   </tbody>
 </table>
 
-<span><%= link "New Topic", to: Routes.topic_path(@conn, :new) %></span>
+<span><%= link "New Topic", to: Routes.course_topic_path(@conn, :new, @section.course_id) %></span>

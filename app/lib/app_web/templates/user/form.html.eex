@@ -5,16 +5,12 @@
     </div>
   <% end %>
 
-  <%= label f, :net_id %>
-  <%= text_input f, :net_id %>
-  <%= error_tag f, :net_id %>
-
   <%= label f, :display_name %>
   <%= text_input f, :display_name %>
   <%= error_tag f, :display_name %>
 
   <%= label f, :email %>
-  <%= text_input f, :email %>
+  <%= email_input f, :email %>
   <%= error_tag f, :email %>
 
   <div>

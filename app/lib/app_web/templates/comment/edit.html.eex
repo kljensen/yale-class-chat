@@ -2,4 +2,4 @@
 
 <%= render "form.html", Map.put(assigns, :action, Routes.comment_path(@conn, :update, @comment)) %>
 
-<span><%= link "Back", to: Routes.comment_path(@conn, :index) %></span>
+<span><%= link "Back", to: Routes.submission_comment_path(@conn, :index, @submission) %></span>

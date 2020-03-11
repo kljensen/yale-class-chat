@@ -1,27 +1,22 @@
 <section class="phx-hero">
-  <h1><%= gettext "Welcome to %{name}!", name: "Yale class chat" %></h1>
-  <p>Current user = <%= @current_user %></p>
-  <p>
-    <a href="/secret">View secret page</a>
-  </p>
+  <h1><%= gettext "Welcome to %{name}!", name: "Yale Class Chat" %></h1>
 </section>
 <section class="row">
   <article class="column">
   </article>
 </section>
 
+<%= if !is_nil(@current_user) do %>
 <section class="row">
   <article class="column">
-    <h2>Resources</h2>
+    <h2>Quick Links</h2>
     <ul>
       <li>
-        <a href="https://hexdocs.pm/phoenix/overview.html">Foo Guides &amp; Docs</a>
-      </li>
-      <li>
-        <a href="https://github.com/phoenixframework/phoenix">Source</a>
-      </li>
-      <li>
-        <a href="https://github.com/phoenixframework/phoenix/blob/v1.4/CHANGELOG.md">v1.4 Changelog</a>
+        <%= if @current_user.is_faculty do %>
+        <%= link "My Courses", to: Routes.course_path(@conn, :index) %>
+        <%= else %>
+        <%= link "My Courses", to: Routes.user_section_path(@conn, :index) %>
+        <%= end %>
       </li>
     </ul>
   </article>
@@ -40,3 +35,4 @@
     </ul>
   </article>
 </section>
+<%= end %>

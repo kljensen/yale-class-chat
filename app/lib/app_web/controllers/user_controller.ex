@@ -27,36 +27,67 @@ defmodule AppWeb.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    user = Accounts.get_user!(id)
-    render(conn, "show.html", user: user)
+    case id == to_string(conn.assigns.current_user.id) do
+      true ->
+        user = unless id == "new", do: user = Accounts.get_user!(id)
+        render(conn, "show.html", user: user)
+      false ->
+        conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+    end
   end
 
   def edit(conn, %{"id" => id}) do
-    user = Accounts.get_user!(id)
-    changeset = Accounts.change_user(user)
-    render(conn, "edit.html", user: user, changeset: changeset)
+    case id == to_string(conn.assigns.current_user.id) do
+      true ->
+        user = Accounts.get_user!(id)
+        changeset = Accounts.change_user(user)
+        render(conn, "edit.html", user: user, changeset: changeset)
+      false ->
+        conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+      end
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
-    user = Accounts.get_user!(id)
+    case id == to_string(conn.assigns.current_user.id) do
+      true ->
+        user = Accounts.get_user!(id)
+        case Accounts.update_user(user, user_params) do
+          {:ok, user} ->
+            conn
+            |> put_flash(:info, "User updated successfully.")
+            |> redirect(to: Routes.user_path(conn, :show, user))
 
-    case Accounts.update_user(user, user_params) do
-      {:ok, user} ->
+          {:error, %Ecto.Changeset{} = changeset} ->
+            render(conn, "edit.html", user: user, changeset: changeset)
+        end
+      false ->
         conn
-        |> put_flash(:info, "User updated successfully.")
-        |> redirect(to: Routes.user_path(conn, :show, user))
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", user: user, changeset: changeset)
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
     end
   end
 
   def delete(conn, %{"id" => id}) do
-    user = Accounts.get_user!(id)
-    {:ok, _user} = Accounts.delete_user(user)
+    case id == to_string(conn.assigns.current_user.id) do
+      true ->
+        user = Accounts.get_user!(id)
+        {:ok, _user} = Accounts.delete_user(user)
 
-    conn
-    |> put_flash(:info, "User deleted successfully.")
-    |> redirect(to: Routes.user_path(conn, :index))
+        conn
+        |> put_flash(:info, "User deleted successfully.")
+        |> redirect(to: Routes.user_path(conn, :index))
+      false ->
+        conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+    end
   end
 end
