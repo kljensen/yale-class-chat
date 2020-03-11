@@ -19,7 +19,7 @@ defmodule AppWeb.Section_RoleController do
     user = conn.assigns.current_user
     list = Accounts.list_users_for_section__roles(user, section)
     user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-    role_list = ["administrator", "owner"]
+    role_list = ["student", "guest", "defunct_student"]
     changeset = Accounts.change_section__role(%Section_Role{})
     render(conn, "new.html", changeset: changeset, section: section, role_list: role_list, user_list: user_list)
   end
@@ -40,13 +40,13 @@ defmodule AppWeb.Section_RoleController do
       {:error, %Ecto.Changeset{} = changeset} ->
         list = Accounts.list_users_for_section__roles(user_auth, section)
         user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-        role_list = ["administrator", "owner"]
+        role_list = ["student", "guest", "defunct_student"]
         render(conn, "new.html", changeset: changeset, section: section, role_list: role_list, user_list: user_list)
 
       {:error, message} ->
         list = Accounts.list_users_for_section__roles(user_auth, section)
         user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-        role_list = ["administrator", "owner"]
+        role_list = ["student", "guest", "defunct_student"]
         changeset = Accounts.change_section__role(%Section_Role{})
         conn
         |> put_flash(:error, message)
@@ -67,7 +67,7 @@ defmodule AppWeb.Section_RoleController do
     user = conn.assigns.current_user
     list = Accounts.list_users_for_section__roles(user, section)
     user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-    role_list = ["administrator", "owner"]
+    role_list = ["student", "guest", "defunct_student"]
     render(conn, "edit.html", section__role: section__role, changeset: changeset, section: section, role_list: role_list, user_list: user_list)
   end
 
@@ -88,7 +88,7 @@ defmodule AppWeb.Section_RoleController do
         changeset = Accounts.change_section__role(section__role)
         list = Accounts.list_users_for_section__roles(user, section)
         user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-        role_list = ["administrator", "owner"]
+        role_list = ["student", "guest", "defunct_student"]
         render(conn, "edit.html", section__role: section__role, changeset: changeset, section: section, role_list: role_list, user_list: user_list)
     end
   end
