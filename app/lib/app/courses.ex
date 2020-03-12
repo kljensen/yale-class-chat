@@ -1,4 +1,9 @@
 defmodule App.Courses do
+  @course_owner_roles ["owner"]
+  @course_admin_roles ["administrator", "owner"]
+  @section_write_roles ["student"]
+  @section_read_roles ["student", "defunct_student", "guest"]
+
   @moduledoc """
   The Courses context.
   """
@@ -334,10 +339,9 @@ defmodule App.Courses do
   """
 
   def update_course(%App.Accounts.User{} = user, %Course{} = course, attrs) do
-    allowed_roles = ["owner"]
     course_role = App.Accounts.get_current_course__role(user, course)
 
-    if Enum.member?(allowed_roles, course_role) do
+    if Enum.member?(@course_owner_roles, course_role) do
       do_update_course(course, attrs)
     else
       {:error, "unauthorized"}
@@ -363,10 +367,9 @@ defmodule App.Courses do
 
   """
   def delete_course(%App.Accounts.User{} = user, %Course{} = course) do
-    allowed_roles = ["owner"]
     course_role = App.Accounts.get_current_course__role(user, course)
 
-    if Enum.member?(allowed_roles, course_role) do
+    if Enum.member?(@course_owner_roles, course_role) do
       do_delete_course(course)
     else
       {:error, "unauthorized"}
@@ -456,11 +459,11 @@ defmodule App.Courses do
 
   """
   def list_user_sections(%Course{} = course, %App.Accounts.User{} = user, inherit_course_role \\ true) do
-    allowed_course_roles = ["administrator", "owner"]
+    allowed_course_roles = @course_admin_roles
     auth_role = App.Accounts.get_current_course__role(user, course)
     uid = user.id
     cid = course.id
-    allowed_section_roles = ["student", "defunct_student", "guest"]
+    allowed_section_roles = @section_read_roles
     query = from r in App.Accounts.Section_Role,
               left_join: s in Section,
               on: r.section_id == s.id,
@@ -512,14 +515,14 @@ defmodule App.Courses do
 
   """
   def get_user_section(%App.Accounts.User{} = user, section_id, inherit_course_role \\ true) do
-    allowed_course_roles = ["administrator", "owner"]
+    allowed_course_roles = @course_admin_roles
     section = Repo.get(Section, section_id)
     query = if !is_nil(section) do
       course = Repo.get(Course, section.course_id)
       auth_role = App.Accounts.get_current_course__role(user, course)
       uid = user.id
       cid = course.id
-      allowed_section_roles = ["student", "defunct_student", "guest"]
+      allowed_section_roles = @section_read_roles
       query = from r in App.Accounts.Section_Role,
                 left_join: s in Section,
                 on: r.section_id == s.id,
@@ -571,14 +574,12 @@ defmodule App.Courses do
 
   """
   def create_section(%App.Accounts.User{} = user, %App.Courses.Course{} = course, attrs \\ %{}) do
-    #If user role is Administrator or Owner, then allow creation of a section
-    allowed_roles = ["owner"]
     course_role = App.Accounts.get_current_course__role(user, course)
 
     cond do
       course.allow_write == false ->
         {:error, "course write not allowed"}
-      Enum.member?(allowed_roles, course_role) == false ->
+      Enum.member?(@course_owner_roles, course_role) == false ->
         {:error, "unauthorized"}
       true ->
         do_create_section(course, attrs)
@@ -606,14 +607,13 @@ defmodule App.Courses do
   """
   def update_section(%App.Accounts.User{} = user, %Section{} = section, attrs) do
     #If user role is Administrator or Owner, then allow update of a section
-    allowed_roles = ["owner"]
     course = get_course!(section.course_id)
     course_role = App.Accounts.get_current_course__role(user, course)
 
     cond do
       course.allow_write == false ->
         {:error, "course write not allowed"}
-      Enum.member?(allowed_roles, course_role) == false ->
+      Enum.member?(@course_owner_roles, course_role) == false ->
         {:error, "unauthorized"}
       true ->
         do_update_section(section, attrs)
@@ -639,15 +639,13 @@ defmodule App.Courses do
 
   """
   def delete_section(%App.Accounts.User{} = user, %Section{} = section) do
-    #If user role is Administrator or Owner, then allow update of a section
-    allowed_roles = ["owner"]
     course = get_course!(section.course_id)
     course_role = App.Accounts.get_current_course__role(user, course)
 
     cond do
       course.allow_write == false ->
         {:error, "course write not allowed"}
-      Enum.member?(allowed_roles, course_role) == false ->
+      Enum.member?(@course_owner_roles, course_role) == false ->
         {:error, "unauthorized"}
       true ->
         do_delete_section(section)
