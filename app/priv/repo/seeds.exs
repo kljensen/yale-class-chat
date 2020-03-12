@@ -83,6 +83,22 @@ defmodule App.DatabaseSeeder do
     "Ought these are balls place mrs their times add she. Taken no great widow spoke of it small. Genius use except son esteem merely her limits. Sons park by do make on. It do oh cottage offered cottage in written. Especially of dissimilar up attachment themselves by interested boisterous. Linen mrs seems men table. Jennings dashwood to quitting marriage bachelor in. On as conviction in of appearance apartments boisterous. ",
     "Suppose end get boy warrant general natural. Delightful met sufficient projection ask. Decisively everything principles if preference do impression of. Preserved oh so difficult repulsive on in household. In what do miss time be. Valley as be appear cannot so by. Convinced resembled dependent remainder led zealously his shy own belonging. Always length letter adieus add number moment she. Promise few compass six several old offices removal parties fat. Concluded rapturous it intention perfectly daughters is as. "
   ]
+  @random_image_url_list [
+    "http://i.imgur.com/u3vyMCW.jpg",
+    "http://i.imgur.com/zF7rPAf.jpg",
+    "http://i.imgur.com/aDTl7OM.jpg",
+    "http://i.imgur.com/KONVsYw.jpg",
+    "http://i.imgur.com/RVM2pYi.png",
+    "http://i.imgur.com/tkMhc9T.jpg",
+    "http://i.imgur.com/KxUrZkp.gif",
+    "http://i.imgur.com/mnDTovy.jpg",
+    "http://i.imgur.com/WpuXbHb.jpg",
+    "http://i.imgur.com/qZA3mCR.jpg",
+    "http://i.imgur.com/AxMS1Fs.png",
+    "http://i.imgur.com/TLSd571.jpg",
+    "http://i.imgur.com/VfMhLIQ.jpg",
+    "http://i.imgur.com/Wu32582.jpg"
+  ]
 
   def insert_users do
     Enum.each(@prof_list, &Accounts.create_user/1)
@@ -170,7 +186,7 @@ defmodule App.DatabaseSeeder do
             Enum.each(1..5, fn x ->
                 submitter = Accounts.get_user_by!(Map.get(Enum.random(@student_list), :net_id))
                 slug = to_string(topic.id) <> to_string(x)
-                attrs = %{description: Enum.random(@random_description_list), image_url: "some image_url", slug: slug, title: Enum.random(@random_title_list), allow_ranking: true, visible: true}
+                attrs = %{description: Enum.random(@random_description_list), Enum.random(@random_image_url_list), slug: slug, title: Enum.random(@random_title_list), allow_ranking: true, visible: true}
                 Submissions.create_submission(submitter, topic, attrs)
             end)
           end

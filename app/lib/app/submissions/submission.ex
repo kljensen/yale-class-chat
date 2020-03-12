@@ -4,7 +4,7 @@ defmodule App.Submissions.Submission do
 
   schema "submissions" do
     field :description, :string
-    field :image_url, :string
+    field :image_url, EctoFields.URL
     field :slug, :string
     field :title, :string
     field :allow_ranking, :boolean, default: false

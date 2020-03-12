@@ -30,8 +30,8 @@ defmodule App.SubmissionsTest do
   describe "submissions" do
     alias App.Submissions.Submission
 
-    @valid_attrs %{description: "some description", image_url: "some image_url", slug: "some slug", title: "some title", allow_ranking: true, visible: true}
-    @update_attrs %{description: "some updated description", image_url: "some updated image_url", slug: "some updated slug", title: "some updated title", allow_ranking: false, visible: false}
+    @valid_attrs %{description: "some description", image_url: "http://i.imgur.com/u3vyMCW.jpg", slug: "some slug", title: "some title", allow_ranking: true, visible: true}
+    @update_attrs %{description: "some updated description", image_url: "http://i.imgur.com/zF7rPAf.jpg", slug: "some updated slug", title: "some updated title", allow_ranking: false, visible: false}
     @invalid_attrs %{description: nil, image_url: nil, slug: nil, title: nil, allow_ranking: nil, hidden: nil}
 
     def role_fixture(attrs \\ %{}) do
@@ -278,7 +278,7 @@ defmodule App.SubmissionsTest do
 
       assert {:ok, %Submission{} = submission} = Submissions.create_submission(submitter, topic, @valid_attrs)
       assert submission.description == "some description"
-      assert submission.image_url == "some image_url"
+      assert submission.image_url == "http://i.imgur.com/u3vyMCW.jpg"
       assert submission.slug == "some slug"
       assert submission.title == "some title"
     end
@@ -345,7 +345,7 @@ defmodule App.SubmissionsTest do
       submitter = context[:submitter]
       assert {:ok, %Submission{} = submission} = Submissions.update_submission(submitter, submission, @update_attrs)
       assert submission.description == "some updated description"
-      assert submission.image_url == "some updated image_url"
+      assert submission.image_url == "http://i.imgur.com/zF7rPAf.jpg"
       assert submission.slug == "some updated slug"
       assert submission.title == "some updated title"
     end

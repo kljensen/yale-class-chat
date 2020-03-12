@@ -6,8 +6,8 @@ defmodule AppWeb.SubmissionControllerTest do
 
   setup [:create_topic]
 
-  @create_attrs %{description: "some description", image_url: "some image_url", slug: "some slug", title: "some title"}
-  @update_attrs %{description: "some updated description", image_url: "some updated image_url", slug: "some updated slug", title: "some updated title"}
+  @create_attrs %{description: "some description", image_url: "http://i.imgur.com/u3vyMCW.jpg", slug: "some slug", title: "some title"}
+  @update_attrs %{description: "some updated description", image_url: "http://i.imgur.com/zF7rPAf.jpg", slug: "some updated slug", title: "some updated title"}
   @invalid_attrs %{description: nil, image_url: nil, slug: nil, title: nil}
 
   def fixture(:submission, topic) do
