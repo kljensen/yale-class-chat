@@ -1,5 +1,6 @@
 defmodule AppWeb.Section_RoleController do
   use AppWeb, :controller
+  @section_read_roles ["student", "defunct_student", "guest"]
 
   alias App.Accounts
   alias App.Accounts.Section_Role
@@ -19,9 +20,8 @@ defmodule AppWeb.Section_RoleController do
     user = conn.assigns.current_user
     list = Accounts.list_users_for_section__roles(user, section)
     user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-    role_list = ["administrator", "owner"]
     changeset = Accounts.change_section__role(%Section_Role{})
-    render(conn, "new.html", changeset: changeset, section: section, role_list: role_list, user_list: user_list)
+    render(conn, "new.html", changeset: changeset, section: section, role_list: @section_read_roles, user_list: user_list)
   end
 
   def create(conn, %{"section__role" => section__role_params, "section_id" => section_id}) do
@@ -40,17 +40,15 @@ defmodule AppWeb.Section_RoleController do
       {:error, %Ecto.Changeset{} = changeset} ->
         list = Accounts.list_users_for_section__roles(user_auth, section)
         user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-        role_list = ["administrator", "owner"]
-        render(conn, "new.html", changeset: changeset, section: section, role_list: role_list, user_list: user_list)
+        render(conn, "new.html", changeset: changeset, section: section, role_list: @section_read_roles, user_list: user_list)
 
       {:error, message} ->
         list = Accounts.list_users_for_section__roles(user_auth, section)
         user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-        role_list = ["administrator", "owner"]
         changeset = Accounts.change_section__role(%Section_Role{})
         conn
         |> put_flash(:error, message)
-        |> render("new.html", changeset: changeset, section: section, role_list: role_list, user_list: user_list)
+        |> render("new.html", changeset: changeset, section: section, role_list: @section_read_roles, user_list: user_list)
     end
   end
 
@@ -67,8 +65,7 @@ defmodule AppWeb.Section_RoleController do
     user = conn.assigns.current_user
     list = Accounts.list_users_for_section__roles(user, section)
     user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-    role_list = ["administrator", "owner"]
-    render(conn, "edit.html", section__role: section__role, changeset: changeset, section: section, role_list: role_list, user_list: user_list)
+    render(conn, "edit.html", section__role: section__role, changeset: changeset, section: section, role_list: @section_read_roles, user_list: user_list)
   end
 
   def update(conn, %{"id" => id, "section__role" => section__role_params}) do
@@ -88,8 +85,7 @@ defmodule AppWeb.Section_RoleController do
         changeset = Accounts.change_section__role(section__role)
         list = Accounts.list_users_for_section__roles(user, section)
         user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-        role_list = ["administrator", "owner"]
-        render(conn, "edit.html", section__role: section__role, changeset: changeset, section: section, role_list: role_list, user_list: user_list)
+        render(conn, "edit.html", section__role: section__role, changeset: changeset, section: section, role_list: @section_read_roles, user_list: user_list)
     end
   end
 

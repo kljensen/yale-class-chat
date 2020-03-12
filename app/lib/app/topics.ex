@@ -1,4 +1,9 @@
 defmodule App.Topics do
+  @course_owner_roles ["owner"]
+  @course_admin_roles ["administrator", "owner"]
+  @section_write_roles ["student"]
+  @section_read_roles ["student", "defunct_student", "guest"]
+
   @moduledoc """
   The Topics context.
   """
@@ -51,7 +56,7 @@ defmodule App.Topics do
     sid = section.id
     uid = user.id
     cid = section.course_id
-    allowed_section_roles = ["student", "defunct_student", "guest"]
+    allowed_section_roles = @section_read_roles
     query = from r in App.Accounts.Section_Role,
               join: s in App.Courses.Section,
               on: r.section_id == s.id,
@@ -70,9 +75,8 @@ defmodule App.Topics do
 
     query = if inherit_course_role do
       course = App.Courses.get_course!(cid)
-      allowed_course_roles = ["administrator", "owner"]
       auth_role = App.Accounts.get_current_course__role(user, course)
-      if Enum.member?(allowed_course_roles, auth_role) do
+      if Enum.member?(@course_admin_roles, auth_role) do
         from t in Topic,
           where: t.section_id == ^sid,
           select: t
@@ -114,14 +118,13 @@ defmodule App.Topics do
 
   """
   def create_topic(%App.Accounts.User{} = user, %App.Courses.Section{} = section, attrs \\ %{}) do
-    allowed_roles = ["administrator", "owner"]
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_course__role(user, course)
 
     cond do
       course.allow_write == false ->
         {:error, "course write not allowed"}
-      Enum.member?(allowed_roles, auth_role) == false ->
+      Enum.member?(@course_admin_roles, auth_role) == false ->
         {:error, "unauthorized"}
       true ->
         do_create_topic(section, attrs)
@@ -148,7 +151,6 @@ defmodule App.Topics do
 
   """
   def update_topic(%App.Accounts.User{} = user, %Topic{} = topic, attrs \\ %{}) do
-    allowed_roles = ["administrator", "owner"]
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_course__role(user, course)
@@ -156,7 +158,7 @@ defmodule App.Topics do
     cond do
       course.allow_write == false ->
         {:error, "course write not allowed"}
-      Enum.member?(allowed_roles, auth_role) == false ->
+      Enum.member?(@course_admin_roles, auth_role) == false ->
         {:error, "unauthorized"}
       true ->
         do_update_topic(topic, attrs)
@@ -182,7 +184,6 @@ defmodule App.Topics do
 
   """
   def delete_topic(%App.Accounts.User{} = user, %Topic{} = topic) do
-    allowed_roles = ["administrator", "owner"]
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_course__role(user, course)
@@ -190,7 +191,7 @@ defmodule App.Topics do
     cond do
       course.allow_write == false ->
         {:error, "course write not allowed"}
-      Enum.member?(allowed_roles, auth_role) == false ->
+      Enum.member?(@course_admin_roles, auth_role) == false ->
         {:error, "unauthorized"}
       true ->
         do_delete_topic(topic)

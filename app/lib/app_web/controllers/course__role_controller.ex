@@ -5,6 +5,8 @@ defmodule AppWeb.Course_RoleController do
   alias App.Accounts.Course_Role
   alias App.Courses
 
+  @course_admin_roles ["administrator", "owner"]
+
   def index(conn, %{"course_id" => course_id}) do
     course = Courses.get_course!(course_id)
     user = conn.assigns.current_user
@@ -19,9 +21,8 @@ defmodule AppWeb.Course_RoleController do
     user = conn.assigns.current_user
     list = Accounts.list_users_for_course__roles(user, course)
     user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-    role_list = ["administrator", "owner"]
     changeset = Accounts.change_course__role(%Course_Role{})
-    render(conn, "new.html", changeset: changeset, course: course, role_list: role_list, user_list: user_list)
+    render(conn, "new.html", changeset: changeset, course: course, role_list: @course_admin_roles, user_list: user_list)
   end
 
   def create(conn, %{"course__role" => course__role_params, "course_id" => course_id}) do
@@ -40,17 +41,15 @@ defmodule AppWeb.Course_RoleController do
       {:error, %Ecto.Changeset{} = changeset} ->
         list = Accounts.list_users_for_course__roles(user_auth, course)
         user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-        role_list = ["administrator", "owner"]
-        render(conn, "new.html", changeset: changeset, course: course, role_list: role_list, user_list: user_list)
+        render(conn, "new.html", changeset: changeset, course: course, role_list: @course_admin_roles, user_list: user_list)
 
       {:error, message} ->
         list = Accounts.list_users_for_course__roles(user_auth, course)
         user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-        role_list = ["administrator", "owner"]
         changeset = Accounts.change_course__role(%Course_Role{})
         conn
         |> put_flash(:error, message)
-        |> render("new.html", changeset: changeset, course: course, role_list: role_list, user_list: user_list)
+        |> render("new.html", changeset: changeset, course: course, role_list: @course_admin_roles, user_list: user_list)
     end
   end
 
@@ -67,9 +66,7 @@ defmodule AppWeb.Course_RoleController do
     user = conn.assigns.current_user
     list = Accounts.list_users_for_course__roles(user, course)
     user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-    IO.inspect user_list
-    role_list = ["administrator", "owner"]
-    render(conn, "edit.html", course__role: course__role, changeset: changeset, course: course, role_list: role_list, user_list: user_list)
+    render(conn, "edit.html", course__role: course__role, changeset: changeset, course: course, role_list: @course_admin_roles, user_list: user_list)
   end
 
   def update(conn, %{"id" => id, "course__role" => course__role_params}) do
@@ -89,8 +86,7 @@ defmodule AppWeb.Course_RoleController do
         changeset = Accounts.change_course__role(course__role)
         list = Accounts.list_users_for_course__roles(user, course)
         user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-        role_list = ["administrator", "owner"]
-        render(conn, "edit.html", course__role: course__role, changeset: changeset, course: course, role_list: role_list, user_list: user_list)
+        render(conn, "edit.html", course__role: course__role, changeset: changeset, course: course, role_list: @course_admin_roles, user_list: user_list)
     end
   end
 

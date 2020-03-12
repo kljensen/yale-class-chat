@@ -6,7 +6,7 @@
   <% end %>
 
   <%= label f, :role %>
-  <%= text_input f, :role %>
+  <%= select f, :role, @role_list %>
   <%= error_tag f, :role %>
 
   <%= label f, :valid_from %>
@@ -16,6 +16,10 @@
   <%= label f, :valid_to %>
   <%= datetime_select f, :valid_to %>
   <%= error_tag f, :valid_to %>
+
+  <%= label f, :user_id %>
+  <%= select f, :user_id, @user_list %>
+  <%= error_tag f, :user_id %>
 
   <div>
     <%= submit "Save" %>

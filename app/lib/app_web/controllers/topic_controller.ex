@@ -6,6 +6,8 @@ defmodule AppWeb.TopicController do
   alias App.Courses
   alias App.Submissions
 
+  @sort_list ["date - ascending", "date - descending", "rating - ascending", "rating - descending", "rating - ascending", "random"]
+
   def index(conn, %{"section_id" => section_id}) do
     section = Courses.get_section!(section_id)
     user = conn.assigns.current_user
@@ -24,7 +26,7 @@ defmodule AppWeb.TopicController do
     sections = Enum.map(section_map, fn [value, key] -> {:"#{key}", value} end)
     selected_sections = Map.values(Map.new(sections))
     {:ok, current_time} = DateTime.now("America/New_York")
-    render(conn, "new.html", changeset: changeset, course: course, sections: sections, selected_sections: selected_sections, current_time: current_time)
+    render(conn, "new.html", changeset: changeset, course: course, sections: sections, selected_sections: selected_sections, current_time: current_time, sort_list: @sort_list)
   end
 
   def create(conn, %{"topic" => topic_params, "course_id" => course_id}) do
@@ -53,7 +55,7 @@ defmodule AppWeb.TopicController do
       nil ->
         changeset = Topics.change_topic(%Topic{})
         put_flash(conn, :error, "Must select at least one section")
-        render(conn, "new.html", changeset: changeset, course: course, sections: sections, selected_sections: selected_sections, current_time: current_time)
+        render(conn, "new.html", changeset: changeset, course: course, sections: sections, selected_sections: selected_sections, current_time: current_time, sort_list: @sort_list)
 
       _ ->
         section_id = List.first(section_ids)
@@ -70,13 +72,13 @@ defmodule AppWeb.TopicController do
             |> redirect(to: Routes.topic_path(conn, :show, topic))
 
           {:error, %Ecto.Changeset{} = changeset} ->
-            render(conn, "new.html", changeset: changeset, course: course, sections: sections, selected_sections: selected_sections, current_time: current_time)
+            render(conn, "new.html", changeset: changeset, course: course, sections: sections, selected_sections: selected_sections, current_time: current_time, sort_list: @sort_list)
 
           {:error, message} ->
             changeset = Topics.change_topic(%Topic{})
             conn
             |> put_flash(:error, message)
-            |> render("new.html", changeset: changeset, course: course, sections: sections, selected_sections: selected_sections, current_time: current_time)
+            |> render("new.html", changeset: changeset, course: course, sections: sections, selected_sections: selected_sections, current_time: current_time, sort_list: @sort_list)
         end
     end
   end
@@ -93,7 +95,7 @@ defmodule AppWeb.TopicController do
     section = Courses.get_section!(topic.section_id)
     changeset = Topics.change_topic(topic)
     {:ok, current_time} = DateTime.now("America/New_York")
-    render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time, section: section)
+    render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time, section: section, sort_list: @sort_list)
   end
 
   def update(conn, %{"id" => id, "topic" => topic_params}) do
@@ -109,7 +111,7 @@ defmodule AppWeb.TopicController do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:ok, current_time} = DateTime.now("America/New_York")
-        render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time, section: section)
+        render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time, section: section, sort_list: @sort_list)
     end
   end
 

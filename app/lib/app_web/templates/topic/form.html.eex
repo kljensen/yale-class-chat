@@ -48,7 +48,7 @@
   <%= error_tag f, :user_submission_limit %>
 
   <%= label f, :sort %>
-  <%= text_input f, :sort %>
+  <%= select f, :sort, @sort_list %>
   <%= error_tag f, :sort %>
 
   <%= if String.starts_with?(@action, "/courses") do %>

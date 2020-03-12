@@ -17,6 +17,10 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
   app:
     build: app
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -46,6 +50,10 @@ services:
       - server
   tests:
     build: app
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
