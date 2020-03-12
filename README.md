@@ -126,17 +126,10 @@ Here are some draft stories
     - ~~submission_limit: integer representing maximum number of submissions per authorized user~~
     - ~~allow_comments: boolean indicating that comments on submissions are allowed.~~
     - sort_order: controls the sort order of submissions. Can be
-<<<<<<< HEAD
       by date, votes (ascending, descending), random. **NOT CURRENTLY IMPLEMENTED**
     - anonymous: controls whether submitter ids/names are displayed to end users
   - I can toggle the status of a submission
     - ~~viewable/hidden~~
-=======
-      by date, votes (ascending, descending), random.
-    - anonymous: controls whether submitter ids/names are displayed to end users
-  - I can toggle the status of a submission
-    - viewable/hidden ***I need more clarification on what this does (can submitters and admins still see the submission?)***
->>>>>>> dev
 - As an authenticated user
   - ~~I can see the courses to which I have read access.~~
   - ~~I can see the sections to which I have read access.~~
