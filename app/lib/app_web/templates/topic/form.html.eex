@@ -44,7 +44,7 @@
   <%= error_tag f, :allow_submission_comments %>
 
   <%= label f, :user_submission_limit %>
-  <%= number_input f, :user_submission_limit %>
+  <%= number_input f, :user_submission_limit, min: 0 %>
   <%= error_tag f, :user_submission_limit %>
 
   <%= label f, :sort %>
