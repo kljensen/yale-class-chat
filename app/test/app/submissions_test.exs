@@ -144,6 +144,67 @@ defmodule App.SubmissionsTest do
       assert length(retrieved_submissions) == 0
     end
 
+    test "list_user_submissions/1 respects topic sort", context do
+      submitter = context[:submitter]
+      student1 = context[:student]
+      student2 = context[:student2]
+      user_faculty = context[:user_faculty]
+      topic = context[:topic]
+
+      submission1 = submission_fixture(submitter, topic)
+      submission2 = submission_fixture(submitter, topic)
+
+      #Submit ratings for sort
+      Submissions.create_rating(student1, submission1, %{score: 1})
+      Submissions.create_rating(student2, submission1, %{score: 2})
+      Submissions.create_rating(student1, submission2, %{score: 4})
+      Submissions.create_rating(student2, submission2, %{score: 5})
+
+      #Sort by date - ascending
+      {:ok, topic} = App.Topics.update_topic(user_faculty, topic, %{sort: "date - ascending"})
+      submission_list = Submissions.list_user_submissions(user_faculty, topic)
+      student_submission_list = Submissions.list_user_submissions(student1, topic)
+      assert length(submission_list) == 2
+      assert length(student_submission_list) == 2
+      assert List.first(submission_list).id == submission1.id
+      assert List.last(submission_list).id == submission2.id
+      assert List.first(student_submission_list).id == submission1.id
+      assert List.last(student_submission_list).id == submission2.id
+
+      #Sort by date - descending
+      {:ok, topic} = App.Topics.update_topic(user_faculty, topic, %{sort: "date - descending"})
+      submission_list = Submissions.list_user_submissions(user_faculty, topic)
+      student_submission_list = Submissions.list_user_submissions(student1, topic)
+      assert length(submission_list) == 2
+      assert length(student_submission_list) == 2
+      assert List.first(submission_list).id == submission2.id
+      assert List.last(submission_list).id == submission1.id
+      assert List.first(student_submission_list).id == submission2.id
+      assert List.last(student_submission_list).id == submission1.id
+
+      #Sort by rating - ascending
+      {:ok, topic} = App.Topics.update_topic(user_faculty, topic, %{sort: "rating - ascending"})
+      submission_list = Submissions.list_user_submissions(user_faculty, topic)
+      student_submission_list = Submissions.list_user_submissions(student1, topic)
+      assert length(submission_list) == 2
+      assert length(student_submission_list) == 2
+      assert List.first(submission_list).id == submission1.id
+      assert List.last(submission_list).id == submission2.id
+      assert List.first(student_submission_list).id == submission1.id
+      assert List.last(student_submission_list).id == submission2.id
+
+      #Sort by rating - ascending
+      {:ok, topic} = App.Topics.update_topic(user_faculty, topic, %{sort: "rating - descending"})
+      submission_list = Submissions.list_user_submissions(user_faculty, topic)
+      student_submission_list = Submissions.list_user_submissions(student1, topic)
+      assert length(submission_list) == 2
+      assert length(student_submission_list) == 2
+      assert List.first(submission_list).id == submission2.id
+      assert List.last(submission_list).id == submission1.id
+      assert List.first(student_submission_list).id == submission2.id
+      assert List.last(student_submission_list).id == submission1.id
+    end
+
     test "list_user_own_submissions/1 returns all submissions by the given user", context do
       submission = submission_fixture(context[:submitter], context[:topic])
       submission2 = submission_fixture(context[:student], context[:topic], %{slug: "student slug"})

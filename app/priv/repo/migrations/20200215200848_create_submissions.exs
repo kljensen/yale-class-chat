@@ -15,6 +15,6 @@ defmodule App.Repo.Migrations.CreateSubmissions do
       timestamps()
     end
 
-    create unique_index(:submissions, [:slug])
+    #create unique_index(:submissions, [:slug])
   end
 end

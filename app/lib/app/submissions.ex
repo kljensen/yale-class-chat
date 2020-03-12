@@ -43,6 +43,7 @@ defmodule App.Submissions do
 
   @doc """
   Returns the list of submissions visible to a given user for a given topic.
+  Obeys sort.
 
   ## Examples
 
@@ -55,25 +56,6 @@ defmodule App.Submissions do
     uid = user.id
     sid = topic.section_id
     allowed_section_roles = @section_read_roles
-    order_by = case topic.sort do
-      "date - ascending" ->
-        [asc: :id]
-
-      "date - descending" ->
-        [desc: :id]
-
-      "rating - ascending" ->
-        [asc: :id] #Needs to be updated
-
-      "rating - descending" ->
-        [asc: :id] #Needs to be updated
-
-      #"random" ->
-      #  fragment("RANDOM()")
-
-      _ ->
-        [desc: :id]
-      end
 
     query = from r in App.Accounts.Section_Role,
               join: s in App.Courses.Section,
@@ -84,6 +66,8 @@ defmodule App.Submissions do
               on: t.section_id == s.id,
               join: su in Submission,
               on: su.topic_id == t.id,
+              left_join: ra in App.Submissions.Rating,
+              on: su.id == ra.submission_id,
               where: r.user_id == ^uid,
               where: r.valid_from <= from_now(0, "day"),
               where: r.valid_to >= from_now(0, "day"),
@@ -94,17 +78,26 @@ defmodule App.Submissions do
               where: t.show_user_submissions,
               where: su.visible,
               where: t.id == ^tid,
-              order_by: ^order_by,
-              select: su
+              group_by: su.id,
+              select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score)}
+
+    query = query
+      |> order_query(topic.sort)
 
     query = if inherit_course_role do
       section = App.Courses.get_section!(sid)
       course = App.Courses.get_course!(section.course_id)
       auth_role = App.Accounts.get_current_course__role(user, course)
       query_tmp = if Enum.member?(@course_admin_roles, auth_role) do
-        from s in Submission,
-          where: s.topic_id == ^tid,
-          order_by: ^order_by
+        q = from su in Submission,
+          left_join: ra in App.Submissions.Rating,
+          on: su.id == ra.submission_id,
+          where: su.topic_id == ^tid,
+          group_by: su.id,
+          select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score)}
+
+        q = q
+          |> admin_order_query(topic.sort)
       else
         query
       end
@@ -115,6 +108,33 @@ defmodule App.Submissions do
 
     Repo.all(query)
   end
+
+  def order_query(query, "date - descending"),
+    do: order_by(query, [r, s, c, t, su, ra], desc: su.id)
+  def order_query(query, "date - ascending"),
+    do: order_by(query, [r, s, c, t, su, ra], asc: su.id)
+  def order_query(query, "rating - descending"),
+    do: order_by(query, [r, s, c, t, su, ra], desc: avg(ra.score))
+  def order_query(query, "rating - ascending"),
+    do: order_by(query, [r, s, c, t, su, ra], asc: avg(ra.score))
+  def order_query(query, "random"),
+    do: order_by(query, [r, s, c, t, su, ra], fragment("RANDOM()"))
+  def order_query(query, _),
+    do: order_by(query, [])
+
+  def admin_order_query(query, "date - descending"),
+    do: order_by(query, [su, ra], desc: su.id)
+  def admin_order_query(query, "date - ascending"),
+    do: order_by(query, [su, ra], asc: su.id)
+  def admin_order_query(query, "rating - descending"),
+    do: order_by(query, [su, ra], desc: avg(ra.score))
+  def admin_order_query(query, "rating - ascending"),
+    do: order_by(query, [su, ra], asc: avg(ra.score))
+  def admin_order_query(query, "random"),
+    do: order_by(query, [su, ra], fragment("RANDOM()"))
+  def admin_order_query(query, _),
+    do: order_by(query, [])
+
 
   @doc """
   Returns the list of submissions by a given user.
