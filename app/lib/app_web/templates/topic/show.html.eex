@@ -24,18 +24,24 @@
         <strong>Allow submission voting:</strong>
         <%= @topic.allow_submission_voting %>
       </li>
-    </ul>
-  </article>
-  <article class="column">
-    <ul>
+
       <li>
         <strong>Anonymous:</strong>
         <%= @topic.anonymous %>
       </li>
 
+    </ul>
+  </article>
+  <article class="column">
+    <ul>
       <li>
         <strong>Allow submission comments:</strong>
         <%= @topic.allow_submission_comments %>
+      </li>
+
+      <li>
+        <strong>Allow students to view submissions by other students:</strong>
+        <%= @topic.show_user_submissions %>
       </li>
 
       <li>
@@ -51,12 +57,14 @@
     </ul>
   </article>
 </section>
+<%= if @can_edit do %>
 <h2>Administration</h2>
 <section class="row">
     <article class="column"><span><%= link "Edit Topic", to: Routes.topic_path(@conn, :edit, @topic) %></span></article>
     <article class="column"><span><%= link "Post New Submission", to: Routes.topic_submission_path(@conn, :new, @topic) %></span></article>
     <article class="column"><span><%= link "Back", to: Routes.section_topic_path(@conn, :index, @topic.section_id) %></span></article>
 </section>
+<%= end %>
 <h2>Submissions</h2>
 <%= for submission <- @submissions do %>
     <h2><%= submission.title %></h2>
@@ -64,7 +72,9 @@
       <span><%= submission.description %></span>
       <section class="row">
       <article class="column"><span><%= link "Show", to: Routes.submission_path(@conn, :show, submission.id) %></span></article>
+      <%= if @can_edit || @uid == submission.user_id do %>
       <article class="column"><span><%= link "Edit", to: Routes.submission_path(@conn, :edit, submission.id) %></span></article>
       <article class="column"><span><%= link "Delete", to: Routes.submission_path(@conn, :delete, submission.id), method: :delete, data: [confirm: "Are you sure?"] %></span></article>
+      <% end %>
     </section>
 <% end %>

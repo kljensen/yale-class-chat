@@ -79,7 +79,7 @@ defmodule App.Submissions do
               where: su.visible,
               where: t.id == ^tid,
               group_by: su.id,
-              select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score)}
+              select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id}
 
     query = query
       |> order_query(topic.sort)
@@ -94,7 +94,7 @@ defmodule App.Submissions do
           on: su.id == ra.submission_id,
           where: su.topic_id == ^tid,
           group_by: su.id,
-          select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score)}
+          select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id}
 
         q = q
           |> admin_order_query(topic.sort)
@@ -162,7 +162,14 @@ defmodule App.Submissions do
   def list_user_own_submissions(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic) do
     tid = topic.id
     uid = user.id
-    Repo.all(from s in Submission, where: s.topic_id == ^tid, where: s.user_id == ^uid)
+    query = from su in Submission,
+              left_join: ra in App.Submissions.Rating,
+              on: su.id == ra.submission_id,
+              where: su.topic_id == ^tid,
+              where: su.user_id == ^uid,
+              group_by: su.id,
+              select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id}
+    Repo.all(query)
   end
 
   @doc """
