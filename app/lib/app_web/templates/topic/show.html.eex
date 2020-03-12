@@ -65,6 +65,7 @@
     <article class="column"><span><%= link "Back", to: Routes.section_topic_path(@conn, :index, @topic.section_id) %></span></article>
 </section>
 <%= end %>
+<%= if length(@submissions) != 0 do %>
 <h2>Submissions</h2>
 <%= for submission <- @submissions do %>
     <h2><%= submission.title %></h2>
@@ -77,4 +78,5 @@
       <article class="column"><span><%= link "Delete", to: Routes.submission_path(@conn, :delete, submission.id), method: :delete, data: [confirm: "Are you sure?"] %></span></article>
       <% end %>
     </section>
+<% end %>
 <% end %>
