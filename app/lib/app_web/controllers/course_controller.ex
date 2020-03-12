@@ -6,17 +6,34 @@ defmodule AppWeb.CourseController do
 
   def index(conn, _params) do
     user = conn.assigns.current_user
-    courses = Courses.list_user_courses(user)
-    list = Courses.list_semester_names()
-    semesters = Map.new(Enum.map(list, fn [key, value] -> {:"#{key}", value} end))
-    render(conn, "index.html", courses: courses, semesters: semesters)
+    case user.is_faculty do
+      true ->
+        courses = Courses.list_user_courses(user)
+        list = Courses.list_semester_names()
+        semesters = Map.new(Enum.map(list, fn [key, value] -> {:"#{key}", value} end))
+        render(conn, "index.html", courses: courses, semesters: semesters)
+      false ->
+        conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+      end
   end
 
   def new(conn, _params) do
-    changeset = Courses.change_course(%Course{})
-    list = Courses.list_semester_names()
-    semesters = Enum.map(list, fn [value, key] -> {:"#{key}", value} end)
-    render(conn, "new.html", [changeset: changeset, semesters: semesters])
+    user = conn.assigns.current_user
+    case user.is_faculty do
+      true ->
+        changeset = Courses.change_course(%Course{})
+        list = Courses.list_semester_names()
+        semesters = Enum.map(list, fn [value, key] -> {:"#{key}", value} end)
+        render(conn, "new.html", [changeset: changeset, semesters: semesters])
+      false ->
+        conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+      end
   end
 
   def create(conn, %{"course" => course_params}) do
@@ -33,6 +50,20 @@ defmodule AppWeb.CourseController do
         list = Courses.list_semester_names()
         semesters = Enum.map(list, fn [value, key] -> {:"#{key}", value} end)
         render(conn, "new.html", [changeset: changeset, semesters: semesters])
+
+      {:error, message} ->
+        case message do
+          "forbidden" ->
+            conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+          "not found" ->
+            conn
+            |> put_status(:not_found)
+            |> put_view(AppWeb.ErrorView)
+            |> render("404.html")
+        end
     end
   end
 

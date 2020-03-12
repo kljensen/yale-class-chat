@@ -399,82 +399,49 @@ defmodule App.Accounts do
     List.first(results)
   end
 
-  def get_current_course__role(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
-    {:ok, current_time} = DateTime.now("Etc/UTC")
-    uid = user.id
-    cid = section.course_id
-    query = from u_r in "course_roles",
-              where: u_r.user_id == ^uid and u_r.course_id == ^cid  and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
-              select: u_r.role
+  @doc """
+  Returns true if the current course__role is in list of edit-allowed roles for a given user and course.
 
-    results = Repo.all(query)
-    List.first(results)
+  Raises `Ecto.NoResultsError` if the Course  role does not exist.
+
+  ## Examples
+
+      iex> can_edit_course(%User{}, %Course{})
+      true
+
+      iex> can_edit_course(%NonAuthUser{}, %Course{})
+      false
+
+  """
+
+  def can_edit_course(%App.Accounts.User{} = user, %App.Courses.Course{} = course) do
+    course_role = get_current_course__role(user, course)
+    Enum.member?(@course_admin_roles, course_role)
   end
 
-  def get_current_course__role(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic) do
-    {:ok, current_time} = DateTime.now("Etc/UTC")
-    uid = user.id
-    sid = topic.section_id
-    query = from u_r in "course_roles",
-              left_join: s in "sections",
-              on: s.course_id == u_r.course_id,
-              where: s.id == ^sid and u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
-              select: u_r.role
-
-    results = Repo.all(query)
-    List.first(results)
+  def can_edit_section(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
+    course_role = get_current_course__role(user, section)
+    Enum.member?(@course_admin_roles, course_role)
   end
 
-  def get_current_course__role(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission) do
-    {:ok, current_time} = DateTime.now("Etc/UTC")
-    uid = user.id
-    tid = submission.topic_id
-    query = from u_r in "course_roles",
-              left_join: s in "sections",
-              on: s.course_id == u_r.course_id,
-              left_join: t in "topics",
-              on: t.section_id == s.id,
-              where: t.id == ^tid and u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
-              select: u_r.role
-
-    results = Repo.all(query)
-    List.first(results)
+  def can_edit_topic(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic) do
+    course_role = get_current_course__role(user, topic)
+    Enum.member?(@course_admin_roles, course_role)
   end
 
-  def get_current_course__role(%App.Accounts.User{} = user, %App.Submissions.Comment{} = comment) do
-    {:ok, current_time} = DateTime.now("Etc/UTC")
-    uid = user.id
-    suid = comment.submission_id
-    query = from u_r in "course_roles",
-              left_join: s in "sections",
-              on: s.course_id == u_r.course_id,
-              left_join: t in "topics",
-              on: t.section_id == s.id,
-              left_join: su in "submissions",
-              on: su.topic_id == t.id,
-              where: su.id == ^suid and u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
-              select: u_r.role
-
-    results = Repo.all(query)
-    List.first(results)
+  def can_edit_submission(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission) do
+    course_role = get_current_course__role(user, submission)
+    Enum.member?(@course_admin_roles, course_role) || user.id == submission.user_id
   end
 
-  def get_current_course__role(%App.Accounts.User{} = user, %App.Submissions.Rating{} = rating) do
-    {:ok, current_time} = DateTime.now("Etc/UTC")
-    uid = user.id
-    suid = rating.submission_id
-    query = from u_r in "course_roles",
-              left_join: s in "sections",
-              on: s.course_id == u_r.course_id,
-              left_join: t in "topics",
-              on: t.section_id == s.id,
-              left_join: su in "submissions",
-              on: su.topic_id == t.id,
-              where: su.id == ^suid and u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
-              select: u_r.role
+  def can_edit_comment(%App.Accounts.User{} = user, %App.Submissions.Comment{} = comment) do
+    course_role = get_current_course__role(user, comment)
+    Enum.member?(@course_admin_roles, course_role) || user.id == comment.user_id
+  end
 
-    results = Repo.all(query)
-    List.first(results)
+  def can_edit_rating(%App.Accounts.User{} = user, %App.Submissions.Rating{} = rating) do
+    course_role = get_current_course__role(user, rating)
+    Enum.member?(@course_admin_roles, course_role) || user.id == rating.user_id
   end
 
 

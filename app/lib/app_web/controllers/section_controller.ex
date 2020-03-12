@@ -9,13 +9,23 @@ defmodule AppWeb.SectionController do
     course = Courses.get_course!(course_id)
     user = conn.assigns.current_user
     sections = Courses.list_user_sections(course, user)
-    render(conn, "index.html", sections: sections, course: course)
+    can_edit = App.Accounts.can_edit_course(user, course)
+    render(conn, "index.html", sections: sections, course: course, can_edit: can_edit)
   end
 
   def new(conn, %{"course_id" => course_id}) do
     course = Courses.get_course!(course_id)
-    changeset = Courses.change_section(%Section{})
-    render(conn, "new.html", changeset: changeset, course: course)
+    user = conn.assigns.current_user
+    case App.Accounts.can_edit_course(user, course) do
+      true ->
+        changeset = Courses.change_section(%Section{})
+        render(conn, "new.html", changeset: changeset, course: course)
+      false ->
+        conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+    end
   end
 
   def create(conn, %{"section" => section_params}) do
@@ -39,7 +49,8 @@ defmodule AppWeb.SectionController do
       {:ok, section} ->
         course = Courses.get_course!(section.course_id)
         topics = Topics.list_user_topics(user, section)
-        render(conn, "show.html", course: course, section: section, topics: topics)
+        can_edit = App.Accounts.can_edit_section(user, section)
+        render(conn, "show.html", course: course, section: section, topics: topics, can_edit: can_edit)
       {:error, message} ->
         case message do
           "forbidden" ->
@@ -60,10 +71,18 @@ defmodule AppWeb.SectionController do
     user = conn.assigns.current_user
     case Courses.get_user_section(user, id) do
       {:ok, section} ->
-        section = Courses.get_section!(id)
-        course = Courses.get_course!(section.course_id)
-        changeset = Courses.change_section(section)
-        render(conn, "edit.html", section: section, changeset: changeset, course: course)
+        case App.Accounts.can_edit_section(user, section) do
+          true ->
+            section = Courses.get_section!(id)
+            course = Courses.get_course!(section.course_id)
+            changeset = Courses.change_section(section)
+            render(conn, "edit.html", section: section, changeset: changeset, course: course)
+          false ->
+            conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+        end
       {:error, message} ->
         case message do
           "forbidden" ->
@@ -93,6 +112,20 @@ defmodule AppWeb.SectionController do
       {:error, %Ecto.Changeset{} = changeset} ->
         course = Courses.get_course!(section.course_id)
         render(conn, "edit.html", section: section, changeset: changeset, course: course)
+
+      {:error, message} ->
+        case message do
+          "forbidden" ->
+            conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+          "not found" ->
+            conn
+            |> put_status(:not_found)
+            |> put_view(AppWeb.ErrorView)
+            |> render("404.html")
+        end
     end
   end
 
