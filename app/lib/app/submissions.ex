@@ -1,4 +1,10 @@
 defmodule App.Submissions do
+  @course_owner_roles ["owner"]
+  @course_admin_roles ["administrator", "owner"]
+  @section_write_roles ["student"]
+  @section_read_roles ["student", "defunct_student", "guest"]
+  @sort_list ["date - ascending", "date - descending", "rating - ascending", "rating - descending", "rating - ascending", "random"]
+
   @moduledoc """
   The Submissions context.
   """
@@ -48,7 +54,26 @@ defmodule App.Submissions do
     tid = topic.id
     uid = user.id
     sid = topic.section_id
-    allowed_section_roles = ["student", "defunct_student", "guest"]
+    allowed_section_roles = @section_read_roles
+    order_by = case topic.sort do
+      "date - ascending" ->
+        [asc: :id]
+
+      "date - descending" ->
+        [desc: :id]
+
+      "rating - ascending" ->
+        [asc: :id] #Needs to be updated
+
+      "rating - descending" ->
+        [asc: :id] #Needs to be updated
+
+      #"random" ->
+      #  fragment("RANDOM()")
+
+      _ ->
+        [desc: :id]
+      end
 
     query = from r in App.Accounts.Section_Role,
               join: s in App.Courses.Section,
@@ -69,19 +94,21 @@ defmodule App.Submissions do
               where: t.show_user_submissions,
               where: su.visible,
               where: t.id == ^tid,
+              order_by: ^order_by,
               select: su
 
     query = if inherit_course_role do
       section = App.Courses.get_section!(sid)
       course = App.Courses.get_course!(section.course_id)
-      allowed_course_roles = ["administrator", "owner"]
       auth_role = App.Accounts.get_current_course__role(user, course)
-      if Enum.member?(allowed_course_roles, auth_role) do
+      query_tmp = if Enum.member?(@course_admin_roles, auth_role) do
         from s in Submission,
-          where: s.topic_id == ^tid
+          where: s.topic_id == ^tid,
+          order_by: ^order_by
       else
         query
       end
+      query_tmp
     else
       query
     end
@@ -162,15 +189,14 @@ defmodule App.Submissions do
 
   """
   def create_submission(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic, attrs \\ %{}) do
-    allowed_roles = ["administrator", "owner", "student"]
-    admin_roles = ["administrator", "owner"]
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_section__role(user, section)
+    course_role = App.Accounts.get_current_course__role(user, course)
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
     #Only allow admins to hide/unhide submissions or allow them to be ranked
-    attrs = if Enum.member?(admin_roles, auth_role) do
+    attrs = if Enum.member?(@course_admin_roles, course_role) do
               attrs
             else
               attrstmp = attrs
@@ -198,8 +224,8 @@ defmodule App.Submissions do
         {:error, "creating submissions not allowed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
-      Enum.member?(allowed_roles, auth_role) == false ->
-        {:error, "unauthorized"}#
+      Enum.member?(@section_write_roles, auth_role) == false && Enum.member?(@course_admin_roles, course_role) == false ->
+        {:error, "unauthorized"}
       true ->
         do_create_submission(user, topic, attrs)
     end
@@ -229,13 +255,12 @@ defmodule App.Submissions do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
-    admin_roles = ["administrator", "owner"]
     auth_role = App.Accounts.get_current_course__role(user, course)
     {:ok, current_time} = DateTime.now("Etc/UTC")
-    authorized = Enum.member?(admin_roles, auth_role) or user.id == submission.user_id
+    authorized = Enum.member?(@course_admin_roles, auth_role) or user.id == submission.user_id
 
     #Only allow admins to hide/unhide submissions or allow them to be ranked
-    attrs = if Enum.member?(admin_roles, auth_role) do
+    attrs = if Enum.member?(@course_admin_roles, auth_role) do
               attrs
             else
               attrstmp = attrs
@@ -290,10 +315,9 @@ defmodule App.Submissions do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
-    admin_roles = ["administrator", "owner"]
     auth_role = App.Accounts.get_current_section__role(user, section)
     {:ok, current_time} = DateTime.now("Etc/UTC")
-    authorized = Enum.member?(admin_roles, auth_role) or user.id == submission.user_id
+    authorized = Enum.member?(@course_admin_roles, auth_role) or user.id == submission.user_id
 
     cond do
       Date.compare(current_time, topic.opened_at) == :lt ->
@@ -372,7 +396,7 @@ defmodule App.Submissions do
     uid = user.id
     sid = topic.section_id
     suid = submission.id
-    allowed_section_roles = ["student", "defunct_student", "guest"]
+    allowed_section_roles = @section_read_roles
 
     query = from r in App.Accounts.Section_Role,
               join: s in App.Courses.Section,
@@ -397,11 +421,8 @@ defmodule App.Submissions do
               select: co
 
     query = if inherit_course_role do
-      section = App.Courses.get_section!(sid)
-      course = App.Courses.get_course!(section.course_id)
-      allowed_course_roles = ["administrator", "owner"]
-      auth_role = App.Accounts.get_current_course__role(user, course)
-      if Enum.member?(allowed_course_roles, auth_role) do
+      auth_role = App.Accounts.get_current_course__role(user, topic)
+      if Enum.member?(@course_admin_roles, auth_role) do
         from co in Comment,
           where: co.submission_id == ^suid
       else
@@ -472,8 +493,6 @@ defmodule App.Submissions do
 
   """
   def create_comment(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
-    allowed_roles = ["student"]
-    allowed_course_roles = ["administrator", "owner"]
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
@@ -490,7 +509,7 @@ defmodule App.Submissions do
         {:error, "topic closed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
-      Enum.member?(allowed_roles, auth_role)  == false && Enum.member?(allowed_course_roles, course_role) == false ->
+      Enum.member?(@section_write_roles, auth_role)  == false && Enum.member?(@course_admin_roles, course_role) == false ->
         {:error, "unauthorized"}
       true ->
         do_create_comment(user, submission, attrs)
@@ -523,7 +542,6 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     {:ok, current_time} = DateTime.now("Etc/UTC")
-    allowed_course_roles = ["administrator", "owner"]
     course_role = App.Accounts.get_current_course__role(user, section)
 
     cond do
@@ -535,7 +553,7 @@ defmodule App.Submissions do
         {:error, "topic closed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
-      user.id != comment.user_id && Enum.member?(allowed_course_roles, course_role) == false ->
+      user.id != comment.user_id && Enum.member?(@course_admin_roles, course_role) == false ->
         {:error, "unauthorized"}
       true ->
         do_update_comment(comment, attrs)
@@ -566,7 +584,6 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     {:ok, current_time} = DateTime.now("Etc/UTC")
-    allowed_course_roles = ["administrator", "owner"]
     course_role = App.Accounts.get_current_course__role(user, course)
 
     cond do
@@ -578,7 +595,7 @@ defmodule App.Submissions do
         {:error, "topic closed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
-        user.id != comment.user_id && Enum.member?(allowed_course_roles, course_role) == false ->
+        user.id != comment.user_id && Enum.member?(@course_admin_roles, course_role) == false ->
         {:error, "unauthorized"}
       true ->
         do_delete_comment(comment)
@@ -646,7 +663,7 @@ defmodule App.Submissions do
     uid = user.id
     sid = topic.section_id
     suid = submission.id
-    allowed_section_roles = ["student", "defunct_student", "guest"]
+    allowed_section_roles = @section_read_roles
 
     query = from r in App.Accounts.Section_Role,
               join: s in App.Courses.Section,
@@ -673,9 +690,8 @@ defmodule App.Submissions do
     query = if inherit_course_role do
       section = App.Courses.get_section!(sid)
       course = App.Courses.get_course!(section.course_id)
-      allowed_course_roles = ["administrator", "owner"]
       auth_role = App.Accounts.get_current_course__role(user, course)
-      if Enum.member?(allowed_course_roles, auth_role) do
+      if Enum.member?(@course_admin_roles, auth_role) do
         from ra in Rating,
           where: ra.submission_id == ^suid
       else
@@ -746,8 +762,6 @@ defmodule App.Submissions do
 
   """
   def create_rating(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
-    allowed_roles = ["student"]
-    allowed_course_roles = ["administrator", "owner"]
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
@@ -764,7 +778,7 @@ defmodule App.Submissions do
         {:error, "topic closed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
-        Enum.member?(allowed_roles, auth_role)  == false && Enum.member?(allowed_course_roles, course_role) == false ->
+        Enum.member?(@section_write_roles, auth_role)  == false && Enum.member?(@course_admin_roles, course_role) == false ->
         {:error, "unauthorized"}
       true ->
         do_create_rating(user, submission, attrs)
@@ -797,7 +811,6 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     {:ok, current_time} = DateTime.now("Etc/UTC")
-    allowed_course_roles = ["administrator", "owner"]
     course_role = App.Accounts.get_current_course__role(user, course)
 
     cond do
@@ -809,7 +822,7 @@ defmodule App.Submissions do
         {:error, "topic closed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
-      user.id != rating.user_id && Enum.member?(allowed_course_roles, course_role) == false ->
+      user.id != rating.user_id && Enum.member?(@course_admin_roles, course_role) == false ->
         {:error, "unauthorized"}
       true ->
         do_update_rating(rating, attrs)
@@ -840,7 +853,6 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     {:ok, current_time} = DateTime.now("Etc/UTC")
-    allowed_course_roles = ["administrator", "owner"]
     course_role = App.Accounts.get_current_course__role(user, course)
 
     cond do
@@ -852,7 +864,7 @@ defmodule App.Submissions do
         {:error, "topic closed"}
       course.allow_write == false ->
         {:error, "course write not allowed"}
-        user.id != rating.user_id && Enum.member?(allowed_course_roles, course_role) == false ->
+        user.id != rating.user_id && Enum.member?(@course_admin_roles, course_role) == false ->
         {:error, "unauthorized"}
       true ->
         do_delete_rating(rating)
