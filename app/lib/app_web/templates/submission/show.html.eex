@@ -3,5 +3,13 @@
 <img src="<%= @submission.image_url %>">
 <span><%= @submission.description %></span>
 
+<%= if @topic.allow_submission_comments && @uid != @submission.user_id do %>
+<span><%= link "Post Comment", to: Routes.submission_comment_path(@conn, :new, @submission) %></span>
+<%= end %>
+<%= if @topic.allow_submission_voting && @uid != @submission.user_id do %>
+<span><%= link "Add Rating", to: Routes.submission_rating_path(@conn, :new, @submission) %></span>
+<%= end %>
+<%= if @can_edit do %>
 <span><%= link "Edit", to: Routes.submission_path(@conn, :edit, @submission) %></span>
+<%= end %>
 <span><%= link "Back", to: Routes.topic_submission_path(@conn, :index, @topic) %></span>

@@ -204,6 +204,60 @@ defmodule App.Submissions do
   def get_submission!(id), do: Repo.get!(Submission, id)
 
   @doc """
+  Gets a single submission, checking for a user's auth role.
+
+  Raises `Ecto.NoResultsError` if the Submission does not exist.
+
+  ## Examples
+
+      iex> get_submission!(123)
+      %Submission{}
+
+      iex> get_submission!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_user_submission(%App.Accounts.User{} = user, id) do
+    submission = Repo.get!(Submission, id)
+    return = case App.Accounts.can_edit_submission(user, submission) do
+                true ->
+                  submission
+                false ->
+                  tid = submission.topic_id
+                  topic = App.Topics.get_topic!(tid)
+                  uid = user.id
+                  sid = topic.section_id
+                  allowed_section_roles = @section_read_roles
+                  query = from r in App.Accounts.Section_Role,
+                            join: s in App.Courses.Section,
+                            on: r.section_id == s.id,
+                            join: c in App.Courses.Course,
+                            on: s.course_id == c.id,
+                            join: t in App.Topics.Topic,
+                            on: t.section_id == s.id,
+                            join: su in Submission,
+                            on: su.topic_id == t.id,
+                            left_join: ra in App.Submissions.Rating,
+                            on: su.id == ra.submission_id,
+                            where: r.user_id == ^uid,
+                            where: r.valid_from <= from_now(0, "day"),
+                            where: r.valid_to >= from_now(0, "day"),
+                            where: r.role in ^allowed_section_roles,
+                            where: c.allow_read == true,
+                            where: s.id == ^sid,
+                            where: t.visible,
+                            where: t.show_user_submissions,
+                            where: su.visible,
+                            where: su.id == ^id,
+                            where: t.id == ^tid,
+                            group_by: su.id,
+                            select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id}
+                  Repo.one(query)
+              end
+    return
+  end
+
+  @doc """
   Creates a submission.
 
   ## Examples

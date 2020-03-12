@@ -41,15 +41,26 @@ defmodule AppWeb.SubmissionController do
   end
 
   def show(conn, %{"id" => id}) do
-    submission = Submissions.get_submission!(id)
+    user = conn.assigns.current_user
+    submission = Submissions.get_user_submission(user, id)
     topic = Topics.get_topic!(submission.topic_id)
-    render(conn, "show.html", submission: submission, topic: topic)
+    can_edit = App.Accounts.can_edit_submission(user, submission)
+    render(conn, "show.html", submission: submission, topic: topic, can_edit: can_edit, uid: user.id)
   end
 
   def edit(conn, %{"id" => id}) do
     submission = Submissions.get_submission!(id)
-    changeset = Submissions.change_submission(submission)
-    render(conn, "edit.html", submission: submission, changeset: changeset)
+    user = conn.assigns.current_user
+    case App.Accounts.can_edit_submission(user, submission) do
+      true ->
+        changeset = Submissions.change_submission(submission)
+        render(conn, "edit.html", submission: submission, changeset: changeset)
+      false ->
+        conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+      end
   end
 
   def update(conn, %{"id" => id, "submission" => submission_params}) do
@@ -65,6 +76,20 @@ defmodule AppWeb.SubmissionController do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", submission: submission, changeset: changeset)
+
+      {:error, message} ->
+        case message do
+          "forbidden" ->
+            conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+          "not found" ->
+            conn
+            |> put_status(:not_found)
+            |> put_view(AppWeb.ErrorView)
+            |> render("404.html")
+          end
     end
   end
 
