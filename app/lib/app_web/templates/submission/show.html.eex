@@ -4,12 +4,28 @@
 <span><%= @submission.description %></span>
 
 <%= if @topic.allow_submission_comments && @uid != @submission.user_id do %>
-<span><%= link "Post Comment", to: Routes.submission_comment_path(@conn, :new, @submission) %></span>
-<%= end %>
+<span><%= link "Post Comment", to: Routes.submission_comment_path(@conn, :new, @submission.id) %></span>
+<% end %>
 <%= if @topic.allow_submission_voting && @uid != @submission.user_id do %>
-<span><%= link "Add Rating", to: Routes.submission_rating_path(@conn, :new, @submission) %></span>
-<%= end %>
+<span><%= link "Add Rating", to: Routes.submission_rating_path(@conn, :new, @submission.id) %></span>
+<% end %>
 <%= if @can_edit do %>
 <span><%= link "Edit", to: Routes.submission_path(@conn, :edit, @submission) %></span>
-<%= end %>
+<% end %>
 <span><%= link "Back", to: Routes.topic_submission_path(@conn, :index, @topic) %></span>
+
+<%= if length(@comments) != 0 do %>
+<h2>Comments</h2>
+<%= for comment <- @comments do %>
+    <h2><%= comment.title %></h2>
+    <div class="comment-info"><span>Posted at: </span><span class="rating"><%= comment.inserted_at %></span></div>
+      <span><%= comment.description %></span>
+      <section class="row">
+      <article class="column"><span><%= link "Show", to: Routes.comment_path(@conn, :show, comment.id) %></span></article>
+      <%= if @can_edit || @uid == comment.user_id do %>
+      <article class="column"><span><%= link "Edit", to: Routes.comment_path(@conn, :edit, comment.id) %></span></article>
+      <article class="column"><span><%= link "Delete", to: Routes.comment_path(@conn, :delete, comment.id), method: :delete, data: [confirm: "Are you sure?"] %></span></article>
+      <% end %>
+    </section>
+<% end %>
+<% end %>

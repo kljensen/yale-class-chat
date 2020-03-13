@@ -251,7 +251,7 @@ defmodule App.Submissions do
                             where: su.id == ^id,
                             where: t.id == ^tid,
                             group_by: su.id,
-                            select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id}
+                            select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id, topic_id: su.topic_id}
                   Repo.one(query)
               end
     return

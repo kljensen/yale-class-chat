@@ -21,10 +21,10 @@
 
       <td>
         <span><%= link "Show", to: Routes.submission_path(@conn, :show, submission) %></span>
-        <%= if @can_edit do %>
+        <%= if @can_edit or submission.user_id == @uid do %>
         <span><%= link "Edit", to: Routes.submission_path(@conn, :edit, submission) %></span>
         <span><%= link "Delete", to: Routes.submission_path(@conn, :delete, submission), method: :delete, data: [confirm: "Are you sure?"] %></span>
-        <%= end %>
+        <% end %>
       </td>
     </tr>
 <% end %>
