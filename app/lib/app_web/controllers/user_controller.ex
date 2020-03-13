@@ -82,7 +82,7 @@ defmodule AppWeb.UserController do
 
         conn
         |> put_flash(:info, "User deleted successfully.")
-        |> redirect(to: Routes.user_path(conn, :index))
+        |> redirect(to: "/")
       false ->
         conn
             |> put_status(:forbidden)

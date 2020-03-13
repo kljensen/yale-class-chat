@@ -30,7 +30,7 @@ defmodule AppWeb.Section_RoleControllerTest do
       conn = conn
         |> init_test_session(uid: "faculty net id")
         |> get(Routes.section_section__role_path(conn, :new, section))
-      assert html_response(conn, 200) =~ "New Section  role"
+      assert html_response(conn, 200) =~ "New Section role"
     end
   end
 
@@ -46,7 +46,7 @@ defmodule AppWeb.Section_RoleControllerTest do
       assert redirected_to(conn) == Routes.section_section__role_path(conn, :show, section, id)
 
       conn = get(conn, Routes.section_section__role_path(conn, :show, section, id))
-      assert html_response(conn, 200) =~ "Show Section  role"
+      assert html_response(conn, 200) =~ "Show Section role"
     end
 
     test "renders errors when data is invalid", %{conn: conn, section: section} do
@@ -55,7 +55,7 @@ defmodule AppWeb.Section_RoleControllerTest do
       conn = conn
         |> init_test_session(uid: "faculty net id")
         |> post(Routes.section_section__role_path(conn, :create, section), section__role: attrs)
-      assert html_response(conn, 200) =~ "New Section  role"
+      assert html_response(conn, 200) =~ "New Section role"
     end
   end
 
@@ -67,7 +67,7 @@ defmodule AppWeb.Section_RoleControllerTest do
       conn = conn
         |> init_test_session(uid: "faculty net id")
         |> get(Routes.section_section__role_path(conn, :edit, section, section__role))
-      assert html_response(conn, 200) =~ "Edit Section  role"
+      assert html_response(conn, 200) =~ "Edit Section role"
     end
   end
 
@@ -90,7 +90,7 @@ defmodule AppWeb.Section_RoleControllerTest do
       conn = conn
         |> init_test_session(uid: "faculty net id")
         |> put(Routes.section_section__role_path(conn, :update, section, section__role), section__role: @invalid_attrs)
-      assert html_response(conn, 200) =~ "Edit Section  role"
+      assert html_response(conn, 200) =~ "Edit Section role"
     end
   end
 

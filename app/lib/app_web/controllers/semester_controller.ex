@@ -66,7 +66,8 @@ defmodule AppWeb.SemesterController do
 
   def delete(conn, %{"id" => id}) do
     semester = Courses.get_semester!(id)
-    {:ok, _semester} = Courses.delete_semester(semester)
+    user = conn.assigns.current_user
+    {:ok, _semester} = Courses.delete_semester(user, semester)
 
     conn
     |> put_flash(:info, "Semester deleted successfully.")
