@@ -127,15 +127,23 @@ defmodule App.Accounts do
 
   """
   def create_user_on_login(net_id) do
-    # Get required fields
-    display_name = net_id
-    email = net_id <> "@connect.yale.edu"
-    is_faculty = false
-    attrs = %{display_name: display_name, email: email, net_id: net_id, is_faculty: is_faculty}
-    %User{}
-    |> User.changeset(attrs)
-    |> Repo.insert()
+    {stat, user} = case Repo.get_by(User, net_id: net_id) do
+      nil ->
+        # Get required fields
+        display_name = net_id
+        email = net_id <> "@connect.yale.edu"
+        is_faculty = false
+        attrs = %{display_name: display_name, email: email, net_id: net_id, is_faculty: is_faculty}
+        %User{}
+        |> User.changeset(attrs)
+        |> Repo.insert()
+      returned_user ->
+        {:ok, returned_user}
+      end
+      {stat, user}
   end
+
+  def get_or_create_user
 
   @doc """
   Updates a user.

@@ -6,6 +6,7 @@
       <article class="column"><span><%= link "Edit Section Details", to: Routes.section_path(@conn, :edit, @section) %></span></article>
       <article class="column"><span><span><%= link "Post New Topic", to: Routes.course_topic_path(@conn, :new, @section.course_id) %></span></article>
       <article class="column"><span><%= link "View Topic List", to: Routes.section_topic_path(@conn, :index, @section) %></span></article>
+      <article class="column"><span><%= link "Add Students to Section", to: Routes.section_section__role_path(@conn, :bulk_new, @section) %></span></article>
       <article class="column"><span><%= link "View Section Roles", to: Routes.section_section__role_path(@conn, :index, @section) %></span></article>
       <article class="column"><span><%= link "Back", to: Routes.course_section_path(@conn, :index, @section.course_id) %></span></article>
 </section>
