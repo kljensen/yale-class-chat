@@ -11,6 +11,14 @@ case $ACTION in
         # Bring down all our processes in development
         docker-compose down
         ;;
+    prod-up)
+        # Bring up all our processes in production
+        docker-compose -f docker-compose.prod.yaml up
+        ;;
+    prod-down)
+        # Bring up all our processes in production
+        docker-compose -f docker-compose.prod.yaml down
+        ;;
     shell)
         # Get a shell in the app container
         docker-compose exec app /bin/bash

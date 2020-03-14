@@ -1,0 +1,43 @@
+version: "3.4"
+volumes:
+  prod_deps:
+services:
+  db:
+    image: postgres:12.1-alpine
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+  app:
+    build: app
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=db
+      - PORT=4000
+      - MIX_ENV=prod
+      - CAS_BASE_URL=${CAS_BASE_URL}
+      - CAS_SERVICE_VALIDATE_BASE_URL=${CAS_SERVICE_VALIDATE_BASE_URL}
+      - CAS_CALLBACK_URL=${CAS_CALLBACK_URL}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+    volumes:
+      - type: bind
+        source: ./app
+        target: /app
+      # Use a volume in the container for our
+      # dependencies to keep the separate from
+      # the testapp deps.
+      - prod_deps:/app/deps/
+    ports:
+      - "127.0.0.1:${PORT}:4000"
+    depends_on:
+      - db
+    entrypoint:
+      - ./run.sh
+    command:
+      - prod-server

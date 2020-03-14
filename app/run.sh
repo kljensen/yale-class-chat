@@ -102,6 +102,14 @@ seeds(){
 
 ACTION=$1
 case $ACTION in
+    prod-server)
+        mix deps.get --only prod
+        run_migrations
+        mix compile
+        npm run deploy --prefix ./assets
+        mix phx.digest
+        mix phx.server
+        ;;
     server)
         setup
         run_server
