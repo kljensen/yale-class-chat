@@ -37,17 +37,18 @@ services:
       - node_deps:/app/assets/node_modules
       - letsencrypt:/etc/letsencrypt/
     ports:
-      - "0.0.0.0:${PORT}:4000"
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
     depends_on:
       - db
     entrypoint:
       - ./run.sh
     command:
       - prod-server
-  certbot:
+  tls:
     image: certbot/certbot:v1.3.0
-    entrypoint: /entrypoint.sh
+    entrypoint: /certbot.sh
     volumes:
       - letsencrypt:/etc/letsencrypt/
-      - "./certbot/entrypoint.sh:/entrypoint.sh"
+      - "./tls/certbot.sh:/certbot.sh"
 
