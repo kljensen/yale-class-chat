@@ -1,6 +1,7 @@
 version: "3.4"
 volumes:
   prod_deps:
+  node_deps:
   letsencrypt:
     external: true
 services:
@@ -33,9 +34,10 @@ services:
         source: ./app
         target: /app
       - prod_deps:/app/deps/
+      - node_deps:/app/assets/node_modules
       - letsencrypt:/etc/letsencrypt/
     ports:
-      - "127.0.0.1:${PORT}:4000"
+      - "0.0.0.0:${PORT}:4000"
     depends_on:
       - db
     entrypoint:

@@ -105,6 +105,7 @@ case $ACTION in
     prod-server)
         mix deps.get --only prod
         run_migrations
+	cd assets && npm install && cd - 
         mix compile
         npm run deploy --prefix ./assets
         mix phx.digest
