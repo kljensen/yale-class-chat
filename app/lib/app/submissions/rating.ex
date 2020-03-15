@@ -13,9 +13,11 @@ defmodule App.Submissions.Rating do
   @doc false
   def changeset(rating, attrs) do
     rating
-    |> cast(attrs, [:score])
+    |> cast(attrs, [:score, :submission_id, :user_id])
     |> validate_required([:score])
     |> foreign_key_constraint(:user_id)
     |> assoc_constraint(:user)
+    |> foreign_key_constraint(:submission_id)
+    |> assoc_constraint(:submission)
   end
 end

@@ -15,7 +15,7 @@ defmodule App.Courses.Section do
   @doc false
   def changeset(section, attrs) do
     section
-    |> cast(attrs, [:title, :crn])
+    |> cast(attrs, [:title, :crn, :course_id])
     |> validate_required([:title, :crn])
     |> unique_constraint(:crn)
     |> foreign_key_constraint(:course_id)

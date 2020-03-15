@@ -369,10 +369,10 @@ defmodule App.Courses do
 
   ## Examples
 
-      iex> update_course(course, %{field: new_value})
+      iex> update_course(user, course, %{field: new_value})
       {:ok, %Course{}}
 
-      iex> update_course(course, %{field: bad_value})
+      iex> update_course(user, course, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """

@@ -98,7 +98,9 @@ defmodule AppWeb.CourseController do
       {:ok, course} ->
         changeset = Courses.change_course(course)
         semester = Courses.get_semester!(course.semester_id)
-        semesters = [{:"#{semester.name}", semester.id}]
+        #semesters = [{:"#{semester.name}", semester.id}]
+        list = Courses.list_semester_names()
+        semesters = Enum.map(list, fn [value, key] -> {:"#{key}", value} end)
         render(conn, "edit.html", course: course, changeset: changeset, semesters: semesters)
       {:error, message} ->
         case message do
