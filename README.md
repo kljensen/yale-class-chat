@@ -21,18 +21,20 @@ PORTGRES_PORT=5432
 POSTGRES_USER=said_upon_playoff
 POSTGRES_PASSWORD=glitter-thing-tamale-flatfoot
 POSTGRES_DB=appdevdb
-PORT=9001
+PORT=9001s
 MIX_ENV=dev
 MOCKCAS_PORT=9002
 CAS_BASE_URL=http://localhost:9002/cas
 CAS_SERVICE_VALIDATE_BASE_URL=http://mockcas:4000/cas
 CAS_CALLBACK_URL=http://localhost:9001/auth/cas/callback
-SECRET_KEY_BASE=SuperSecretKeyBase
+SECRET_KEY_BASE=a7b3f3db42a7a3264a24880906403216b944afbd9bd67365992222ad1a7961c758870182274cd442a3cd89acf5abd5fdccc76974c9ab15a200f5ac2a20eb4b5e
+DOMAIN=foo.som.yale.edu
 ```
 
 Run `./admin.sh up` to bring up the app. The app will
 then be available at [http://localhost:9001](http://localhost:9001)
-or on whatever you set `$PORT` as.
+or on whatever you set `$PORT` as. (Note that the `./admin.sh` script
+will source a `.env` file in your current working directory.)
 
 To get a shell in the running docker container, do
 
@@ -45,6 +47,25 @@ To restart all Elixir processes in the test and app containers, do
 ```
 ./admin.sh restart
 ```
+
+## Running in production
+
+In production, we serve the application mainly over HTTPS and redirect
+HTTP requests to HTTPS. This repo has a second docker compose file:
+`docker-compose.prod.yaml` that shows the services that we start in
+production. To begin, you'll need a domain name that is passed to 
+running containers via the `DOMAIN` environment variable. Also, you'll
+need to generate certificates. To initialize your certificates, run
+
+```
+./admin.sh prod-init-certs
+```
+
+This will require answering a few questions. Upon success, certificates
+will be stored in the `letsencrypt` docker volume. The certificates are
+renewed automatically by the `certbot` docker service.
+
+
 
 ## Tech stack
 

@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+# Source environment variables
+set -a
+. ./.env
+set +a
+
 ACTION=$1
 case $ACTION in
     up)
@@ -19,6 +24,19 @@ case $ACTION in
         # Bring up all our processes in production
         docker-compose -f docker-compose.prod.yaml down
         ;;
+    prod-init-certs)
+	# Get our TLS certs from LetsEncrypt
+        docker volume create letsencrypt
+        docker run \
+	    -p 80:80 -it \
+	    -v letsencrypt:/etc/letsencrypt \
+	    certbot/certbot \
+	    certonly \
+            --standalone \
+	    --preferred-challenges http \
+	    -d $DOMAIN
+	;;
+
     shell)
         # Get a shell in the app container
         docker-compose exec app /bin/bash

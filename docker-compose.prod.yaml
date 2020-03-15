@@ -1,6 +1,8 @@
 version: "3.4"
 volumes:
   prod_deps:
+  letsencrypt:
+    external: true
 services:
   db:
     image: postgres:12.1-alpine
@@ -25,14 +27,13 @@ services:
       - CAS_SERVICE_VALIDATE_BASE_URL=${CAS_SERVICE_VALIDATE_BASE_URL}
       - CAS_CALLBACK_URL=${CAS_CALLBACK_URL}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - DOMAIN=${DOMAIN}
     volumes:
       - type: bind
         source: ./app
         target: /app
-      # Use a volume in the container for our
-      # dependencies to keep the separate from
-      # the testapp deps.
       - prod_deps:/app/deps/
+      - letsencrypt:/etc/letsencrypt/
     ports:
       - "127.0.0.1:${PORT}:4000"
     depends_on:
@@ -41,3 +42,10 @@ services:
       - ./run.sh
     command:
       - prod-server
+  certbot:
+    image: certbot/certbot:v1.3.0
+    entrypoint: /entrypoint.sh
+    volumes:
+      - letsencrypt:/etc/letsencrypt/
+      - "./certbot/entrypoint.sh:/entrypoint.sh"
+
