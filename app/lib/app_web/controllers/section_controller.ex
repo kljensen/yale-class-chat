@@ -40,7 +40,26 @@ defmodule AppWeb.SectionController do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset, course: course)
-    end
+
+      {:error, message} ->
+        case message do
+          "forbidden" ->
+            conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+          "not found" ->
+            conn
+            |> put_status(:not_found)
+            |> put_view(AppWeb.ErrorView)
+            |> render("404.html")
+          _ ->
+            changeset = Courses.change_section(%Section{})
+            conn
+            |> put_flash(:error, message)
+            |> render("new.html", changeset: changeset, course: course)
+          end
+      end
   end
 
   def show(conn, %{"id" => id}) do
@@ -63,6 +82,11 @@ defmodule AppWeb.SectionController do
             |> put_status(:not_found)
             |> put_view(AppWeb.ErrorView)
             |> render("404.html")
+          _ ->
+            changeset = Courses.change_section(%Section{})
+            conn
+            |> put_flash(:error, message)
+            |> redirect(to: "/")
         end
     end
   end
@@ -95,6 +119,11 @@ defmodule AppWeb.SectionController do
             |> put_status(:not_found)
             |> put_view(AppWeb.ErrorView)
             |> render("404.html")
+          _ ->
+            changeset = Courses.change_section(%Section{})
+            conn
+            |> put_flash(:error, message)
+            |> redirect(to: "/")
         end
     end
   end
@@ -125,6 +154,11 @@ defmodule AppWeb.SectionController do
             |> put_status(:not_found)
             |> put_view(AppWeb.ErrorView)
             |> render("404.html")
+          _ ->
+            changeset = Courses.change_section(%Section{})
+            conn
+            |> put_flash(:error, message)
+            |> redirect(to: "/")
         end
     end
   end
