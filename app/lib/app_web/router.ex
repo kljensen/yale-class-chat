@@ -16,6 +16,7 @@ defmodule AppWeb.Router do
   pipeline :auth do
     plug AppWeb.Plug.Auth
     plug AppWeb.Plug.SetCurrentUser
+    plug AppWeb.Plug.AuthenticateUser
   end
 
   scope "/auth", AppWeb do

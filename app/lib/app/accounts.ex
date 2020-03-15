@@ -95,6 +95,7 @@ defmodule App.Accounts do
 
   """
   def get_user_by!(net_id), do: Repo.get_by!(User, net_id: net_id)
+  def get_user_by(net_id), do: Repo.get_by(User, net_id: net_id)
 
   @doc """
   Creates a user.
