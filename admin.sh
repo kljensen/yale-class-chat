@@ -36,7 +36,10 @@ case $ACTION in
 	    --preferred-challenges http \
 	    -d $DOMAIN
 	;;
-
+    ls-letsencrypt)
+	# List the contents of the letsencrypt volume
+        docker run --rm -i -v=letsencrypt:/etc/letsencrypt busybox find /etc/letsencrypt
+	;;
     shell)
         # Get a shell in the app container
         docker-compose exec app /bin/bash
