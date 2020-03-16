@@ -64,7 +64,7 @@ defmodule AppWeb.RatingController do
       rating ->
         submission = Submissions.get_submission!(rating.submission_id)
         can_edit = App.Accounts.can_edit_rating(user, rating)
-        render(conn, "show.html", rating: rating, submission: submission, can_edit: can_edit)
+        render(conn, "show.html", rating: rating, submission: submission, can_edit: can_edit, uid: user.id)
       end
   end
 

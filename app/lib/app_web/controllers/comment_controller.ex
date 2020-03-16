@@ -64,7 +64,7 @@ defmodule AppWeb.CommentController do
       comment ->
         submission = Submissions.get_submission!(comment.submission_id)
         can_edit = App.Accounts.can_edit_comment(user, comment)
-        render(conn, "show.html", comment: comment, submission: submission, can_edit: can_edit)
+        render(conn, "show.html", comment: comment, submission: submission, can_edit: can_edit, uid: user.id)
     end
   end
 

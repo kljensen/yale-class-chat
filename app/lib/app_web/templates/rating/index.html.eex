@@ -15,8 +15,10 @@
 
       <td>
         <span><%= link "Show", to: Routes.rating_path(@conn, :show, rating) %></span>
+        <%= if @can_edit || @uid == rating.user_id do %>
         <span><%= link "Edit", to: Routes.rating_path(@conn, :edit, rating) %></span>
         <span><%= link "Delete", to: Routes.rating_path(@conn, :delete, rating), method: :delete, data: [confirm: "Are you sure?"] %></span>
+        <% end %>
       </td>
     </tr>
 <% end %>
