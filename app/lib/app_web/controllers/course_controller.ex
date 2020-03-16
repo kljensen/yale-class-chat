@@ -144,10 +144,18 @@ defmodule AppWeb.CourseController do
   def delete(conn, %{"id" => id}) do
     course = Courses.get_course!(id)
     user = conn.assigns.current_user
-    {:ok, _course} = Courses.delete_course(user, course)
+    case App.Accounts.can_edit_course(user, course) do
+      true ->
+        {:ok, _course} = Courses.delete_course(user, course)
+        conn
+        |> put_flash(:info, "Course deleted successfully.")
+        |> redirect(to: Routes.course_path(conn, :index))
 
-    conn
-    |> put_flash(:info, "Course deleted successfully.")
-    |> redirect(to: Routes.course_path(conn, :index))
+      false ->
+        conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+      end
   end
 end

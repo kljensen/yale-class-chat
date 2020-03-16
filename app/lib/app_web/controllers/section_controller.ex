@@ -167,10 +167,18 @@ defmodule AppWeb.SectionController do
     section = Courses.get_section!(id)
     cid = section.course_id
     user = conn.assigns.current_user
-    {:ok, _section} = Courses.delete_section(user, section)
+    case App.Accounts.can_edit_section(user, section) do
+      true ->
+        {:ok, _section} = Courses.delete_section(user, section)
+        conn
+        |> put_flash(:info, "Section deleted successfully.")
+        |> redirect(to: Routes.course_section_path(conn, :index, cid))
 
-    conn
-    |> put_flash(:info, "Section deleted successfully.")
-    |> redirect(to: Routes.course_section_path(conn, :index, cid))
+      false ->
+        conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+      end
   end
 end
