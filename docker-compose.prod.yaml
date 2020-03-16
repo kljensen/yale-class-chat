@@ -2,6 +2,7 @@ version: "3.4"
 volumes:
   prod_deps:
   node_deps:
+  acme_challenge:
   letsencrypt:
     external: true
 services:
@@ -35,6 +36,7 @@ services:
         target: /app
       - prod_deps:/app/deps/
       - node_deps:/app/assets/node_modules
+      - acme_challenge:/app/priv/static/.well-known/acme-challenge/
       - letsencrypt:/etc/letsencrypt/
       - "./tls/dhparam.pem:/etc/dhparam.pem"
     ports:
@@ -46,10 +48,21 @@ services:
       - ./run.sh
     command:
       - prod-server
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
   tls:
     image: certbot/certbot:v1.3.0
     entrypoint: /certbot.sh
+    depends_on:
+      - app
+    environment:
+      - MIX_ENV=prod
     volumes:
       - letsencrypt:/etc/letsencrypt/
       - "./tls/certbot.sh:/certbot.sh"
+      - acme_challenge:/tmp/webroot/.well-known/acme-challenge/
 
