@@ -34,6 +34,7 @@ config :app, AppWeb.Endpoint,
     keyfile: "/etc/letsencrypt/live/#{domain}/privkey.pem",
     certfile: "/etc/letsencrypt/live/#{domain}/cert.pem",
     cacertfile: "/etc/letsencrypt/live/#{domain}/fullchain.pem",
+    dhfile: "/etc/dhparam.pem",
     transport_options: [socket_opts: [:inet6]]
   ]
 
