@@ -14,9 +14,11 @@ defmodule App.Submissions.Comment do
   @doc false
   def changeset(comment, attrs) do
     comment
-    |> cast(attrs, [:title, :description])
+    |> cast(attrs, [:title, :description, :submission_id, :user_id])
     |> validate_required([:title, :description])
     |> foreign_key_constraint(:user_id)
     |> assoc_constraint(:user)
+    |> foreign_key_constraint(:submission_id)
+    |> assoc_constraint(:submission)
   end
 end

@@ -1,13 +1,16 @@
 <h1><%= @course.department %> <%= @course.number %>: <%= @course.name %></h1>
 <h1>Section <%= @section.title %></h1>
+<%= if @can_edit do %>
 <h2>Administration</h2>
 <section class="row">
-<article class="column"><span><%= link "Edit Section Details", to: Routes.section_path(@conn, :edit, @section) %></span></article>
-<article class="column"><span><span><%= link "Post New Topic", to: Routes.course_topic_path(@conn, :new, @section.course_id) %></span></article>
-<article class="column"><span><%= link "View Topic List", to: Routes.section_topic_path(@conn, :index, @section) %></span></article>
-<article class="column"><span><%= link "View Section Roles", to: Routes.section_section__role_path(@conn, :index, @section) %></span></article>
-<article class="column"><span><%= link "Back", to: Routes.course_section_path(@conn, :index, @section.course_id) %></span></article>
+      <article class="column"><span><%= link "Edit Section Details", to: Routes.section_path(@conn, :edit, @section) %></span></article>
+      <article class="column"><span><span><%= link "Post New Topic", to: Routes.course_topic_path(@conn, :new, @section.course_id) %></span></article>
+      <article class="column"><span><%= link "View Topic List", to: Routes.section_topic_path(@conn, :index, @section) %></span></article>
+      <article class="column"><span><%= link "Add Students to Section", to: Routes.section_section__role_path(@conn, :bulk_new, @section) %></span></article>
+      <article class="column"><span><%= link "View Section Roles", to: Routes.section_section__role_path(@conn, :index, @section) %></span></article>
+      <article class="column"><span><%= link "Back", to: Routes.course_section_path(@conn, :index, @section.course_id) %></span></article>
 </section>
+<%= end %>
 
 <h2>Topics</h2>
 <%= for topic <- @topics do %>
@@ -15,7 +18,9 @@
       <span><%= topic.description %></span>
       <section class="row">
       <article class="column"><span><%= link "Show", to: Routes.topic_path(@conn, :show, topic) %></span></article>
+      <%= if @can_edit do %>
       <article class="column"><span><%= link "Edit", to: Routes.topic_path(@conn, :edit, topic) %></span></article>
       <article class="column"><span><%= link "Delete", to: Routes.topic_path(@conn, :delete, topic), method: :delete, data: [confirm: "Are you sure?"] %></span></article>
+      <%= end %>
       </section>
 <% end %>

@@ -17,7 +17,7 @@ defmodule App.Courses.Course do
   @doc false
   def changeset(course, attrs) do
     course
-    |> cast(attrs, [:name, :department, :number, :allow_write, :allow_read])
+    |> cast(attrs, [:name, :department, :number, :allow_write, :allow_read, :semester_id])
     |> validate_required([:name, :department, :number, :allow_write, :allow_read])
     |> foreign_key_constraint(:semester_id)
     |> assoc_constraint(:semester)

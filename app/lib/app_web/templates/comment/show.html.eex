@@ -14,5 +14,7 @@
 
 </ul>
 
+<%= if @can_edit do %>
 <span><%= link "Edit", to: Routes.comment_path(@conn, :edit, @comment) %></span>
+<% end %>
 <span><%= link "Back", to: Routes.submission_comment_path(@conn, :index, @submission) %></span>

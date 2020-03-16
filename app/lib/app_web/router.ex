@@ -16,6 +16,7 @@ defmodule AppWeb.Router do
   pipeline :auth do
     plug AppWeb.Plug.Auth
     plug AppWeb.Plug.SetCurrentUser
+    plug AppWeb.Plug.AuthenticateUser
   end
 
   scope "/auth", AppWeb do
@@ -45,6 +46,8 @@ defmodule AppWeb.Router do
 
     resources "/sections", SectionController, except: [:index, :new] do
       resources "/topics", TopicController, except: [:show, :new, :create]
+      get "/add_section_roles", Section_RoleController, :bulk_new
+      post "/add_section_roles", Section_RoleController, :bulk_create
       resources "/section_roles", Section_RoleController
     end
 

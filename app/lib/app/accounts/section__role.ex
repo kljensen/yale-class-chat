@@ -15,7 +15,7 @@ defmodule App.Accounts.Section_Role do
   @doc false
   def changeset(section__role, attrs) do
     section__role
-    |> cast(attrs, [:role, :valid_from, :valid_to])
+    |> cast(attrs, [:role, :valid_from, :valid_to, :user_id, :section_id])
     |> validate_required([:role, :valid_from, :valid_to])
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:section_id)

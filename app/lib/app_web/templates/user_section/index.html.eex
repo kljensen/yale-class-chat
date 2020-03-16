@@ -3,22 +3,20 @@
 <table>
   <thead>
     <tr>
-      <th>Title</th>
-      <th>Crn</th>
-
+      <th>Semester</th>
+      <th>Course</th>
+      <th>Section</th>
       <th></th>
     </tr>
   </thead>
   <tbody>
 <%= for section <- @sections do %>
     <tr>
+      <td><%= section.semester_name %></td>
+      <td><%= section.course_dept <> " " <> Integer.to_string(section.course_num) <> ": " <> section.course_name  %></td>
       <td><%= section.title %></td>
-      <td><%= section.crn %></td>
-
       <td>
-        <span><%= link "Show", to: Routes.section_path(@conn, :show, section) %></span>
-        <span><%= link "Edit", to: Routes.section_path(@conn, :edit, section) %></span>
-        <span><%= link "Delete", to: Routes.section_path(@conn, :delete, section), method: :delete, data: [confirm: "Are you sure?"] %></span>
+        <span><%= link "Show", to: Routes.section_path(@conn, :show, section.id) %></span>
       </td>
     </tr>
 <% end %>

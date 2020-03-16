@@ -1,4 +1,4 @@
-<h1>Edit Section  role</h1>
+<h1>Edit Section role</h1>
 
 <%= render "form.html", Map.put(assigns, :action, Routes.section_section__role_path(@conn, :update, @section, @section__role)) %>
 

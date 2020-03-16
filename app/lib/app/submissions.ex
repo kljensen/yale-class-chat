@@ -43,6 +43,7 @@ defmodule App.Submissions do
 
   @doc """
   Returns the list of submissions visible to a given user for a given topic.
+  Obeys sort.
 
   ## Examples
 
@@ -55,25 +56,6 @@ defmodule App.Submissions do
     uid = user.id
     sid = topic.section_id
     allowed_section_roles = @section_read_roles
-    order_by = case topic.sort do
-      "date - ascending" ->
-        [asc: :id]
-
-      "date - descending" ->
-        [desc: :id]
-
-      "rating - ascending" ->
-        [asc: :id] #Needs to be updated
-
-      "rating - descending" ->
-        [asc: :id] #Needs to be updated
-
-      #"random" ->
-      #  fragment("RANDOM()")
-
-      _ ->
-        [desc: :id]
-      end
 
     query = from r in App.Accounts.Section_Role,
               join: s in App.Courses.Section,
@@ -84,6 +66,8 @@ defmodule App.Submissions do
               on: t.section_id == s.id,
               join: su in Submission,
               on: su.topic_id == t.id,
+              left_join: ra in App.Submissions.Rating,
+              on: su.id == ra.submission_id,
               where: r.user_id == ^uid,
               where: r.valid_from <= from_now(0, "day"),
               where: r.valid_to >= from_now(0, "day"),
@@ -94,17 +78,28 @@ defmodule App.Submissions do
               where: t.show_user_submissions,
               where: su.visible,
               where: t.id == ^tid,
-              order_by: ^order_by,
-              select: su
+              group_by: su.id,
+              select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id}
+
+    query = query
+      |> order_query(topic.sort)
 
     query = if inherit_course_role do
       section = App.Courses.get_section!(sid)
       course = App.Courses.get_course!(section.course_id)
       auth_role = App.Accounts.get_current_course__role(user, course)
       query_tmp = if Enum.member?(@course_admin_roles, auth_role) do
-        from s in Submission,
-          where: s.topic_id == ^tid,
-          order_by: ^order_by
+        q = from su in Submission,
+          left_join: ra in App.Submissions.Rating,
+          on: su.id == ra.submission_id,
+          where: su.topic_id == ^tid,
+          group_by: su.id,
+          select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id}
+
+        q = q
+          |> admin_order_query(topic.sort)
+
+        q
       else
         query
       end
@@ -115,6 +110,33 @@ defmodule App.Submissions do
 
     Repo.all(query)
   end
+
+  def order_query(query, "date - descending"),
+    do: order_by(query, [r, s, c, t, su, ra], desc: su.id)
+  def order_query(query, "date - ascending"),
+    do: order_by(query, [r, s, c, t, su, ra], asc: su.id)
+  def order_query(query, "rating - descending"),
+    do: order_by(query, [r, s, c, t, su, ra], desc: avg(ra.score))
+  def order_query(query, "rating - ascending"),
+    do: order_by(query, [r, s, c, t, su, ra], asc: avg(ra.score))
+  def order_query(query, "random"),
+    do: order_by(query, [r, s, c, t, su, ra], fragment("RANDOM()"))
+  def order_query(query, _),
+    do: order_by(query, [])
+
+  def admin_order_query(query, "date - descending"),
+    do: order_by(query, [su, ra], desc: su.id)
+  def admin_order_query(query, "date - ascending"),
+    do: order_by(query, [su, ra], asc: su.id)
+  def admin_order_query(query, "rating - descending"),
+    do: order_by(query, [su, ra], desc: avg(ra.score))
+  def admin_order_query(query, "rating - ascending"),
+    do: order_by(query, [su, ra], asc: avg(ra.score))
+  def admin_order_query(query, "random"),
+    do: order_by(query, [su, ra], fragment("RANDOM()"))
+  def admin_order_query(query, _),
+    do: order_by(query, [])
+
 
   @doc """
   Returns the list of submissions by a given user.
@@ -142,7 +164,14 @@ defmodule App.Submissions do
   def list_user_own_submissions(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic) do
     tid = topic.id
     uid = user.id
-    Repo.all(from s in Submission, where: s.topic_id == ^tid, where: s.user_id == ^uid)
+    query = from su in Submission,
+              left_join: ra in App.Submissions.Rating,
+              on: su.id == ra.submission_id,
+              where: su.topic_id == ^tid,
+              where: su.user_id == ^uid,
+              group_by: su.id,
+              select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id}
+    Repo.all(query)
   end
 
   @doc """
@@ -177,6 +206,60 @@ defmodule App.Submissions do
   def get_submission!(id), do: Repo.get!(Submission, id)
 
   @doc """
+  Gets a single submission, checking for a user's auth role.
+
+  Raises `Ecto.NoResultsError` if the Submission does not exist.
+
+  ## Examples
+
+      iex> get_submission!(123)
+      %Submission{}
+
+      iex> get_submission!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_user_submission(%App.Accounts.User{} = user, id) do
+    submission = Repo.get!(Submission, id)
+    return = case App.Accounts.can_edit_submission(user, submission) do
+                true ->
+                  submission
+                false ->
+                  tid = submission.topic_id
+                  topic = App.Topics.get_topic!(tid)
+                  uid = user.id
+                  sid = topic.section_id
+                  allowed_section_roles = @section_read_roles
+                  query = from r in App.Accounts.Section_Role,
+                            join: s in App.Courses.Section,
+                            on: r.section_id == s.id,
+                            join: c in App.Courses.Course,
+                            on: s.course_id == c.id,
+                            join: t in App.Topics.Topic,
+                            on: t.section_id == s.id,
+                            join: su in Submission,
+                            on: su.topic_id == t.id,
+                            left_join: ra in App.Submissions.Rating,
+                            on: su.id == ra.submission_id,
+                            where: r.user_id == ^uid,
+                            where: r.valid_from <= from_now(0, "day"),
+                            where: r.valid_to >= from_now(0, "day"),
+                            where: r.role in ^allowed_section_roles,
+                            where: c.allow_read == true,
+                            where: s.id == ^sid,
+                            where: t.visible,
+                            where: t.show_user_submissions,
+                            where: su.visible,
+                            where: su.id == ^id,
+                            where: t.id == ^tid,
+                            group_by: su.id,
+                            select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id, topic_id: su.topic_id}
+                  Repo.one(query)
+              end
+    return
+  end
+
+  @doc """
   Creates a submission.
 
   ## Examples
@@ -200,16 +283,19 @@ defmodule App.Submissions do
               attrs
             else
               attrstmp = attrs
+
               attrstmp = if Map.get(attrstmp, :visible) do
-                attrstmp = Map.delete(attrstmp, :visible)
+                Map.delete(attrstmp, :visible)
               else
                 attrstmp
               end
+
               attrstmp = if Map.get(attrstmp, :allow_ranking) do
-                attrstmp = Map.delete(attrstmp, :allow_ranking)
+                Map.delete(attrstmp, :allow_ranking)
               else
                 attrstmp
               end
+
               attrstmp
             end
 
@@ -265,12 +351,12 @@ defmodule App.Submissions do
             else
               attrstmp = attrs
               attrstmp = if Map.get(attrstmp, :visible) do
-                attrstmp = Map.delete(attrstmp, :visible)
+                Map.delete(attrstmp, :visible)
               else
                 attrstmp
               end
               attrstmp = if Map.get(attrstmp, :allow_ranking) do
-                attrstmp = Map.delete(attrstmp, :allow_ranking)
+                Map.delete(attrstmp, :allow_ranking)
               else
                 attrstmp
               end
@@ -394,7 +480,6 @@ defmodule App.Submissions do
     tid = submission.topic_id
     topic = App.Topics.get_topic!(tid)
     uid = user.id
-    sid = topic.section_id
     suid = submission.id
     allowed_section_roles = @section_read_roles
 
@@ -479,6 +564,63 @@ defmodule App.Submissions do
 
   """
   def get_comment!(id), do: Repo.get!(Comment, id)
+
+  @doc """
+  Gets a single comment, checking for a user's auth role.
+
+  Raises `Ecto.NoResultsError` if the Comment does not exist.
+
+  ## Examples
+
+      iex> get_comment!(123)
+      %Comment{}
+
+      iex> get_comment!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_user_comment(%App.Accounts.User{} = user, id) do
+    comment = Repo.get!(Comment, id)
+    return = case App.Accounts.can_edit_comment(user, comment) do
+                true ->
+                  comment
+                false ->
+                  submission = get_submission!(comment.submission_id)
+                  tid = submission.topic_id
+                  topic = App.Topics.get_topic!(tid)
+                  uid = user.id
+                  sid = topic.section_id
+                  allowed_section_roles = @section_read_roles
+                  query = from r in App.Accounts.Section_Role,
+                            join: s in App.Courses.Section,
+                            on: r.section_id == s.id,
+                            join: c in App.Courses.Course,
+                            on: s.course_id == c.id,
+                            join: t in App.Topics.Topic,
+                            on: t.section_id == s.id,
+                            join: su in Submission,
+                            on: su.topic_id == t.id,
+                            left_join: co in App.Submission.Comment,
+                            on: su.id == co.submission_id,
+                            where: r.user_id == ^uid,
+                            where: r.valid_from <= from_now(0, "day"),
+                            where: r.valid_to >= from_now(0, "day"),
+                            where: r.role in ^allowed_section_roles,
+                            where: c.allow_read == true,
+                            where: s.id == ^sid,
+                            where: t.visible,
+                            where: t.show_user_submissions,
+                            where: su.visible,
+                            where: su.id == ^id,
+                            where: t.id == ^tid,
+                            where: co.id == ^id,
+                            group_by: su.id,
+                            select: co
+                  Repo.one(query)
+              end
+    return
+  end
+
 
   @doc """
   Creates a comment.
@@ -748,6 +890,62 @@ defmodule App.Submissions do
 
   """
   def get_rating!(id), do: Repo.get!(Rating, id)
+
+  @doc """
+  Gets a single rating, checking for a user's auth role.
+
+  Raises `Ecto.NoResultsError` if the Rating does not exist.
+
+  ## Examples
+
+      iex> get_rating!(123)
+      %Rating{}
+
+      iex> get_rating!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_user_rating(%App.Accounts.User{} = user, id) do
+    rating = Repo.get!(Rating, id)
+    return = case App.Accounts.can_edit_rating(user, rating) do
+                true ->
+                  rating
+                false ->
+                  submission = get_submission!(rating.submission_id)
+                  tid = submission.topic_id
+                  topic = App.Topics.get_topic!(tid)
+                  uid = user.id
+                  sid = topic.section_id
+                  allowed_section_roles = @section_read_roles
+                  query = from r in App.Accounts.Section_Role,
+                            join: s in App.Courses.Section,
+                            on: r.section_id == s.id,
+                            join: c in App.Courses.Course,
+                            on: s.course_id == c.id,
+                            join: t in App.Topics.Topic,
+                            on: t.section_id == s.id,
+                            join: su in Submission,
+                            on: su.topic_id == t.id,
+                            left_join: ra in App.Submission.Rating,
+                            on: su.id == ra.submission_id,
+                            where: r.user_id == ^uid,
+                            where: r.valid_from <= from_now(0, "day"),
+                            where: r.valid_to >= from_now(0, "day"),
+                            where: r.role in ^allowed_section_roles,
+                            where: c.allow_read == true,
+                            where: s.id == ^sid,
+                            where: t.visible,
+                            where: t.show_user_submissions,
+                            where: su.visible,
+                            where: su.id == ^id,
+                            where: t.id == ^tid,
+                            where: ra.id == ^id,
+                            group_by: su.id,
+                            select: ra
+                  Repo.one(query)
+              end
+    return
+  end
 
   @doc """
   Creates a rating.

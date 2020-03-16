@@ -24,8 +24,9 @@ defmodule App.Topics.Topic do
   @doc false
   def changeset(topic, attrs) do
     topic
-    |> cast(attrs, [:title, :description, :slug, :opened_at, :closed_at, :allow_submissions, :allow_submission_voting, :anonymous, :allow_submission_comments, :user_submission_limit, :sort, :allow_ranking, :show_user_submissions, :visible])
+    |> cast(attrs, [:title, :description, :slug, :opened_at, :closed_at, :allow_submissions, :allow_submission_voting, :anonymous, :allow_submission_comments, :user_submission_limit, :sort, :allow_ranking, :show_user_submissions, :visible, :section_id])
     |> validate_required([:title, :description, :slug, :opened_at, :closed_at, :allow_submissions, :allow_submission_voting, :anonymous, :allow_submission_comments, :user_submission_limit, :sort, :allow_ranking, :show_user_submissions, :visible])
+    |> validate_number(:user_submission_limit, greater_than_or_equal_to: 0)
     |> foreign_key_constraint(:section_id)
     |> assoc_constraint(:section)
   end

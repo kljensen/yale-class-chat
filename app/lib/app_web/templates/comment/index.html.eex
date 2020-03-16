@@ -17,8 +17,10 @@
 
       <td>
         <span><%= link "Show", to: Routes.comment_path(@conn, :show, comment) %></span>
+        <%= if @can_edit || @uid == comment.user_id do %>
         <span><%= link "Edit", to: Routes.comment_path(@conn, :edit, comment) %></span>
         <span><%= link "Delete", to: Routes.comment_path(@conn, :delete, comment), method: :delete, data: [confirm: "Are you sure?"] %></span>
+        <% end %>
       </td>
     </tr>
 <% end %>

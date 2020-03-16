@@ -43,8 +43,12 @@
   <%= checkbox f, :allow_submission_comments %>
   <%= error_tag f, :allow_submission_comments %>
 
+  <%= label f, "Allow students to view submissions from other students" %>
+  <%= checkbox f, :show_user_submissions %>
+  <%= error_tag f, :show_user_submissions %>
+
   <%= label f, :user_submission_limit %>
-  <%= number_input f, :user_submission_limit %>
+  <%= number_input f, :user_submission_limit, min: 0 %>
   <%= error_tag f, :user_submission_limit %>
 
   <%= label f, :sort %>

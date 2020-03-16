@@ -62,7 +62,9 @@ defmodule App.MixProject do
       {:phoenix_live_view, "~> 0.8.0"},
       {:floki, ">= 0.0.0"},
       # Using tzdata for time zone conversions
-      {:tzdata, "~> 1.0.1"}
+      {:tzdata, "~> 1.0.1"},
+      # Using EctoFields for URL and email validation
+      {:ecto_fields, "~> 1.2.0"}
     ]
   end
 

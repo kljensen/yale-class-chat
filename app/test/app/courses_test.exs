@@ -289,6 +289,16 @@ defmodule App.CoursesTest do
       assert course.number == 43
     end
 
+    test "update_course/3 with changed semester changes association" do
+      course = course_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, semester2} = Courses.create_semester(user_faculty, @update_attrs)
+
+      refute course.semester_id == semester2.id
+      assert {:ok, %Course{} = course} = Courses.update_course(user_faculty, course, %{semester_id: semester2.id})
+      assert course.semester_id == semester2.id
+    end
+
     test "update_course/3 by unauthorized user returns error" do
       course = course_fixture()
       user_noauth = ATest.user_fixture()

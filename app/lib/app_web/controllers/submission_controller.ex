@@ -9,7 +9,8 @@ defmodule AppWeb.SubmissionController do
     topic = Topics.get_topic!(topic_id)
     user = conn.assigns.current_user
     submissions = Submissions.list_user_submissions(user, topic)
-    render(conn, "index.html", submissions: submissions, topic: topic)
+    can_edit = App.Accounts.can_edit_topic(user, topic)
+    render(conn, "index.html", submissions: submissions, topic: topic, can_edit: can_edit, uid: user.id)
   end
 
   def new(conn, %{"topic_id" => topic_id}) do
@@ -41,20 +42,33 @@ defmodule AppWeb.SubmissionController do
   end
 
   def show(conn, %{"id" => id}) do
-    submission = Submissions.get_submission!(id)
+    user = conn.assigns.current_user
+    submission = Submissions.get_user_submission(user, id)
+    submission_check = Submissions.get_submission!(submission.id)
     topic = Topics.get_topic!(submission.topic_id)
-    render(conn, "show.html", submission: submission, topic: topic)
+    can_edit = App.Accounts.can_edit_submission(user, submission_check)
+    can_edit_topic = App.Accounts.can_edit_topic(user, topic)
+    comments = Submissions.list_user_comments(user, submission_check)
+    render(conn, "show.html", submission: submission, topic: topic, can_edit: can_edit, uid: user.id, can_edit_topic: can_edit_topic, comments: comments)
   end
 
   def edit(conn, %{"id" => id}) do
     submission = Submissions.get_submission!(id)
-    changeset = Submissions.change_submission(submission)
-    render(conn, "edit.html", submission: submission, changeset: changeset)
+    user = conn.assigns.current_user
+    case App.Accounts.can_edit_submission(user, submission) do
+      true ->
+        changeset = Submissions.change_submission(submission)
+        render(conn, "edit.html", submission: submission, changeset: changeset)
+      false ->
+        conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+      end
   end
 
   def update(conn, %{"id" => id, "submission" => submission_params}) do
     submission = Submissions.get_submission!(id)
-    topic = Topics.get_topic!(submission.topic_id)
     user = conn.assigns.current_user
 
     case Submissions.update_submission(user, submission, submission_params) do
@@ -65,17 +79,39 @@ defmodule AppWeb.SubmissionController do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", submission: submission, changeset: changeset)
+
+      {:error, message} ->
+        case message do
+          "forbidden" ->
+            conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+          "not found" ->
+            conn
+            |> put_status(:not_found)
+            |> put_view(AppWeb.ErrorView)
+            |> render("404.html")
+          end
     end
   end
 
   def delete(conn, %{"id" => id}) do
     submission = Submissions.get_submission!(id)
-    topic = Topics.get_topic!(submission.topic_id)
     user = conn.assigns.current_user
-    {:ok, _submission} = Submissions.delete_submission(user, submission)
+    case App.Accounts.can_edit_submission(user, submission) do
+      true ->
+        topic = Topics.get_topic!(submission.topic_id)
+        {:ok, _submission} = Submissions.delete_submission(user, submission)
+        conn
+        |> put_flash(:info, "Submission deleted successfully.")
+        |> redirect(to: Routes.topic_submission_path(conn, :index, topic))
 
-    conn
-    |> put_flash(:info, "Submission deleted successfully.")
-    |> redirect(to: Routes.topic_submission_path(conn, :index, topic))
+      false ->
+        conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+      end
   end
 end

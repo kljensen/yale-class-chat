@@ -369,10 +369,10 @@ defmodule App.Courses do
 
   ## Examples
 
-      iex> update_course(course, %{field: new_value})
+      iex> update_course(user, course, %{field: new_value})
       {:ok, %Course{}}
 
-      iex> update_course(course, %{field: bad_value})
+      iex> update_course(user, course, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
@@ -463,11 +463,13 @@ defmodule App.Courses do
               on: r.section_id == s.id,
               left_join: c in Course,
               on: s.course_id == c.id,
+              left_join: se in Semester,
+              on: c.semester_id == se.id,
               where: r.user_id == ^uid,
               where: r.valid_from <= from_now(0, "day"),
               where: r.valid_to >= from_now(0, "day"),
               where: c.allow_read == true,
-              select: s
+              select: %{id: s.id, title: s.title, crn: s.crn, course_num: c.number, course_dept: c.department, course_name: c.name, semester_name: se.name}
     Repo.all(query)
   end
 

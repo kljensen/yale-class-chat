@@ -35,12 +35,15 @@
 
       <td>
         <span><%= link "Show", to: Routes.topic_path(@conn, :show, topic) %></span>
+        <%= if @can_edit do %>
         <span><%= link "Edit", to: Routes.topic_path(@conn, :edit, topic) %></span>
         <span><%= link "Delete", to: Routes.topic_path(@conn, :delete, topic), method: :delete, data: [confirm: "Are you sure?"] %></span>
+        <%= end %>
       </td>
     </tr>
 <% end %>
   </tbody>
 </table>
-
+<%= if @can_edit do %>
 <span><%= link "New Topic", to: Routes.course_topic_path(@conn, :new, @section.course_id) %></span>
+<%= end %>

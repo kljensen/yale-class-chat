@@ -10,7 +10,7 @@ defmodule AppWeb.Plug.SetCurrentUser do
   def call(conn, _params) do
     uid = Plug.Conn.get_session(conn, :uid)
     cond do
-      current_user = uid && App.Accounts.get_user_by!(uid) ->
+      current_user = uid && App.Accounts.get_user_by(uid) ->
         conn
         |> assign(:current_user, current_user)
         |> assign(:user_signed_in?, true)

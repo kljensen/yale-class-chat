@@ -15,7 +15,7 @@ defmodule App.Accounts.Course_Role do
   @doc false
   def changeset(course__role, attrs) do
     course__role
-    |> cast(attrs, [:role, :valid_from, :valid_to])
+    |> cast(attrs, [:role, :valid_from, :valid_to, :user_id, :course_id])
     |> validate_required([:role, :valid_from, :valid_to])
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:course_id)
