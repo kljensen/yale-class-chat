@@ -18,12 +18,25 @@ secret_key_base =
     You can generate one by calling: mix phx.gen.secret
     """
 
+domain = System.get_env("DOMAIN")
 config :app, AppWeb.Endpoint,
+  secret_key_base: secret_key_base,
+  url: [host: domain, port: 443],
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  force_ssl: [hsts: true],
   http: [
-    port: String.to_integer(System.get_env("PORT") || "4000"),
+    port: 80,
     transport_options: [socket_opts: [:inet6]]
   ],
-  secret_key_base: secret_key_base
+  https: [
+    port: 443,
+    cipher_suite: :strong,
+    keyfile: "/etc/letsencrypt/live/#{domain}/privkey.pem",
+    certfile: "/etc/letsencrypt/live/#{domain}/cert.pem",
+    cacertfile: "/etc/letsencrypt/live/#{domain}/fullchain.pem",
+    transport_options: [socket_opts: [:inet6]]
+  ]
+
 
 # ## Using releases (Elixir v1.9+)
 #
