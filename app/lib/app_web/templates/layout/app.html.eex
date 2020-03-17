@@ -6,11 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Yale Class Chat</title>
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
+
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.3.6/dist/css/uikit.min.css" />
+
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.3.6/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.3.6/dist/js/uikit-icons.min.js"></script>
+
+
     <%= csrf_meta_tag() %>
   </head>
   <body>
     <header>
-      <section class="container">
+      <section class="container top-matter">
+        <div class="row">
+            <div class="column">
+                Yale
+            </div>
+            <div class="column">
+                Class Q&amp;A
+            </div>
+        </div>
         <nav role="navigation">
           <ul>
             <%= if is_nil(@conn.private.plug_session["uid"]) do %>
@@ -20,9 +37,6 @@
             <% end %>
           </ul>
         </nav>
-        <a href="/" class="phx-logo">
-          <img src="<%= Routes.static_path(@conn, "/images/yale-som.jpg") %>" alt="Yale SOM Logo"/>
-        </a>
       </section>
     </header>
     <main role="main" class="container">

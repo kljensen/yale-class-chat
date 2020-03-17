@@ -1,31 +1,17 @@
-<h1>Listing Courses</h1>
-
-<table>
-  <thead>
-    <tr>
-      <th>Semester</th>
-      <th>Name</th>
-      <th>Viewing</th>
-      <th>Participating</th>
-
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-<%= for course <- @courses do %>
-    <tr>
-      <td><%= Map.get(@semesters, :"#{course.semester_id}") %></td>
-      <td><%= course.department <> to_string(course.number) <> ": " <> course.name %></td>
-      <td><%= if course.allow_read do %>Allowed<% else %>Not Allowed<% end%></td>
-      <td><%= if course.allow_write do %>Allowed<% else %>Not Allowed<% end%></td>
-      <td>
-        <span><%= link "View", to: Routes.course_path(@conn, :show, course) %></span>
-        <span><%= link "Edit", to: Routes.course_path(@conn, :edit, course) %></span>
-        <span><%= link "Delete", to: Routes.course_path(@conn, :delete, course), method: :delete, data: [confirm: "Are you sure?"] %></span>
-      </td>
-    </tr>
-<% end %>
-  </tbody>
-</table>
+<div class="uk-grid-column-small uk-grid-row-large uk-child-width-1-3@s uk-text-center uk-grid-match" uk-grid>
+    <%= for {course, i} <- Enum.with_index(@courses) do %>
+    <div>
+        <div class="uk-card uk-card-default uk-card-body">
+          <p><%= Map.get(@semesters, :"#{course.semester_id}") %></p>
+          <p><%= course.department <> to_string(course.number) <> ": " <> course.name %></p>
+          <p>
+            <span><%= link "View", to: Routes.course_path(@conn, :show, course) %></span>
+            <span><%= link "Edit", to: Routes.course_path(@conn, :edit, course) %></span>
+            <span><%= link "Delete", to: Routes.course_path(@conn, :delete, course), method: :delete, data: [confirm: "Are you sure?"] %></span>
+          </p>
+        </div>
+    </div>
+    <% end %>
+</div>
 
 <span><%= link "New Course", to: Routes.course_path(@conn, :new) %></span>
