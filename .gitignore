@@ -1,2 +1,2 @@
-.env
+.env*
 app/assets/node_modules

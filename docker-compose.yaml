@@ -41,7 +41,7 @@ services:
       # the testapp deps.
       - dev_deps:/app/deps/
     ports:
-      - "127.0.0.1:${PORT}:4000"
+      - "${HOST}:${PORT}:4000"
     depends_on:
       - db
     entrypoint:
