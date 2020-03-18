@@ -1,4 +1,13 @@
-<h1><%= @course.department %> <%= @course.number %>: <%= @course.name %></h1>
+<div>
+    <a class="back" href="<%= Routes.user_section_path(@conn, :index) %>">
+        <span class="back-arrow">❮</span>
+        Sections
+    </a>
+    <a class="back" href="<%= Routes.user_section_path(@conn, :index) %>">
+        <span class="back-arrow">❮</span> 
+        <%= @course.department %><%= @course.number %>
+    </a>
+</div>
 <h1>Section <%= @section.title %></h1>
 <%= if @can_edit do %>
 <h2>Administration</h2>

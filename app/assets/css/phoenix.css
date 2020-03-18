@@ -14,9 +14,13 @@
 }
 
 body {
-    font-family: "Mallory-Book";
     color: #222222;
     margin:0;
+    font-family: "Mallory-Book";
+}
+
+.main-body{
+padding:1rem;
 }
 
 .top-matter{
@@ -33,6 +37,37 @@ a {
 }
 a:hover {
     color: #286dc0;
+    text-decoration: none;
+}
+
+a.back {
+    display: block;
+}
+
+// https://flatuicolors.com/palette/defo
+.color-1{ border-left: 10px solid #1abc9c;}
+.color-2{ border-left: 10px solid #16a085;}
+.color-3{ border-left: 10px solid #2ecc71;}
+.color-4{ border-left: 10px solid #27ae60;}
+.color-5{ border-left: 10px solid #3498db;}
+.color-6{ border-left: 10px solid #2980b9;}
+.color-7{ border-left: 10px solid #9b59b6;}
+.color-8{ border-left: 10px solid #8e44ad;}
+.color-9{ border-left: 10px solid #34495e;}
+.color-10{ border-left: 10px solid #2c3e50;}
+.color-11{ border-left: 10px solid #f1c40f;}
+.color-12{ border-left: 10px solid #f39c12;}
+.color-13{ border-left: 10px solid #e67e22;}
+.color-14{ border-left: 10px solid #d35400;}
+.color-15{ border-left: 10px solid #e74c3c;}
+.color-16{ border-left: 10px solid #c0392b;}
+.color-17{ border-left: 10px solid #ecf0f1;}
+.color-18{ border-left: 10px solid #bdc3c7;}
+.color-19{ border-left: 10px solid #95a5a6;}
+.color-20{ border-left: 10px solid #7f8c8d;}
+
+.back-arrow {
+    margin-right: 0.5rem;
 }
 
 

@@ -1,26 +1,22 @@
-<h1>My Courses</h1>
+<div class="uk-grid-column-medium uk-grid-row-medium uk-child-width-1-3@s uk-grid-match" uk-grid>
+    <%= for {section, i} <- Enum.with_index(@sections) do %>
+    <div>
+        <a href="<%= Routes.section_path(@conn, :show, section.id) %>">
+            <div class="uk-card uk-card-small uk-card-default uk-card-hover color-<%= 1 + rem section.course_num + 1, 20 %>">
+                <div class="uk-card-header">
+                    <div class="uk-width-expand">
+                        <h3 class="uk-card-title uk-margin-remove-bottom">
+                          <%= section.course_dept %><%=  Integer.to_string(section.course_num)  %>
+                        </h3>
+                        <p class="uk-text-meta uk-margin-remove-top uk-margin-remove-bottom">
+                          <%= section.course_name %> &mdash;
+                          <%= section.semester_name %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <% end %>
+</div>
 
-<table>
-  <thead>
-    <tr>
-      <th>Semester</th>
-      <th>Course</th>
-      <th>Section</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-<%= for section <- @sections do %>
-    <tr>
-      <td><%= section.semester_name %></td>
-      <td><%= section.course_dept <> " " <> Integer.to_string(section.course_num) <> ": " <> section.course_name  %></td>
-      <td><%= section.title %></td>
-      <td>
-        <span><%= link "Show", to: Routes.section_path(@conn, :show, section.id) %></span>
-      </td>
-    </tr>
-<% end %>
-  </tbody>
-</table>
-
-<span><%= link "Back", to: Routes.page_path(@conn, :index) %></span>
