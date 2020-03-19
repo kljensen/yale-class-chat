@@ -3,13 +3,27 @@
         <h1 class="uk-heading-divider"><%= @submission.title %></h1>
         <img src="<%= @submission.image_url %>">
         <p><%= @submission.description %></p>
-    </div>
+        </div>
+        <%= if @topic.anonymous do %>
+        <% else %>
+        <b><%= @submission.user_display_name %></b>
+        /
+        <% end %>
+        <%= @submission.rating_count |> Integer.to_string %> ratings
+        <%= if @submission.rating_count > 0 do %>
+        (avg = <%= @submission.avg_rating |> Decimal.round(2) |> Decimal.to_string %>)
+        <% end %>
+        /
+        <%= @submission.comment_count |> Integer.to_string %> comments
+        /
+        <span>Posted at: </span><span class="rating"><%= @submission.inserted_at %>
     <%= if @can_edit do %>
+    <div>
     <%= link "Edit", to: Routes.submission_path(@conn, :edit, @submission.id) %>
     |
     <%= link "Delete", to: Routes.submission_path(@conn, :delete, @submission.id), method: :delete, data: [confirm: "Are you sure?"] %>
+    </div>
     <% end %>
-    <%= @submission.avg_rating %>
 </div>
 
 <h2>Comments</h2>
