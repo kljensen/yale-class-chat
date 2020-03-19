@@ -1,0 +1,26 @@
+<div class="uk-light uk-background-secondary breadcrumb-holder">
+    <ul class="breadcrumb uk-breadcrumb">
+        <li>
+            <a href="<%= Routes.user_section_path(@conn, :index) %>">
+                Sections
+            </a>
+        </li>
+        <li>
+             <a href="<%= Routes.course_path(@conn, :show, @course) %>">
+                <%= @course.department <> " " <> Integer.to_string(@course.number) %>
+            </a>
+        </li>
+        <li>
+            <span>
+                <%= truncate_text(@topic.title, 10) %>
+            </span>
+        </li>
+        <%= if !is_nil(assigns[:submission]) do %>
+        <li>
+            <span>
+                <%= @submission.title %>
+            </span>
+        </li>
+        <% end %>
+    </ul>
+</div>

@@ -29,6 +29,7 @@ CAS_SERVICE_VALIDATE_BASE_URL=http://mockcas:4000/cas
 CAS_CALLBACK_URL=http://localhost:9001/auth/cas/callback
 SECRET_KEY_BASE=a7b3f3db42a7a3264a24880906403216b944afbd9bd67365992222ad1a7961c758870182274cd442a3cd89acf5abd5fdccc76974c9ab15a200f5ac2a20eb4b5e
 DOMAIN=foo.som.yale.edu
+HOST=127.0.0.1
 ```
 
 Run `./admin.sh up` to bring up the app. The app will

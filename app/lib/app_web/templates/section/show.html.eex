@@ -1,6 +1,5 @@
-<h1><%= @course.department %> <%= @course.number %>: <%= @course.name %></h1>
-<h1>Section <%= @section.title %></h1>
 <%= if @can_edit do %>
+<h1>Section <%= @section.title %></h1>
 <h2>Administration</h2>
 <section class="row">
       <article class="column"><span><%= link "Edit Section Details", to: Routes.section_path(@conn, :edit, @section) %></span></article>
@@ -12,15 +11,32 @@
 </section>
 <%= end %>
 
-<h2>Topics</h2>
+<div class="uk-grid-column-medium uk-grid-row-medium uk-child-width-1-2@s uk-grid-match" uk-grid>
 <%= for topic <- @topics do %>
-      <h2><%= topic.title %></h2>
-      <span><%= topic.description %></span>
-      <section class="row">
-      <article class="column"><span><%= link "Show", to: Routes.topic_path(@conn, :show, topic) %></span></article>
-      <%= if @can_edit do %>
-      <article class="column"><span><%= link "Edit", to: Routes.topic_path(@conn, :edit, topic) %></span></article>
-      <article class="column"><span><%= link "Delete", to: Routes.topic_path(@conn, :delete, topic), method: :delete, data: [confirm: "Are you sure?"] %></span></article>
-      <%= end %>
-      </section>
+    <a href="<%= Routes.topic_path(@conn, :show, topic) %>">
+    <div class="uk-card uk-card-small uk-card-default uk-card-hover color-<%= 1 + rem topic.id, 20 %>">
+        <div class="uk-card-header">
+            <div class="uk-width-expand">
+                <h3 class="uk-card-title uk-margin-remove-bottom">
+                    <%= topic.title %>
+                </h3>
+                <p class="uk-text-meta uk-margin-remove-top uk-margin-remove-bottom">
+                    <%= topic.description %>
+                </p>
+            </div>
+            <%= if @can_edit do %>
+              <h2><%= topic.title %></h2>
+              <span><%= topic.description %></span>
+              <section class="row">
+              <article class="column"><span><%= link "Show", to: Routes.topic_path(@conn, :show, topic) %></span></article>
+              <%= if @can_edit do %>
+              <article class="column"><span><%= link "Edit", to: Routes.topic_path(@conn, :edit, topic) %></span></article>
+              <article class="column"><span><%= link "Delete", to: Routes.topic_path(@conn, :delete, topic), method: :delete, data: [confirm: "Are you sure?"] %></span></article>
+              <%= end %>
+              </section>
+            <% end %>
+        </div>
+    </div>
+    </a>
 <% end %>
+</div>

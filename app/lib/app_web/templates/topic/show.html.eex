@@ -1,82 +1,58 @@
-<h1><%= @topic.title %></h1>
-<span><%= @topic.description %></span>
-<h2>Details</h2>
-<section class="row">
-  <article class="column">
-    <ul>
+<div class="uk-margin-bottom">
+    <div class="uk-padding-small topic-title">
+    <h1 class="uk-heading-divider"><%= @topic.title %></h1>
+    <p><%= @topic.description %></p>
+    </div>
+</div>
 
-      <li>
-        <strong>Opened at:</strong>
-        <%= @topic.opened_at %>
-      </li>
 
-      <li>
-        <strong>Closed at:</strong>
-        <%= @topic.closed_at %>
-      </li>
 
-      <li>
-        <strong>Allow submissions:</strong>
-        <%= @topic.allow_submissions %>
-      </li>
+<div class="uk-grid-column-medium uk-grid-row-medium uk-child-width-1-2@s uk-grid-match" uk-grid>
+    <%= for {submission, i} <- Enum.with_index(@submissions) do %>
+        <div>
+            <a href="<%= Routes.submission_path(@conn, :show, submission.id) %>">
+                <div class="uk-card uk-card-small uk-card-default uk-card-hover color-<%= 1 + rem submission.id, 20 %>">
+                    <div class="uk-card-header">
+                        <div class="uk-width-expand">
+                            <h5 class="uk-card-title uk-margin-remove-bottom">
+                                <%= submission.title %>
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="uk-card-body">
+                        <div class="uk-width-expand">
+                            <p>
+                                <%= submission.description %>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="uk-card-footer">
+                        <div class="details uk-width-expand">
+                            <%= if @topic.anonymous do %>
+                            <% else %>
+                            <b><%= submission.user_display_name %></b>
+                            /
+                            <% end %>
+                            <%= submission.rating_count |> Integer.to_string %> ratings
+                            <%= if submission.rating_count > 0 do %>
+                            , avg = <%= submission.avg_rating |> Decimal.round(2) |> Decimal.to_string %>
+                            <% end %>
+                            /
+                            <%= submission.comment_count |> Integer.to_string %> comments
+                            /
+                            <span>Posted at: </span><span class="rating"><%= submission.inserted_at %>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    <% end %>
+</div>
 
-      <li>
-        <strong>Allow submission voting:</strong>
-        <%= @topic.allow_submission_voting %>
-      </li>
+<div class="uk-position-fixed uk-position-z-index absolute uk-dark uk-position-bottom-right">
+<a href=<%= Routes.topic_submission_path(@conn, :new, @topic.id) %> class="add uk-box-shadow-small uk-box-shadow-hover-large" uk-marker></a>
+</div>
 
-      <li>
-        <strong>Anonymous:</strong>
-        <%= @topic.anonymous %>
-      </li>
 
-    </ul>
-  </article>
-  <article class="column">
-    <ul>
-      <li>
-        <strong>Allow submission comments:</strong>
-        <%= @topic.allow_submission_comments %>
-      </li>
 
-      <li>
-        <strong>Allow students to view submissions by other students:</strong>
-        <%= @topic.show_user_submissions %>
-      </li>
 
-      <li>
-        <strong>User submission limit:</strong>
-        <%= @topic.user_submission_limit %>
-      </li>
-
-      <li>
-        <strong>Sort:</strong>
-        <%= @topic.sort %>
-      </li>
-
-    </ul>
-  </article>
-</section>
-<%= if @can_edit do %>
-<h2>Administration</h2>
-<section class="row">
-    <article class="column"><span><%= link "Edit Topic", to: Routes.topic_path(@conn, :edit, @topic) %></span></article>
-    <article class="column"><span><%= link "Post New Submission", to: Routes.topic_submission_path(@conn, :new, @topic) %></span></article>
-    <article class="column"><span><%= link "Back", to: Routes.section_topic_path(@conn, :index, @topic.section_id) %></span></article>
-</section>
-<%= end %>
-<%= if length(@submissions) != 0 do %>
-<h2>Submissions</h2>
-<%= for submission <- @submissions do %>
-    <h2><%= submission.title %></h2>
-    <div class="submission-info"><span>Posted at: </span><span class="rating"><%= submission.inserted_at %><span>Average rating: </span><span class="rating"><%= submission.avg_rating |> Decimal.round(2) |> Decimal.to_string %></span></div>
-      <span><%= submission.description %></span>
-      <section class="row">
-      <article class="column"><span><%= link "Show", to: Routes.submission_path(@conn, :show, submission.id) %></span></article>
-      <%= if @can_edit || @uid == submission.user_id do %>
-      <article class="column"><span><%= link "Edit", to: Routes.submission_path(@conn, :edit, submission.id) %></span></article>
-      <article class="column"><span><%= link "Delete", to: Routes.submission_path(@conn, :delete, submission.id), method: :delete, data: [confirm: "Are you sure?"] %></span></article>
-      <% end %>
-    </section>
-<% end %>
-<% end %>

@@ -44,6 +44,10 @@ case $ACTION in
         # Get a shell in the app container
         docker-compose exec app /bin/bash
         ;;
+    dbshell)
+        docker-compose exec db psql -U $POSTGRES_USER $POSTGRES_DB
+        ;;
+
     iex)
         # Get an iex shell in the app container
         docker-compose exec app /app/run.sh iex

@@ -4,39 +4,46 @@ defmodule AppWeb.SubmissionController do
   alias App.Submissions
   alias App.Submissions.Submission
   alias App.Topics
+  alias App.Courses
 
   def index(conn, %{"topic_id" => topic_id}) do
     topic = Topics.get_topic!(topic_id)
+    section = Courses.get_section!(topic.section_id)
+    course = Courses.get_course!(section.course_id)
     user = conn.assigns.current_user
     submissions = Submissions.list_user_submissions(user, topic)
     can_edit = App.Accounts.can_edit_topic(user, topic)
-    render(conn, "index.html", submissions: submissions, topic: topic, can_edit: can_edit, uid: user.id)
+    render(conn, "index.html", submissions: submissions, topic: topic, can_edit: can_edit, uid: user.id, section: section, course: course)
   end
 
   def new(conn, %{"topic_id" => topic_id}) do
     changeset = Submissions.change_submission(%Submission{})
     topic = Topics.get_topic!(topic_id)
-    render(conn, "new.html", changeset: changeset, topic: topic)
+    section = Courses.get_section!(topic.section_id)
+    course = Courses.get_course!(section.course_id)
+    render(conn, "new.html", changeset: changeset, topic: topic, section: section, course: course)
   end
 
   def create(conn, %{"submission" => submission_params, "topic_id" => topic_id}) do
     user = conn.assigns.current_user
     topic = Topics.get_topic!(topic_id)
+    section = Courses.get_section!(topic.section_id)
+    course = Courses.get_course!(section.course_id)
 
     case Submissions.create_submission(user, topic, submission_params) do
       {:ok, submission} ->
         conn
         |> put_flash(:info, "Submission created successfully.")
-        |> redirect(to: Routes.submission_path(conn, :show, submission))
+        |> redirect(to: Routes.topic_path(conn, :show, topic))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset, topic: topic)
+        render(conn, "new.html", changeset: changeset, topic: topic, section: section, course: course)
 
       {:error, message} ->
         changeset = Submissions.change_submission(%Submission{})
         conn
         |> put_flash(:error, message)
-        |> render("new.html", changeset: changeset, topic: topic)
+        |> render("new.html", changeset: changeset, topic: topic, section: section, course: course)
 
     end
   end
@@ -44,12 +51,18 @@ defmodule AppWeb.SubmissionController do
   def show(conn, %{"id" => id}) do
     user = conn.assigns.current_user
     submission = Submissions.get_user_submission(user, id)
+    my_rating = Submissions.get_user_submission_rating(user.id, submission.id)
     submission_check = Submissions.get_submission!(submission.id)
     topic = Topics.get_topic!(submission.topic_id)
     can_edit = App.Accounts.can_edit_submission(user, submission_check)
+    is_admin = App.Accounts.can_edit_topic(user, topic)
     can_edit_topic = App.Accounts.can_edit_topic(user, topic)
     comments = Submissions.list_user_comments(user, submission_check)
-    render(conn, "show.html", submission: submission, topic: topic, can_edit: can_edit, uid: user.id, can_edit_topic: can_edit_topic, comments: comments)
+    section = Courses.get_section!(topic.section_id)
+    course = Courses.get_course!(section.course_id)
+    comment_changeset = Submissions.change_comment(%App.Submissions.Comment{})
+    rating_changeset = Submissions.change_rating(%App.Submissions.Rating{})
+    render(conn, "show.html", submission: submission, topic: topic, can_edit: can_edit, uid: user.id, can_edit_topic: can_edit_topic, comments: comments, section: section, course: course, is_admin: is_admin, comment_changeset: comment_changeset, rating_changeset: rating_changeset, my_rating: my_rating)
   end
 
   def edit(conn, %{"id" => id}) do
@@ -57,8 +70,11 @@ defmodule AppWeb.SubmissionController do
     user = conn.assigns.current_user
     case App.Accounts.can_edit_submission(user, submission) do
       true ->
+        topic = Topics.get_topic!(submission.topic_id)
+        section = Courses.get_section!(topic.section_id)
+        course = Courses.get_course!(section.course_id)
         changeset = Submissions.change_submission(submission)
-        render(conn, "edit.html", submission: submission, changeset: changeset)
+        render(conn, "edit.html", submission: submission, changeset: changeset, topic: topic, section: section, course: course)
       false ->
         conn
             |> put_status(:forbidden)
@@ -78,7 +94,10 @@ defmodule AppWeb.SubmissionController do
         |> redirect(to: Routes.submission_path(conn, :show, submission))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", submission: submission, changeset: changeset)
+        topic = Topics.get_topic!(submission.topic_id)
+        section = Courses.get_section!(topic.section_id)
+        course = Courses.get_course!(section.course_id)
+        render(conn, "edit.html", submission: submission, changeset: changeset, topic: topic, section: section, course: course)
 
       {:error, message} ->
         case message do
@@ -105,7 +124,7 @@ defmodule AppWeb.SubmissionController do
         {:ok, _submission} = Submissions.delete_submission(user, submission)
         conn
         |> put_flash(:info, "Submission deleted successfully.")
-        |> redirect(to: Routes.topic_submission_path(conn, :index, topic))
+        |> redirect(to: Routes.topic_path(conn, :show, topic))
 
       false ->
         conn

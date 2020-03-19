@@ -44,6 +44,7 @@ defmodule AppWeb do
       import AppWeb.Gettext
       alias AppWeb.Router.Helpers, as: Routes
       import Phoenix.LiveView.Helpers
+      import AppWeb.Helpers
     end
   end
 

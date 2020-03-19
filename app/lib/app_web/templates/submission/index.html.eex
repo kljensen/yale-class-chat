@@ -20,10 +20,10 @@
       <td><%= submission.image_url %></td>
 
       <td>
-        <span><%= link "Show", to: Routes.submission_path(@conn, :show, submission) %></span>
+        <span><%= link "Show", to: Routes.submission_path(@conn, :show, submission.id) %></span>
         <%= if @can_edit or submission.user_id == @uid do %>
-        <span><%= link "Edit", to: Routes.submission_path(@conn, :edit, submission) %></span>
-        <span><%= link "Delete", to: Routes.submission_path(@conn, :delete, submission), method: :delete, data: [confirm: "Are you sure?"] %></span>
+        <span><%= link "Edit", to: Routes.submission_path(@conn, :edit, submission.id) %></span>
+        <span><%= link "Delete", to: Routes.submission_path(@conn, :delete, submission.id), method: :delete, data: [confirm: "Are you sure?"] %></span>
         <% end %>
       </td>
     </tr>

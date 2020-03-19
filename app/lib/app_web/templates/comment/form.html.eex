@@ -5,8 +5,7 @@
     </div>
   <% end %>
 
-  <%= label f, :title %>
-  <%= text_input f, :title %>
+  <%= hidden_input f, :title, value: "Sample" %>
   <%= error_tag f, :title %>
 
   <%= label f, :description %>

@@ -297,28 +297,33 @@ defmodule App.DatabaseSeeder do
           attrs = Map.put(z, :crn, crn)
           {:ok, section} = Courses.create_section(creator, course, attrs)
           section_role_attrs = %{role: "student", valid_from: "2010-04-17T14:00:00Z", valid_to: "2100-04-17T14:00:00Z"}
-          for u <- @student_list do
+
+          shuffled_list = Enum.shuffle @student_list
+          short_student_list = Enum.take(shuffled_list, 3)
+
+          for u <- short_student_list do
             user = Accounts.get_user_by!(u.net_id)
             Accounts.create_section__role(creator, user, section, section_role_attrs)
           end
+
           for a <- @topic_list do
             slug = Map.get(section, :crn) <> to_string(Map.get(a, :title))
             attrs = Map.put(a, :slug, slug)
             topic_writer = Accounts.get_user_by!(Map.get(Enum.random(@prof_list), :net_id))
             {:ok, topic} = Topics.create_topic(topic_writer, section, attrs)
             Enum.each(1..5, fn b ->
-              submitter = Accounts.get_user_by!(Map.get(Enum.random(@student_list), :net_id))
+              submitter = Accounts.get_user_by!(Map.get(Enum.random(short_student_list), :net_id))
               slug = to_string(topic.id) <> to_string(b)
               attrs = %{description: Enum.random(@random_description_list), image_url: Enum.random(@random_image_url_list), slug: slug, title: Enum.random(@random_title_list), allow_ranking: true, visible: true}
               {:ok, submission} = Submissions.create_submission(submitter, topic, attrs)
 
               Enum.each(1..5, fn c ->
-                student = Accounts.get_user_by!(Map.get(Enum.random(@student_list), :net_id))
+                student = Accounts.get_user_by!(Map.get(Enum.random(short_student_list), :net_id))
                 attrs = %{description: Enum.random(@random_description_list), title: Enum.random(@random_title_list)}
                 Submissions.create_comment(student, submission, attrs)
               end)
-              Enum.each(1..5, fn d ->
-                student = Accounts.get_user_by!(Map.get(Enum.random(@student_list), :net_id))
+              Enum.each(1..1, fn d ->
+                student = Accounts.get_user_by!(Map.get(Enum.random(short_student_list), :net_id))
                 attrs = %{score: Enum.random(0..5)}
                 Submissions.create_rating(student, submission, attrs)
               end)

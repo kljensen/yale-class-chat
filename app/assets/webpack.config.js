@@ -31,7 +31,19 @@ module.exports = (env, options) => ({
       {
         test: /\.css$/,
         use: [MiniCssExtractPlugin.loader, 'css-loader']
-      }
+      },
+      {
+        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/, // needed for font-awesome
+            use: [
+                {
+                    loader: 'file-loader',
+                    options: {
+                        name: '[name].[ext]',
+                        outputPath: '../fonts',
+                    },
+                },
+            ],
+        },
     ]
   },
   plugins: [
