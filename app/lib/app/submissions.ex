@@ -82,8 +82,22 @@ defmodule App.Submissions do
               where: t.show_user_submissions,
               where: su.visible,
               where: t.id == ^tid,
-              group_by: su.id,
-              select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), comment_count: count(co.id), user_id: su.user_id}
+              group_by: [su.id, u.net_id, u.display_name, u.email],
+              select: %{id: su.id,
+                        title: su.title,
+                        description: su.description,
+                        allow_ranking: su.allow_ranking,
+                        visible: su.visible,
+                        image_url: su.image_url,
+                        slug: su.slug,
+                        inserted_at: su.inserted_at,
+                        avg_rating: avg(ra.score),
+                        rating_count: count(ra.id),
+                        comment_count: count(co.id),
+                        user_id: su.user_id,
+                        user_netid: u.net_id,
+                        user_display_name: u.display_name,
+                        user_email: u.email}
 
     query = query
       |> order_query(topic.sort)
@@ -98,9 +112,25 @@ defmodule App.Submissions do
           on: su.id == ra.submission_id,
           left_join: co in App.Submissions.Comment,
           on: su.id == co.submission_id,
+          left_join: u in App.Accounts.User,
+          on: su.user_id == u.id,
           where: su.topic_id == ^tid,
-          group_by: su.id,
-          select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), comment_count: count(co.id), user_id: su.user_id}
+          group_by: [su.id, u.net_id, u.display_name, u.email],
+          select: %{id: su.id,
+                        title: su.title,
+                        description: su.description,
+                        allow_ranking: su.allow_ranking,
+                        visible: su.visible,
+                        image_url: su.image_url,
+                        slug: su.slug,
+                        inserted_at: su.inserted_at,
+                        avg_rating: avg(ra.score),
+                        rating_count: count(ra.id),
+                        comment_count: count(co.id),
+                        user_id: su.user_id,
+                        user_netid: u.net_id,
+                        user_display_name: u.display_name,
+                        user_email: u.email}
 
         q = q
           |> admin_order_query(topic.sort)
@@ -263,6 +293,13 @@ defmodule App.Submissions do
                   Repo.one(query)
               end
     return
+  end
+
+  def get_user_submission_rating(uid, sid) do
+    query = from ra in App.Submissions.Rating,
+              where: ra.user_id == ^uid,
+              where: ra.submission_id == ^sid
+    Repo.one(query)
   end
 
   @doc """

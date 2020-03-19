@@ -8,6 +8,7 @@
   <%= label f, :score %>
   <%= number_input f, :score %>
   <%= error_tag f, :score %>
+  <%= error_tag f, :one_rating_per_user %>
 
   <div>
     <%= submit "Save" %>

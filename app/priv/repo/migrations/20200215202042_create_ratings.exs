@@ -9,5 +9,6 @@ defmodule App.Repo.Migrations.CreateRatings do
       timestamps()
     end
 
+    create unique_index(:ratings, [:submission_id, :user_id], name: :one_rating_per_user)
   end
 end

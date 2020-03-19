@@ -19,5 +19,6 @@ defmodule App.Submissions.Rating do
     |> assoc_constraint(:user)
     |> foreign_key_constraint(:submission_id)
     |> assoc_constraint(:submission)
+    |> unique_constraint(:one_rating_per_user, name: :one_rating_per_user, message: "You can only rate a submission once.")
   end
 end

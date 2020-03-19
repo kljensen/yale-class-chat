@@ -115,12 +115,14 @@ defmodule AppWeb.TopicController do
   def edit(conn, %{"id" => id}) do
     topic = Topics.get_topic!(id)
     user = conn.assigns.current_user
+    section = Courses.get_section!(topic.section_id)
+    course = Courses.get_course!(section.course_id)
     case App.Accounts.can_edit_topic(user, topic) do
       true ->
         section = Courses.get_section!(topic.section_id)
         changeset = Topics.change_topic(topic)
         {:ok, current_time} = DateTime.now("America/New_York")
-        render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time, section: section, sort_list: @sort_list)
+        render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time, section: section, sort_list: @sort_list, section: section, course: course)
 
       false ->
         conn

@@ -322,7 +322,7 @@ defmodule App.DatabaseSeeder do
                 attrs = %{description: Enum.random(@random_description_list), title: Enum.random(@random_title_list)}
                 Submissions.create_comment(student, submission, attrs)
               end)
-              Enum.each(1..5, fn d ->
+              Enum.each(1..1, fn d ->
                 student = Accounts.get_user_by!(Map.get(Enum.random(short_student_list), :net_id))
                 attrs = %{score: Enum.random(0..5)}
                 Submissions.create_rating(student, submission, attrs)
