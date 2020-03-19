@@ -5,9 +5,6 @@
     </div>
   <% end %>
 
-  <%= hidden_input f, :title, value: "Sample" %>
-  <%= error_tag f, :title %>
-
   <%= label f, :description %>
   <%= text_input f, :description %>
   <%= error_tag f, :description %>

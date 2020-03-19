@@ -3,11 +3,6 @@
 <ul>
 
   <li>
-    <strong>Title:</strong>
-    <%= @comment.title %>
-  </li>
-
-  <li>
     <strong>Description:</strong>
     <%= @comment.description %>
   </li>
