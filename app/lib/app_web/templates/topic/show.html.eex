@@ -1,5 +1,53 @@
-<h1><%= @topic.title %></h1>
-<span><%= @topic.description %></span>
+<div class="uk-margin-bottom">
+    <div class="uk-padding-small topic-title">
+    <h1 class="uk-heading-divider"><%= @topic.title %></h1>
+    <p><%= @topic.description %></p>
+    </div>
+</div>
+
+
+
+<div class="uk-grid-column-medium uk-grid-row-medium uk-child-width-1-2@s uk-grid-match" uk-grid>
+    <%= for {submission, i} <- Enum.with_index(@submissions) do %>
+        <div>
+            <a href="<%= Routes.submission_path(@conn, :show, submission.id) %>">
+                <div class="uk-card uk-card-small uk-card-default uk-card-hover color-<%= 1 + rem submission.id, 20 %>">
+                    <div class="uk-card-header">
+                        <div class="uk-width-expand">
+                            <h5 class="uk-card-title uk-margin-remove-bottom">
+                                <%= submission.title %>
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="uk-card-body">
+                        <div class="uk-width-expand">
+                            <p>
+                                <%= submission.description %>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="uk-card-footer">
+                        <div class="details uk-width-expand">
+                            <%= submission.avg_rating |> Decimal.round(2) |> Decimal.to_string %> pts
+                            /
+                            <span>Posted at: </span><span class="rating"><%= submission.inserted_at %>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    <% end %>
+</div>
+
+<div class="uk-position-fixed uk-position-z-index absolute uk-dark uk-position-bottom-right">
+<a href="" class="add uk-box-shadow-small uk-box-shadow-hover-large" uk-marker></a>
+</div>
+
+
+
+
+
+<!--
 <h2>Details</h2>
 <section class="row">
   <article class="column">
@@ -80,3 +128,4 @@
     </section>
 <% end %>
 <% end %>
+-->

@@ -3,24 +3,46 @@
     font-family: "YaleNew";
     src: url("https://yaleidentity.yale.edu/sites/all/themes/yalenew_base/fonts/YaleNew/YaleNew-normal-normal/yalenew-roman-webfont.woff2") format('woff');
 }
-@font-face {
-    font-family: "Mallory-Bold";
-    src: url("https://yaleidentity.yale.edu/sites/all/themes/yalenew_base/fonts/Mallory/Mallory/Mallory-Bold.woff");
-    font-weight: bold;
+
+@font-face{
+    font-family:"Mallory";
+    src:url(https://yaleidentity.yale.edu/sites/all/themes/yalenew_base/fonts/Mallory/Mallory/Mallory-Book.woff) format("woff"),url(/sites/all/themes/yalenew_base/fonts/Mallory/Mallory/Mallory-Book.woff2) format("woff2");
+    font-weight:normal;
+    font-style:normal;
 }
-@font-face {
-    font-family: "Mallory-Book";
-    src: url("https://yaleidentity.yale.edu/sites/all/themes/yalenew_base/fonts/Mallory/Mallory/Mallory-Book.woff");
+@font-face{
+    font-family:"Mallory";
+    src:url(https://yaleidentity.yale.edu/sites/all/themes/yalenew_base/fonts/Mallory/Mallory/Mallory-Bold.woff) format("woff"),url(/sites/all/themes/yalenew_base/fonts/Mallory/Mallory/Mallory-Bold.woff2) format("woff2");
+    font-weight:bold;
+    font-style:normal;
+}
+@font-face{
+    font-family:"Mallory";
+    src:url(https://yaleidentity.yale.edu/sites/all/themes/yalenew_base/fonts/Mallory/Mallory/Mallory-BookItalic.woff) format("woff"),url(/sites/all/themes/yalenew_base/fonts/Mallory/Mallory/Mallory-BookItalic.woff2) format("woff2");
+    font-weight:normal;
+    font-style:italic;
+}
+@font-face{
+    font-family:"Mallory";
+    src:url(https://yaleidentity.yale.edu/sites/all/themes/yalenew_base/fonts/Mallory/Mallory/Mallory-BoldItalic.woff) format("woff"),url(/sites/all/themes/yalenew_base/fonts/Mallory/Mallory/Mallory-BoldItalic.woff2) format("woff2");
+    font-weight:bold;
+    font-style:italic;
 }
 
 body {
     color: #222222;
     margin:0;
-    font-family: "Mallory-Book";
+    font-family: "Mallory";
+    padding-bottom:3rem;
+    background-color:#ecf0f1;
+    text-rendering: optimizeLegibility;
+    font-smooth: auto;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing:grayscale;
 }
 
 .main-body{
-padding:1rem;
+   padding: 0 1rem 1rem 1rem;
 }
 
 .top-matter{
@@ -29,7 +51,16 @@ padding:1rem;
     color: #fff;
     background-color: #003366;
 }
-.title{
+.top-matter a{
+    color: white;
+}
+.top-matter a:hover{
+    color: white;
+    text-decoration: none;
+}
+
+.topic-title, .submission-body {
+    background-color: white;
 }
 
 a {
@@ -40,8 +71,91 @@ a:hover {
     text-decoration: none;
 }
 
-a.back {
-    display: block;
+span.vote span {
+  border: 1px solid #e5e5e5;
+  line-height: 0.5em;
+}
+
+.uk-card-footer .details {
+    font-size: 0.80rem;
+    color: #999;
+}
+
+a.add {
+    margin-right: 1.5em;
+    margin-bottom: 1em;
+    border: 1px solid #222;
+}
+a.add:hover {
+    border: 1px solid #000;
+}
+
+article.uk-comment{
+    background-color: white;
+    padding: 15px;
+}
+
+li.comment{
+    margin-top: 30px;
+}
+
+.uk-comment-list > :nth-child(n+2) {
+    margin-top: 30px;
+}
+
+.speech-bubble {
+    position: relative;
+    border-radius: .4em;
+}
+
+.speech-bubble:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 0;
+    height: 0;
+    border: 15px solid transparent;
+    border-top-color: #fff;
+    border-bottom: 0;
+    margin-left: -15px;
+    margin-bottom: -15px;
+}
+
+ul li.comment:nth-child(odd) .speech-bubble:after {
+    left: 30px;
+    border-right: 0;
+}
+ul li.comment:nth-child(even) .speech-bubble:after {
+    right: 15px;
+    border-left: 0;
+}
+
+div.comment-author {
+    font-size: 0.80rem;
+    color: #999;
+    margin-top: 15px;
+}
+div.comment-author-even {
+    text-align:right;
+    margin-right: 45px;
+}
+div.comment-author-odd {
+    text-align:left;
+    margin-left: 45px;
+}
+
+.breadcrumb-holder {
+    margin: 0;
+    padding: 0.5em 0 0.5em 15px;
+}
+
+.breadcrumb-holder ul {
+    margin-bottom: 0;
+}
+
+.uk-breadcrumb span, .uk-breadcrumb a {
+    text-transform: lower;
+    font-variant-caps: small-caps;
 }
 
 // https://flatuicolors.com/palette/defo
