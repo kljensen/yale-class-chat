@@ -237,7 +237,7 @@ defmodule AppWeb.TopicController do
 
         conn
         |> put_flash(:info, "Topic deleted successfully.")
-        |> redirect(to: Routes.section_topic_path(conn, :index, topic.section))
+        |> redirect(to: Routes.section_path(conn, :show, topic.section))
 
       {:error, message} ->
         case message do

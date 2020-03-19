@@ -15,14 +15,14 @@ defmodule AppWeb.CommentControllerTest do
     comment
   end
 
-  describe "index" do
-    test "lists all comments", %{conn: conn, submission: submission} do
-      conn = conn
-        |> init_test_session(uid: "faculty net id")
-        |> get(Routes.submission_comment_path(conn, :index, submission))
-      assert html_response(conn, 200) =~ "Listing Comments"
-    end
-  end
+  #describe "index" do
+  #  test "lists all comments", %{conn: conn, submission: submission} do
+  #    conn = conn
+  #      |> init_test_session(uid: "faculty net id")
+  #      |> get(Routes.submission_comment_path(conn, :index, submission))
+  #    assert html_response(conn, 200) =~ "Listing Comments"
+  #  end
+  #end
 
   describe "new comment" do
     test "renders form", %{conn: conn, submission: submission} do

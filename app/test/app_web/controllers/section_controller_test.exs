@@ -15,15 +15,15 @@ defmodule AppWeb.SectionControllerTest do
     section
   end
 
-  describe "index" do
-    test "lists all sections", %{conn: conn} do
-      section = fixture(:section)
-      conn = conn
-        |> init_test_session(uid: "faculty net id")
-        |> get(Routes.course_section_path(conn, :index, section.course_id))
-      assert html_response(conn, 200) =~ "Listing Sections"
-    end
-  end
+  #describe "index" do
+  #  test "lists all sections", %{conn: conn} do
+  #    section = fixture(:section)
+  #    conn = conn
+  #      |> init_test_session(uid: "faculty net id")
+  #      |> get(Routes.course_section_path(conn, :index, section.course_id))
+  #    assert html_response(conn, 200) =~ "Listing Sections"
+  #  end
+  #end
 
   describe "new section" do
     test "renders form", %{conn: conn} do
@@ -100,7 +100,7 @@ defmodule AppWeb.SectionControllerTest do
       conn = conn
         |> init_test_session(uid: "faculty net id")
         |> delete(Routes.section_path(conn, :delete, section))
-      assert redirected_to(conn) == Routes.course_section_path(conn, :index, course_id)
+      assert redirected_to(conn) == Routes.course_path(conn, :show, course_id)
       conn = get(conn, Routes.section_path(conn, :show, section))
       assert html_response(conn, 404) =~ "Not Found"
     end

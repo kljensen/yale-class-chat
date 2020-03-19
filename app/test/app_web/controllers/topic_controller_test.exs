@@ -15,16 +15,16 @@ defmodule AppWeb.TopicControllerTest do
     topic
   end
 
-  describe "index" do
-    setup [:create_section]
-
-    test "lists all topics", %{conn: conn, section: section} do
-      conn = conn
-        |> init_test_session(uid: "faculty net id")
-        |> get(Routes.section_topic_path(conn, :index, section))
-      assert html_response(conn, 200) =~ "Listing Topics"
-    end
-  end
+  #describe "index" do
+  #  setup [:create_section]
+  #
+  #  test "lists all topics", %{conn: conn, section: section} do
+  #    conn = conn
+  #      |> init_test_session(uid: "faculty net id")
+  #      |> get(Routes.section_topic_path(conn, :index, section))
+  #    assert html_response(conn, 200) =~ "Listing Topics"
+  #  end
+  #end
 
   describe "new topic" do
     setup [:create_section]
@@ -107,7 +107,7 @@ defmodule AppWeb.TopicControllerTest do
       conn = conn
         |> init_test_session(uid: "faculty net id")
         |> delete(Routes.topic_path(conn, :delete, topic))
-      assert redirected_to(conn) == Routes.section_topic_path(conn, :index, section)
+      assert redirected_to(conn) == Routes.section_path(conn, :show, section)
       conn = get(conn, Routes.topic_path(conn, :show, topic))
       assert html_response(conn, 404) =~ "Not Found"
     end

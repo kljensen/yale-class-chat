@@ -2,4 +2,4 @@
 
 <%= render "form.html", Map.put(assigns, :action, Routes.section_path(@conn, :create)) %>
 
-<span><%= link "Back", to: Routes.course_section_path(@conn, :index, @course.id) %></span>
+<span><%= link "Back", to: Routes.course_path(@conn, :show, @course.id) %></span>
