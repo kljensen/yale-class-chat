@@ -4,9 +4,9 @@ defmodule AppWeb.TopicControllerTest do
   alias App.Topics
   import Plug.Test
 
-  @create_attrs %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2120"}, description: "some description", opened_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "3", "year" => "2020"}, slug: "some slug", sort: "some sort", title: "some title", user_submission_limit: 42}
-  @update_attrs %{allow_submission_comments: false, allow_submission_voting: false, allow_submissions: false, anonymous: false, closed_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, description: "some updated description", opened_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, slug: "some updated slug", sort: "some updated sort", title: "some updated title", user_submission_limit: 43}
-  @invalid_attrs %{allow_submission_comments: nil, allow_submission_voting: nil, allow_submissions: nil, anonymous: nil, closed_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, description: nil, opened_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, slug: nil, sort: nil, title: nil, user_submission_limit: nil}
+  @create_attrs %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2120"}, description: "some description", opened_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "3", "year" => "2020"}, slug: "some slug", sort: "some sort", title: "some title", user_submission_limit: 42, visible: true, show_user_submissions: true}
+  @update_attrs %{allow_submission_comments: false, allow_submission_voting: false, allow_submissions: false, anonymous: false, closed_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, description: "some updated description", opened_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, slug: "some updated slug", sort: "some updated sort", title: "some updated title", user_submission_limit: 43, visible: false, show_user_submissions: false}
+  @invalid_attrs %{allow_submission_comments: nil, allow_submission_voting: nil, allow_submissions: nil, anonymous: nil, closed_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, description: nil, opened_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, slug: nil, sort: nil, title: nil, user_submission_limit: nil, visible: nil, show_user_submissions: nil}
 
   def fixture(:topic) do
     section = AppWeb.SectionControllerTest.fixture(:section)
@@ -53,7 +53,7 @@ defmodule AppWeb.TopicControllerTest do
       assert redirected_to(conn) == Routes.topic_path(conn, :show, id)
 
       conn = get(conn, Routes.topic_path(conn, :show, id))
-      assert html_response(conn, 200) =~ "Details"
+      assert html_response(conn, 200) =~ @create_attrs.title
     end
 
     test "renders errors when data is invalid", %{conn: conn, section: section} do
@@ -108,9 +108,8 @@ defmodule AppWeb.TopicControllerTest do
         |> init_test_session(uid: "faculty net id")
         |> delete(Routes.topic_path(conn, :delete, topic))
       assert redirected_to(conn) == Routes.section_topic_path(conn, :index, section)
-      assert_error_sent 404, fn ->
-        get(conn, Routes.topic_path(conn, :show, topic))
-      end
+      conn = get(conn, Routes.topic_path(conn, :show, topic))
+      assert html_response(conn, 404) =~ "Not Found"
     end
   end
 

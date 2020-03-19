@@ -257,9 +257,22 @@ defmodule App.Submissions do
   """
   def get_user_submission(%App.Accounts.User{} = user, id) do
     submission = Repo.get!(Submission, id)
-    return = case App.Accounts.can_edit_submission(user, submission) do
+    result = case App.Accounts.can_edit_submission(user, submission) do
                 true ->
-                  submission
+                  query = from su in Submission,
+                            join: t in App.Topics.Topic,
+                            on: su.topic_id == t.id,
+                            join: s in App.Courses.Section,
+                            on: t.section_id == s.id,
+                            join: c in App.Courses.Course,
+                            on: s.course_id == c.id,
+                            left_join: ra in App.Submissions.Rating,
+                            on: su.id == ra.submission_id,
+                            where: c.allow_read == true,
+                            where: su.id == ^id,
+                            group_by: su.id,
+                            select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id, topic_id: su.topic_id}
+                  Repo.one(query)
                 false ->
                   tid = submission.topic_id
                   topic = App.Topics.get_topic!(tid)
@@ -292,7 +305,17 @@ defmodule App.Submissions do
                             select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id, topic_id: su.topic_id}
                   Repo.one(query)
               end
-    return
+    if is_nil(result) do
+      query = from s in Submission, where: s.id == ^id
+      message = if Repo.exists?(query) do
+                  "forbidden"
+                else
+                  "not found"
+                end
+      {:error, message}
+    else
+      {:ok, result}
+    end
   end
 
   def get_user_submission_rating(uid, sid) do
@@ -626,39 +649,43 @@ defmodule App.Submissions do
     comment = Repo.get!(Comment, id)
     return = case App.Accounts.can_edit_comment(user, comment) do
                 true ->
-                  comment
+                  {:ok, comment}
                 false ->
-                  submission = get_submission!(comment.submission_id)
-                  tid = submission.topic_id
-                  topic = App.Topics.get_topic!(tid)
-                  uid = user.id
-                  sid = topic.section_id
-                  allowed_section_roles = @section_read_roles
-                  query = from r in App.Accounts.Section_Role,
-                            join: s in App.Courses.Section,
-                            on: r.section_id == s.id,
-                            join: c in App.Courses.Course,
-                            on: s.course_id == c.id,
-                            join: t in App.Topics.Topic,
-                            on: t.section_id == s.id,
-                            join: su in Submission,
-                            on: su.topic_id == t.id,
-                            left_join: co in App.Submissions.Comment,
-                            on: su.id == co.submission_id,
-                            where: r.user_id == ^uid,
-                            where: r.valid_from <= from_now(0, "day"),
-                            where: r.valid_to >= from_now(0, "day"),
-                            where: r.role in ^allowed_section_roles,
-                            where: c.allow_read == true,
-                            where: s.id == ^sid,
-                            where: t.visible,
-                            where: t.show_user_submissions,
-                            where: su.visible,
-                            where: su.id == ^id,
-                            where: t.id == ^tid,
-                            where: co.id == ^id,
-                            select: co
-                  Repo.one(query)
+                  returntmp = case get_user_submission(user, comment.submission_id) do
+                                {:ok, submission} ->
+                                  tid = submission.topic_id
+                                  uid = user.id
+                                  sid = submission.topic.section_id
+                                  allowed_section_roles = @section_read_roles
+                                  query = from r in App.Accounts.Section_Role,
+                                            join: s in App.Courses.Section,
+                                            on: r.section_id == s.id,
+                                            join: c in App.Courses.Course,
+                                            on: s.course_id == c.id,
+                                            join: t in App.Topics.Topic,
+                                            on: t.section_id == s.id,
+                                            join: su in Submission,
+                                            on: su.topic_id == t.id,
+                                            left_join: co in App.Submissions.Comment,
+                                            on: su.id == co.submission_id,
+                                            where: r.user_id == ^uid,
+                                            where: r.valid_from <= from_now(0, "day"),
+                                            where: r.valid_to >= from_now(0, "day"),
+                                            where: r.role in ^allowed_section_roles,
+                                            where: c.allow_read == true,
+                                            where: s.id == ^sid,
+                                            where: t.visible,
+                                            where: t.show_user_submissions,
+                                            where: su.visible,
+                                            where: su.id == ^id,
+                                            where: t.id == ^tid,
+                                            where: co.id == ^id,
+                                            select: co
+                                  Repo.one(query)
+
+                                {:error, message} ->
+                                  {:error, message}
+                                end
               end
     return
   end

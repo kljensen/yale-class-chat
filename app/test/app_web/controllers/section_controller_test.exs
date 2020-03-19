@@ -47,8 +47,7 @@ defmodule AppWeb.SectionControllerTest do
       assert redirected_to(conn) == Routes.section_path(conn, :show, id)
 
       conn = get(conn, Routes.section_path(conn, :show, id))
-      assert html_response(conn, 200) =~ "Section"
-      assert html_response(conn, 200) =~ "Topics"
+      assert html_response(conn, 200) =~ @create_attrs.title
     end
 
     test "renders errors when data is invalid", %{conn: conn} do

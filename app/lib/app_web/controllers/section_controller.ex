@@ -66,7 +66,7 @@ defmodule AppWeb.SectionController do
     user = conn.assigns.current_user
     case Courses.get_user_section(user, id) do
       {:ok, section} ->
-        course = Courses.get_course!(section.course_id)
+        course = section.course
         topics = Topics.list_user_topics(user, section)
         can_edit = App.Accounts.can_edit_section(user, section)
         render(conn, "show.html", course: course, section: section, topics: topics, can_edit: can_edit)
@@ -97,8 +97,7 @@ defmodule AppWeb.SectionController do
       {:ok, section} ->
         case App.Accounts.can_edit_section(user, section) do
           true ->
-            section = Courses.get_section!(id)
-            course = Courses.get_course!(section.course_id)
+            course = section.course
             changeset = Courses.change_section(section)
             render(conn, "edit.html", section: section, changeset: changeset, course: course)
           false ->
@@ -129,8 +128,8 @@ defmodule AppWeb.SectionController do
   end
 
   def update(conn, %{"id" => id, "section" => section_params}) do
-    section = Courses.get_section!(id)
     user = conn.assigns.current_user
+    {:ok, section} = Courses.get_user_section(user, id)
 
     case Courses.update_section(user, section, section_params) do
       {:ok, section} ->
@@ -139,7 +138,7 @@ defmodule AppWeb.SectionController do
         |> redirect(to: Routes.section_path(conn, :show, section))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        course = Courses.get_course!(section.course_id)
+        course = section.course
         render(conn, "edit.html", section: section, changeset: changeset, course: course)
 
       {:error, message} ->
@@ -164,9 +163,10 @@ defmodule AppWeb.SectionController do
   end
 
   def delete(conn, %{"id" => id}) do
-    section = Courses.get_section!(id)
-    cid = section.course_id
     user = conn.assigns.current_user
+    {:ok, section} = Courses.get_user_section(user, id)
+    cid = section.course_id
+
     case App.Accounts.can_edit_section(user, section) do
       true ->
         {:ok, _section} = Courses.delete_section(user, section)

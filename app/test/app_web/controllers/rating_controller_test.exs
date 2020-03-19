@@ -40,10 +40,10 @@ defmodule AppWeb.RatingControllerTest do
         |> post(Routes.submission_rating_path(conn, :create, submission), rating: @create_attrs)
 
       assert %{id: id} = redirected_params(conn)
-      assert redirected_to(conn) == Routes.rating_path(conn, :show, id)
+      assert redirected_to(conn) == Routes.submission_path(conn, :show, id)
 
-      conn = get(conn, Routes.rating_path(conn, :show, id))
-      assert html_response(conn, 200) =~ "Show Rating"
+      conn = get(conn, Routes.submission_path(conn, :show, id))
+      assert html_response(conn, 200) =~ Integer.to_string(Map.get(@create_attrs, :score))
     end
 
     test "renders errors when data is invalid", %{conn: conn, submission: submission} do
@@ -72,9 +72,9 @@ defmodule AppWeb.RatingControllerTest do
       conn = conn
         |> init_test_session(uid: "faculty net id")
         |> put(Routes.rating_path(conn, :update, rating), rating: @update_attrs)
-      assert redirected_to(conn) == Routes.rating_path(conn, :show, rating)
+      assert redirected_to(conn) == Routes.submission_path(conn, :show, rating.submission_id)
 
-      conn = get(conn, Routes.rating_path(conn, :show, rating))
+      conn = get(conn, Routes.submission_path(conn, :show, rating.submission_id))
       assert html_response(conn, 200) =~ Integer.to_string(Map.get(@update_attrs, :score))
     end
 
@@ -94,7 +94,7 @@ defmodule AppWeb.RatingControllerTest do
       conn = conn
         |> init_test_session(uid: "faculty net id")
         |> delete(Routes.rating_path(conn, :delete, rating))
-      assert redirected_to(conn) == Routes.submission_rating_path(conn, :index, submission)
+      assert redirected_to(conn) == Routes.submission_path(conn, :show, submission)
       assert_error_sent 404, fn ->
         get(conn, Routes.submission_rating_path(conn, :show, rating, submission))
       end
