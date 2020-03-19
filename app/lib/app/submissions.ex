@@ -68,6 +68,10 @@ defmodule App.Submissions do
               on: su.topic_id == t.id,
               left_join: ra in App.Submissions.Rating,
               on: su.id == ra.submission_id,
+              left_join: co in App.Submissions.Comment,
+              on: su.id == co.submission_id,
+              left_join: u in App.Accounts.User,
+              on: su.user_id == u.id,
               where: r.user_id == ^uid,
               where: r.valid_from <= from_now(0, "day"),
               where: r.valid_to >= from_now(0, "day"),
@@ -79,7 +83,7 @@ defmodule App.Submissions do
               where: su.visible,
               where: t.id == ^tid,
               group_by: su.id,
-              select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id}
+              select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), comment_count: count(co.id), user_id: su.user_id}
 
     query = query
       |> order_query(topic.sort)
@@ -92,9 +96,11 @@ defmodule App.Submissions do
         q = from su in Submission,
           left_join: ra in App.Submissions.Rating,
           on: su.id == ra.submission_id,
+          left_join: co in App.Submissions.Comment,
+          on: su.id == co.submission_id,
           where: su.topic_id == ^tid,
           group_by: su.id,
-          select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id}
+          select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), comment_count: count(co.id), user_id: su.user_id}
 
         q = q
           |> admin_order_query(topic.sort)

@@ -6,13 +6,13 @@
             </a>
         </li>
         <li>
-             <a href="">
-                CourseTitleAndNum
+             <a href="<%= Routes.course_path(@conn, :show, @course) %>">
+                <%= @course.department <> " " <> Integer.to_string(@course.number) %>
             </a>
         </li>
         <li>
             <span>
-                <%= @topic.title %>
+                <%= truncate_text(@topic.title, 10) %>
             </span>
         </li>
         <%= if !is_nil(assigns[:submission]) do %>

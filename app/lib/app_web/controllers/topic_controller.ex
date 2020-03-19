@@ -96,6 +96,8 @@ defmodule AppWeb.TopicController do
     topic = Topics.get_topic!(id)
     user = conn.assigns.current_user
     can_edit = App.Accounts.can_edit_topic(user, topic)
+    section = Courses.get_section!(topic.section_id)
+    course = Courses.get_course!(section.course_id)
     submissions = case topic.show_user_submissions do
       true ->
         Submissions.list_user_submissions(user, topic)
@@ -107,7 +109,7 @@ defmodule AppWeb.TopicController do
             Submissions.list_user_own_submissions(user, topic)
           end
       end
-    render(conn, "show.html", topic: topic, submissions: submissions, can_edit: can_edit, uid: user.id)
+    render(conn, "show.html", topic: topic, submissions: submissions, can_edit: can_edit, uid: user.id, section: section, course: course)
   end
 
   def edit(conn, %{"id" => id}) do

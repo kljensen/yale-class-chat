@@ -6,8 +6,8 @@
             </a>
         </li>
         <li>
-             <a href="<%= Routes.section_topic_path(@conn, :index, @topic.section_id)  %>">
-                CourseAndNumHere
+             <a href="<%= Routes.course_path(@conn, :show, @course) %>">
+                <%= @course.department <> " " <> Integer.to_string(@course.number) %>
             </a>
         </li>
         <li>

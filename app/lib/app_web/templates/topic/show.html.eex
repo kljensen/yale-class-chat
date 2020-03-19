@@ -30,6 +30,8 @@
                         <div class="details uk-width-expand">
                             <%= submission.avg_rating |> Decimal.round(2) |> Decimal.to_string %> pts
                             /
+                            <%= submission.comment_count |> Integer.to_string %> comments
+                            /
                             <span>Posted at: </span><span class="rating"><%= submission.inserted_at %>
                         </div>
                     </div>

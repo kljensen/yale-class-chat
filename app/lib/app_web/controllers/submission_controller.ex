@@ -4,6 +4,7 @@ defmodule AppWeb.SubmissionController do
   alias App.Submissions
   alias App.Submissions.Submission
   alias App.Topics
+  alias App.Courses
 
   def index(conn, %{"topic_id" => topic_id}) do
     topic = Topics.get_topic!(topic_id)
@@ -16,7 +17,9 @@ defmodule AppWeb.SubmissionController do
   def new(conn, %{"topic_id" => topic_id}) do
     changeset = Submissions.change_submission(%Submission{})
     topic = Topics.get_topic!(topic_id)
-    render(conn, "new.html", changeset: changeset, topic: topic)
+    section = Courses.get_section!(topic.section_id)
+    course = Courses.get_course!(section.course_id)
+    render(conn, "new.html", changeset: changeset, topic: topic, course: course)
   end
 
   def create(conn, %{"submission" => submission_params, "topic_id" => topic_id}) do
@@ -49,7 +52,9 @@ defmodule AppWeb.SubmissionController do
     can_edit = App.Accounts.can_edit_submission(user, submission_check)
     can_edit_topic = App.Accounts.can_edit_topic(user, topic)
     comments = Submissions.list_user_comments(user, submission_check)
-    render(conn, "show.html", submission: submission, topic: topic, can_edit: can_edit, uid: user.id, can_edit_topic: can_edit_topic, comments: comments)
+    section = Courses.get_section!(topic.section_id)
+    course = Courses.get_course!(section.course_id)
+    render(conn, "show.html", submission: submission, topic: topic, can_edit: can_edit, uid: user.id, can_edit_topic: can_edit_topic, comments: comments, section: section, course: course)
   end
 
   def edit(conn, %{"id" => id}) do
