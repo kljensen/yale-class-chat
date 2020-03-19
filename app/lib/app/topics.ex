@@ -105,6 +105,35 @@ defmodule App.Topics do
   """
   def get_topic!(id), do: Repo.get!(Topic, id)
 
+  def get_user_topic(%App.Accounts.User{} = user, topic_id) do
+    allowed_course_roles = @course_admin_roles
+    uid = user.id
+    query = from t in Topic,
+              where: t.id == ^topic_id,
+              left_join: s in assoc(t, :section),
+              on: t.section_id == s.id,
+              left_join: c in assoc(s, :course),
+              on: s.course_id == c.id,
+              select: t
+    result = if !is_nil(query) do
+      query = query
+        |> preload([t, s, c], [section: {s, course: c}])
+      Repo.one(query)
+    end
+
+    if is_nil(result) do
+      query = from t in Topic, where: t.id == ^topic_id
+      message = if Repo.exists?(query) do
+                  "forbidden"
+                else
+                  "not found"
+                end
+      {:error, message}
+    else
+      {:ok, result}
+    end
+  end
+
   @doc """
   Creates a topic.
 

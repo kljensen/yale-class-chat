@@ -108,9 +108,8 @@ defmodule AppWeb.TopicControllerTest do
         |> init_test_session(uid: "faculty net id")
         |> delete(Routes.topic_path(conn, :delete, topic))
       assert redirected_to(conn) == Routes.section_topic_path(conn, :index, section)
-      assert_error_sent 404, fn ->
-        get(conn, Routes.topic_path(conn, :show, topic))
-      end
+      conn = get(conn, Routes.topic_path(conn, :show, topic))
+      assert html_response(conn, 404) =~ "Not Found"
     end
   end
 
