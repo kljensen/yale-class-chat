@@ -39,24 +39,24 @@ defmodule AppWeb.Router do
 
     #get "/", PageController, :index
     resources "/courses", CourseController do
-      resources "/sections", SectionController, only: [:index, :new]
+      resources "/sections", SectionController, only: [:new]
       resources "/course_roles", Course_RoleController
       resources "/topics", TopicController, only: [:new, :create]
     end
 
     resources "/sections", SectionController, except: [:index, :new] do
-      resources "/topics", TopicController, except: [:show, :new, :create]
+      resources "/topics", TopicController, except: [:show, :new, :create, :index]
       get "/add_section_roles", Section_RoleController, :bulk_new
       post "/add_section_roles", Section_RoleController, :bulk_create
       resources "/section_roles", Section_RoleController
     end
 
     resources "/topics", TopicController, only: [:show] do
-      resources "/submissions", SubmissionController, except: [:show]
+      resources "/submissions", SubmissionController, except: [:show, :index]
     end
 
     resources "/submissions", SubmissionController, only: [:show] do
-      resources "/comments", CommentController
+      resources "/comments", CommentController, except: [:index]
       resources "/ratings", RatingController
     end
 

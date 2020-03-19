@@ -514,9 +514,9 @@ defmodule App.SubmissionsTest do
   describe "comments" do
     alias App.Submissions.Comment
 
-    @valid_attrs %{description: "some description", title: "some title"}
-    @update_attrs %{description: "some updated description", title: "some updated title"}
-    @invalid_attrs %{description: nil, title: nil}
+    @valid_attrs %{description: "some description"}
+    @update_attrs %{description: "some updated description"}
+    @invalid_attrs %{description: nil}
 
     def comment_fixture(user, submission, attrs \\ %{}) do
       params =
@@ -537,7 +537,6 @@ defmodule App.SubmissionsTest do
       retrieved_comment = List.first(retrieved_comments)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
     end
 
     test "list_comments/1 returns all comments for the given submission", context do
@@ -551,13 +550,11 @@ defmodule App.SubmissionsTest do
       retrieved_comment = List.first(retrieved_comments)
       assert retrieved_comment.id == comment2.id
       assert retrieved_comment.description == comment2.description
-      assert retrieved_comment.title == comment2.title
       retrieved_comments = Submissions.list_comments(submission)
       assert length(retrieved_comments) == 1
       retrieved_comment = List.first(retrieved_comments)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
     end
 
     test "list_user_comments/3 returns all comments for the given submission", context do
@@ -574,7 +571,6 @@ defmodule App.SubmissionsTest do
       retrieved_comment = List.first(retrieved_comments)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
 
       retrieved_comments = Submissions.list_user_comments(user_faculty, submission2)
       assert length(retrieved_comments) == 0
@@ -583,7 +579,6 @@ defmodule App.SubmissionsTest do
       retrieved_comment = List.first(retrieved_comments)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
     end
 
     test "list_user_comments/3 returns no comments if no valid role", context do
@@ -640,11 +635,9 @@ defmodule App.SubmissionsTest do
       retrieved_comment = List.first(retrieved_comments)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
       retrieved_comment = List.last(retrieved_comments)
       assert retrieved_comment.id == comment2.id
       assert retrieved_comment.description == comment2.description
-      assert retrieved_comment.title == comment2.title
 
       retrieved_comments = Submissions.list_user_own_comments(student2)
       assert length(retrieved_comments) == 0
@@ -663,14 +656,12 @@ defmodule App.SubmissionsTest do
       retrieved_comment = List.first(retrieved_comments)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
 
       retrieved_comments = Submissions.list_user_own_comments(student, submission2)
       assert length(retrieved_comments) == 1
       retrieved_comment = List.first(retrieved_comments)
       assert retrieved_comment.id == comment2.id
       assert retrieved_comment.description == comment2.description
-      assert retrieved_comment.title == comment2.title
 
       retrieved_comments = Submissions.list_user_own_comments(student2, submission)
       assert length(retrieved_comments) == 0
@@ -684,7 +675,6 @@ defmodule App.SubmissionsTest do
       retrieved_comment = Submissions.get_comment!(comment.id)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
     end
 
     test "create_comment/3 with valid data creates a comment", context do
@@ -693,14 +683,12 @@ defmodule App.SubmissionsTest do
 
       assert {:ok, %Comment{} = comment} = Submissions.create_comment(student, submission, @valid_attrs)
       assert comment.description == "some description"
-      assert comment.title == "some title"
     end
 
     test "create_comment/3 with invalid data returns error changeset", context do
       student = context[:student]
       submission = submission_fixture(context[:submitter], context[:topic])
       assert {:error, changeset = comment} = Submissions.create_comment(student, submission, @invalid_attrs)
-      assert %{title: ["can't be blank"]} = errors_on(changeset)
       assert %{description: ["can't be blank"]} = errors_on(changeset)
     end
 
@@ -755,7 +743,6 @@ defmodule App.SubmissionsTest do
       comment = comment_fixture(student, submission)
       assert {:ok, %Comment{} = comment} = Submissions.update_comment(student, comment, @update_attrs)
       assert comment.description == "some updated description"
-      assert comment.title == "some updated title"
     end
 
     test "update_comment/3 with invalid data returns error changeset", context do
@@ -766,7 +753,6 @@ defmodule App.SubmissionsTest do
       retrieved_comment = Submissions.get_comment!(comment.id)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
     end
 
     test "update_comment/3 by unauthorized user returns error", context do
@@ -777,7 +763,6 @@ defmodule App.SubmissionsTest do
       retrieved_comment = Submissions.get_comment!(comment.id)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
     end
 
     test "update_comment/3 on non-writeable course updates the comment", context do
@@ -794,7 +779,6 @@ defmodule App.SubmissionsTest do
       retrieved_comment = Submissions.get_comment!(comment.id)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
     end
 
     test "update_comment/3 returns error if topic not yet open", context do
@@ -808,7 +792,6 @@ defmodule App.SubmissionsTest do
       retrieved_comment = Submissions.get_comment!(comment.id)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
     end
 
     test "update_comment/3 returns error if topic closed", context do
@@ -822,7 +805,6 @@ defmodule App.SubmissionsTest do
       retrieved_comment = Submissions.get_comment!(comment.id)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
     end
 
     test "update_comment/3 returns error if commenting not allowed", context do
@@ -836,7 +818,6 @@ defmodule App.SubmissionsTest do
       retrieved_comment = Submissions.get_comment!(comment.id)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
     end
 
     test "delete_comment/2 deletes the comment", context do
@@ -855,7 +836,6 @@ defmodule App.SubmissionsTest do
       retrieved_comment = Submissions.get_comment!(comment.id)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
     end
 
     test "delete_comment/2 on non-writeable course returns error", context do
@@ -872,7 +852,6 @@ defmodule App.SubmissionsTest do
       retrieved_comment = Submissions.get_comment!(comment.id)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
     end
 
     test "delete_comment/2 returns error if topic not yet open", context do
@@ -886,7 +865,6 @@ defmodule App.SubmissionsTest do
       retrieved_comment = Submissions.get_comment!(comment.id)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
     end
 
     test "delete_comment/2 returns error if topic closed", context do
@@ -900,7 +878,6 @@ defmodule App.SubmissionsTest do
       retrieved_comment = Submissions.get_comment!(comment.id)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
     end
 
     test "delete_comment/2 returns error if commenting not allowed", context do
@@ -914,7 +891,6 @@ defmodule App.SubmissionsTest do
       retrieved_comment = Submissions.get_comment!(comment.id)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
-      assert retrieved_comment.title == comment.title
     end
 
     test "change_comment/1 returns a comment changeset", context do

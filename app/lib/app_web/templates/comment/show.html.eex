@@ -3,11 +3,6 @@
 <ul>
 
   <li>
-    <strong>Title:</strong>
-    <%= @comment.title %>
-  </li>
-
-  <li>
     <strong>Description:</strong>
     <%= @comment.description %>
   </li>
@@ -17,4 +12,4 @@
 <%= if @can_edit do %>
 <span><%= link "Edit", to: Routes.comment_path(@conn, :edit, @comment) %></span>
 <% end %>
-<span><%= link "Back", to: Routes.submission_comment_path(@conn, :index, @submission) %></span>
+<span><%= link "Back", to: Routes.submission_path(@conn, :show, @submission) %></span>

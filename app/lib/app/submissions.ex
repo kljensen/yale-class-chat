@@ -92,8 +92,8 @@ defmodule App.Submissions do
                         slug: su.slug,
                         inserted_at: su.inserted_at,
                         avg_rating: avg(ra.score),
-                        rating_count: count(ra.id),
-                        comment_count: count(co.id),
+                        rating_count: count(ra.id, :distinct),
+                        comment_count: count(co.id, :distinct),
                         user_id: su.user_id,
                         user_netid: u.net_id,
                         user_display_name: u.display_name,
@@ -125,8 +125,8 @@ defmodule App.Submissions do
                         slug: su.slug,
                         inserted_at: su.inserted_at,
                         avg_rating: avg(ra.score),
-                        rating_count: count(ra.id),
-                        comment_count: count(co.id),
+                        rating_count: count(ra.id, :distinct),
+                        comment_count: count(co.id, :distinct),
                         user_id: su.user_id,
                         user_netid: u.net_id,
                         user_display_name: u.display_name,
@@ -268,10 +268,24 @@ defmodule App.Submissions do
                             on: s.course_id == c.id,
                             left_join: ra in App.Submissions.Rating,
                             on: su.id == ra.submission_id,
+                            left_join: co in App.Submissions.Comment,
+                            on: su.id == co.submission_id,
                             where: c.allow_read == true,
                             where: su.id == ^id,
                             group_by: su.id,
-                            select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id, topic_id: su.topic_id}
+                            select: %{id: su.id,
+                                        title: su.title,
+                                        description: su.description,
+                                        allow_ranking: su.allow_ranking,
+                                        visible: su.visible,
+                                        image_url: su.image_url,
+                                        slug: su.slug,
+                                        inserted_at: su.inserted_at,
+                                        avg_rating: avg(ra.score),
+                                        rating_count: count(ra.id, :distinct),
+                                        comment_count: count(co.id, :distinct),
+                                        user_id: su.user_id,
+                                        topic_id: su.topic_id}
                   Repo.one(query)
                 false ->
                   tid = submission.topic_id
@@ -290,6 +304,8 @@ defmodule App.Submissions do
                             on: su.topic_id == t.id,
                             left_join: ra in App.Submissions.Rating,
                             on: su.id == ra.submission_id,
+                            left_join: co in App.Submissions.Comment,
+                            on: su.id == co.submission_id,
                             where: r.user_id == ^uid,
                             where: r.valid_from <= from_now(0, "day"),
                             where: r.valid_to >= from_now(0, "day"),
@@ -302,8 +318,20 @@ defmodule App.Submissions do
                             where: su.id == ^id,
                             where: t.id == ^tid,
                             group_by: su.id,
-                            select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id, topic_id: su.topic_id}
-                  Repo.one(query)
+                            select: %{id: su.id,
+                                        title: su.title,
+                                        description: su.description,
+                                        allow_ranking: su.allow_ranking,
+                                        visible: su.visible,
+                                        image_url: su.image_url,
+                                        slug: su.slug,
+                                        inserted_at: su.inserted_at,
+                                        avg_rating: avg(ra.score),
+                                        rating_count: count(ra.id, :distinct),
+                                        comment_count: count(co.id, :distinct),
+                                        user_id: su.user_id,
+                                        topic_id: su.topic_id}
+                    Repo.one(query)
               end
     if is_nil(result) do
       query = from s in Submission, where: s.id == ^id

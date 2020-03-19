@@ -5,9 +5,9 @@ defmodule AppWeb.CommentControllerTest do
 
   setup [:create_submission]
 
-  @create_attrs %{description: "some description", title: "some title"}
-  @update_attrs %{description: "some updated description", title: "some updated title"}
-  @invalid_attrs %{description: nil, title: nil}
+  @create_attrs %{description: "some description"}
+  @update_attrs %{description: "some updated description"}
+  @invalid_attrs %{description: nil}
 
   def fixture(:comment, submission) do
     user_faculty = App.Accounts.get_user_by!("faculty net id")
@@ -15,14 +15,14 @@ defmodule AppWeb.CommentControllerTest do
     comment
   end
 
-  describe "index" do
-    test "lists all comments", %{conn: conn, submission: submission} do
-      conn = conn
-        |> init_test_session(uid: "faculty net id")
-        |> get(Routes.submission_comment_path(conn, :index, submission))
-      assert html_response(conn, 200) =~ "Listing Comments"
-    end
-  end
+  #describe "index" do
+  #  test "lists all comments", %{conn: conn, submission: submission} do
+  #    conn = conn
+  #      |> init_test_session(uid: "faculty net id")
+  #      |> get(Routes.submission_comment_path(conn, :index, submission))
+  #    assert html_response(conn, 200) =~ "Listing Comments"
+  #  end
+  #end
 
   describe "new comment" do
     test "renders form", %{conn: conn, submission: submission} do

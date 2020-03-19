@@ -16,14 +16,14 @@ defmodule AppWeb.SubmissionControllerTest do
     submission
   end
 
-  describe "index" do
-    test "lists all submissions", %{conn: conn, topic: topic} do
-      conn = conn
-        |> init_test_session(uid: "faculty net id")
-        |> get(Routes.topic_submission_path(conn, :index, topic))
-      assert html_response(conn, 200) =~ "Listing Submissions"
-    end
-  end
+  #describe "index" do
+  #  test "lists all submissions", %{conn: conn, topic: topic} do
+  #    conn = conn
+  #      |> init_test_session(uid: "faculty net id")
+  #      |> get(Routes.topic_submission_path(conn, :index, topic))
+  #    assert html_response(conn, 200) =~ "Listing Submissions"
+  #  end
+  #end
 
   describe "new submission" do
     test "renders form", %{conn: conn, topic: topic} do

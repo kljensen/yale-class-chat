@@ -172,7 +172,7 @@ defmodule AppWeb.SectionController do
         {:ok, _section} = Courses.delete_section(user, section)
         conn
         |> put_flash(:info, "Section deleted successfully.")
-        |> redirect(to: Routes.course_section_path(conn, :index, cid))
+        |> redirect(to: Routes.course_path(conn, :show, cid))
 
       false ->
         conn

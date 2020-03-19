@@ -11,14 +11,14 @@
             </a>
         </li>
         <li>
-            <span>
+            <a href="<%= Routes.topic_path(@conn, :show, @topic) %>">
                 <%= truncate_text(@topic.title, 10) %>
-            </span>
+            </a>
         </li>
         <%= if !is_nil(assigns[:submission]) do %>
         <li>
             <span>
-                <%= @submission.title %>
+                <%= truncate_text(@submission.title, 10) %>
             </span>
         </li>
         <% end %>
