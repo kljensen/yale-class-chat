@@ -3,6 +3,25 @@
     <h1 class="uk-heading-divider"><%= @topic.title %></h1>
     <p><%= @topic.description %></p>
     </div>
+    <div class="uk-padding-small topic-details">
+    <% topic_status = cond do
+    @topic.closed_at <= current_time(0) ->
+    "closed"
+    @topic.opened_at >= current_time(0) ->
+    "closed"
+    true ->
+    "open"
+    end %>
+
+    <p><%= if @topic.anonymous, do: "posted submissions are anonymous / " %>
+    <%= "topic is " <> topic_status <>" / " %>
+    <%= "submissions: "%><%= if @topic.allow_submissions == false, do: "not "%><%= "allowed /"%>
+    <%= "comments: "%><%= if @topic.allow_submission_comments == false, do: "not "%><%= "allowed /"%>
+    <%= "ratings: "%><%= if @topic.allow_ranking == false, do: "not "%><%= "allowed /"%>
+    <%= "viewing other user submissions: "%><%= if @topic.show_user_submissions == false, do: "not "%><%= "allowed"%>
+    <%= "submission limit: "%><%= Integer.to_string(@topic.user_submission_limit) %>
+    </p>
+    </div>
 </div>
 
 

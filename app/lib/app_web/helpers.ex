@@ -7,4 +7,9 @@ defmodule AppWeb.Helpers do
       string
     end
   end
+
+  def current_time(_) do
+    {:ok, curtime} = DateTime.now("Etc/UTC")
+    curtime
+  end
 end
