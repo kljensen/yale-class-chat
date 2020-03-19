@@ -40,7 +40,7 @@
 </div>
 
 <div class="uk-position-fixed uk-position-z-index absolute uk-dark uk-position-bottom-right">
-<a href="" class="add uk-box-shadow-small uk-box-shadow-hover-large" uk-marker></a>
+<a href=<%= Routes.topic_submission_path(@conn, :new, @topic.id) %> class="add uk-box-shadow-small uk-box-shadow-hover-large" uk-marker></a>
 </div>
 
 

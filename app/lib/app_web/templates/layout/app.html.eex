@@ -27,7 +27,7 @@
             </div>
         </div>
         </a>
-        <!--
+
         <nav role="navigation">
           <ul>
             <%= if is_nil(@conn.private.plug_session["uid"]) do %>
@@ -37,7 +37,7 @@
             <% end %>
           </ul>
         </nav>
-        -->
+
       </section>
     </header>
     <%= render_existing @view_module, "breadcrumbs.html", assigns %>

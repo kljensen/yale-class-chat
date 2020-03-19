@@ -15,10 +15,12 @@
                 <%= @topic.title %>
             </span>
         </li>
+        <%= if !is_nil(assigns[:submission]) do %>
         <li>
             <span>
                 <%= @submission.title %>
             </span>
         </li>
+        <% end %>
     </ul>
 </div>
