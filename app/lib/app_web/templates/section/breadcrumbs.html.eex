@@ -6,9 +6,16 @@
             </a>
         </li>
         <li>
-             <a href="<%= Routes.section_path(@conn, :show, @section.id) %>">
+             <a href="<%= Routes.course_path(@conn, :show, @course.id) %>">
                 <%= @course.department %><%= @course.number %>
             </a>
         </li>
+        <%= if !is_nil(assigns[:section]) do %>
+        <li>
+            <span>
+                <%= @section.title %>
+            </span>
+        </li>
+        <% end %>
     </ul>
 </div>

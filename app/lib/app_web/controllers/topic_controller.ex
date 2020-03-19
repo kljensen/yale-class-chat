@@ -10,11 +10,12 @@ defmodule AppWeb.TopicController do
 
   def index(conn, %{"section_id" => section_id}) do
     section = Courses.get_section!(section_id)
+    course = Courses.get_course!(section.course_id)
     user = conn.assigns.current_user
     can_edit = App.Accounts.can_edit_section(user, section)
 
     topics = Topics.list_user_topics(user, section)
-    render(conn, "index.html", topics: topics, section: section, can_edit: can_edit)
+    render(conn, "index.html", topics: topics, section: section, can_edit: can_edit, course: course)
   end
 
   def new(conn, %{"course_id" => course_id}) do
@@ -133,8 +134,9 @@ defmodule AppWeb.TopicController do
   end
 
   def update(conn, %{"id" => id, "topic" => topic_params}) do
+    user = conn.assigns.current_user
     topic = Topics.get_topic!(id)
-    section = Courses.get_section!(topic.section_id)
+    {:ok, section} = Courses.get_user_section(user, topic.section_id)
     user = conn.assigns.current_user
 
     case Topics.update_topic(user, topic, topic_params) do
@@ -145,7 +147,7 @@ defmodule AppWeb.TopicController do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:ok, current_time} = DateTime.now("America/New_York")
-        render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time, section: section, sort_list: @sort_list)
+        render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time, section: section, sort_list: @sort_list, course: section.course)
 
       {:error, message} ->
         case message do

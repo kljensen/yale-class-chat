@@ -41,10 +41,10 @@ defmodule AppWeb.SubmissionControllerTest do
         |> post(Routes.topic_submission_path(conn, :create, topic), submission: @create_attrs)
 
       assert %{id: id} = redirected_params(conn)
-      assert redirected_to(conn) == Routes.submission_path(conn, :show, id)
+      assert redirected_to(conn) == Routes.topic_path(conn, :show, topic.id)
 
-      conn = get(conn, Routes.submission_path(conn, :show, id))
-      assert html_response(conn, 200) =~ "Submitted in response to:"
+      conn = get(conn, Routes.topic_path(conn, :show, topic.id))
+      assert html_response(conn, 200) =~ @create_attrs.title
     end
 
     test "renders errors when data is invalid", %{conn: conn, topic: topic} do
@@ -75,7 +75,7 @@ defmodule AppWeb.SubmissionControllerTest do
         |> put(Routes.submission_path(conn, :update, submission), submission: @update_attrs)
       assert redirected_to(conn) == Routes.submission_path(conn, :show, submission)
 
-      conn = get(conn, Routes.submission_path(conn, :show, submission))
+      conn = get(conn, Routes.submission_path(conn, :show, submission.id))
       assert html_response(conn, 200) =~ "some updated description"
     end
 
@@ -94,7 +94,7 @@ defmodule AppWeb.SubmissionControllerTest do
       conn = conn
         |> init_test_session(uid: "faculty net id")
         |> delete(Routes.submission_path(conn, :delete, submission))
-      assert redirected_to(conn) == Routes.topic_submission_path(conn, :index, topic)
+      assert redirected_to(conn) == Routes.topic_path(conn, :show, topic)
       assert_error_sent 404, fn ->
         get(conn, Routes.submission_path(conn, :show, submission))
       end

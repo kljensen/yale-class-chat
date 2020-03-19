@@ -40,10 +40,10 @@ defmodule AppWeb.CommentControllerTest do
         |> post(Routes.submission_comment_path(conn, :create, submission), comment: @create_attrs)
 
       assert %{id: id} = redirected_params(conn)
-      assert redirected_to(conn) == Routes.comment_path(conn, :show, id)
+      assert redirected_to(conn) == Routes.submission_path(conn, :show, id)
 
-      conn = get(conn, Routes.comment_path(conn, :show, id))
-      assert html_response(conn, 200) =~ "Show Comment"
+      conn = get(conn, Routes.submission_path(conn, :show, id))
+      assert html_response(conn, 200) =~ @create_attrs.description
     end
 
     test "renders errors when data is invalid", %{conn: conn, submission: submission} do
@@ -72,7 +72,7 @@ defmodule AppWeb.CommentControllerTest do
       conn = conn
         |> init_test_session(uid: "faculty net id")
         |> put(Routes.comment_path(conn, :update, comment), comment: @update_attrs)
-      assert redirected_to(conn) == Routes.comment_path(conn, :show, comment)
+      assert redirected_to(conn) == Routes.submission_path(conn, :show, comment.submission_id)
 
       conn = get(conn, Routes.comment_path(conn, :show, comment))
       assert html_response(conn, 200) =~ "some updated description"
@@ -94,7 +94,7 @@ defmodule AppWeb.CommentControllerTest do
       conn = conn
         |> init_test_session(uid: "faculty net id")
         |> delete(Routes.comment_path(conn, :delete, comment))
-      assert redirected_to(conn) == Routes.submission_comment_path(conn, :index, submission)
+      assert redirected_to(conn) == Routes.submission_path(conn, :show, submission)
       assert_error_sent 404, fn ->
         get(conn, Routes.submission_comment_path(conn, :show, comment, submission))
       end

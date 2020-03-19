@@ -28,7 +28,7 @@ defmodule AppWeb.CourseControllerTest do
         |> init_test_session(uid: "faculty net id")
         |> get(Routes.course_path(conn, :index))
 
-      assert html_response(conn, 200) =~ "Listing Courses"
+      assert html_response(conn, 200) =~ "New Course"
     end
   end
 

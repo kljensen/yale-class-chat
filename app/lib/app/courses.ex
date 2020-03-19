@@ -565,10 +565,10 @@ defmodule App.Courses do
       cid = course.id
       allowed_section_roles = @section_read_roles
       query = from s in Section,
-                left_join: r in App.Accounts.Section_Role,
-                on: r.section_id == s.id,
                 left_join: c in assoc(s, :course),
                 on: s.course_id == c.id,
+                left_join: r in App.Accounts.Section_Role,
+                on: r.section_id == s.id,
                 where: r.user_id == ^uid,
                 where: r.valid_from <= from_now(0, "day"),
                 where: r.valid_to >= from_now(0, "day"),
@@ -580,6 +580,8 @@ defmodule App.Courses do
       query = if inherit_course_role and Enum.member?(allowed_course_roles, auth_role) do
         from s in Section,
           where: s.id == ^section_id,
+          left_join: c in assoc(s, :course),
+          on: s.course_id == c.id,
           select: s
       else
           query
@@ -590,9 +592,7 @@ defmodule App.Courses do
     result = if !is_nil(query) do
       query = query
         |> preload([s, c], [course: c])
-
       Repo.one(query)
-
     end
 
     if is_nil(result) do

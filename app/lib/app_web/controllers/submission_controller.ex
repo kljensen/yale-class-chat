@@ -51,8 +51,9 @@ defmodule AppWeb.SubmissionController do
   def show(conn, %{"id" => id}) do
     user = conn.assigns.current_user
     submission = Submissions.get_user_submission(user, id)
-    my_rating = Submissions.get_user_submission_rating(user.id, submission.id)
-    submission_check = Submissions.get_submission!(submission.id)
+    #submission = Submissions.get_submission!(id)
+    my_rating = Submissions.get_user_submission_rating(user.id, id)
+    submission_check = Submissions.get_submission!(id)
     topic = Topics.get_topic!(submission.topic_id)
     can_edit = App.Accounts.can_edit_submission(user, submission_check)
     is_admin = App.Accounts.can_edit_topic(user, topic)
@@ -62,7 +63,19 @@ defmodule AppWeb.SubmissionController do
     course = Courses.get_course!(section.course_id)
     comment_changeset = Submissions.change_comment(%App.Submissions.Comment{})
     rating_changeset = Submissions.change_rating(%App.Submissions.Rating{})
-    render(conn, "show.html", submission: submission, topic: topic, can_edit: can_edit, uid: user.id, can_edit_topic: can_edit_topic, comments: comments, section: section, course: course, is_admin: is_admin, comment_changeset: comment_changeset, rating_changeset: rating_changeset, my_rating: my_rating)
+    render(conn, "show.html",
+            submission: submission,
+            topic: topic,
+            can_edit: can_edit,
+            uid: user.id,
+            can_edit_topic: can_edit_topic,
+            comments: comments,
+            section: section,
+            course: course,
+            is_admin: is_admin,
+            comment_changeset: comment_changeset,
+            rating_changeset: rating_changeset,
+            my_rating: my_rating)
   end
 
   def edit(conn, %{"id" => id}) do

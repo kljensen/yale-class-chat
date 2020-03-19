@@ -259,7 +259,20 @@ defmodule App.Submissions do
     submission = Repo.get!(Submission, id)
     return = case App.Accounts.can_edit_submission(user, submission) do
                 true ->
-                  submission
+                  query = from su in Submission,
+                            join: t in App.Topics.Topic,
+                            on: su.topic_id == t.id,
+                            join: s in App.Courses.Section,
+                            on: t.section_id == s.id,
+                            join: c in App.Courses.Course,
+                            on: s.course_id == c.id,
+                            left_join: ra in App.Submissions.Rating,
+                            on: su.id == ra.submission_id,
+                            where: c.allow_read == true,
+                            where: su.id == ^id,
+                            group_by: su.id,
+                            select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id, topic_id: su.topic_id}
+                  Repo.one(query)
                 false ->
                   tid = submission.topic_id
                   topic = App.Topics.get_topic!(tid)
