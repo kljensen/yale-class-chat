@@ -600,7 +600,7 @@ defmodule App.Submissions do
                             on: t.section_id == s.id,
                             join: su in Submission,
                             on: su.topic_id == t.id,
-                            left_join: co in App.Submission.Comment,
+                            left_join: co in App.Submissions.Comment,
                             on: su.id == co.submission_id,
                             where: r.user_id == ^uid,
                             where: r.valid_from <= from_now(0, "day"),
@@ -614,7 +614,6 @@ defmodule App.Submissions do
                             where: su.id == ^id,
                             where: t.id == ^tid,
                             where: co.id == ^id,
-                            group_by: su.id,
                             select: co
                   Repo.one(query)
               end
@@ -926,7 +925,7 @@ defmodule App.Submissions do
                             on: t.section_id == s.id,
                             join: su in Submission,
                             on: su.topic_id == t.id,
-                            left_join: ra in App.Submission.Rating,
+                            left_join: ra in App.Submissions.Rating,
                             on: su.id == ra.submission_id,
                             where: r.user_id == ^uid,
                             where: r.valid_from <= from_now(0, "day"),
@@ -940,7 +939,6 @@ defmodule App.Submissions do
                             where: su.id == ^id,
                             where: t.id == ^tid,
                             where: ra.id == ^id,
-                            group_by: su.id,
                             select: ra
                   Repo.one(query)
               end
