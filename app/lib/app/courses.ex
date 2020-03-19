@@ -564,10 +564,10 @@ defmodule App.Courses do
       uid = user.id
       cid = course.id
       allowed_section_roles = @section_read_roles
-      query = from r in App.Accounts.Section_Role,
-                left_join: s in Section,
+      query = from s in Section,
+                left_join: r in App.Accounts.Section_Role,
                 on: r.section_id == s.id,
-                left_join: c in Course,
+                left_join: c in assoc(s, :course),
                 on: s.course_id == c.id,
                 where: r.user_id == ^uid,
                 where: r.valid_from <= from_now(0, "day"),
@@ -587,7 +587,13 @@ defmodule App.Courses do
     else
       nil
     end
-    result = if !is_nil(query), do: Repo.one(query)
+    result = if !is_nil(query) do
+      query = query
+        |> preload([s, c], [course: c])
+
+      Repo.one(query)
+
+    end
 
     if is_nil(result) do
       query = from s in Section, where: s.id == ^section_id
