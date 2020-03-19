@@ -1,0 +1,24 @@
+<div class="uk-light uk-background-secondary breadcrumb-holder">
+    <ul class="breadcrumb uk-breadcrumb">
+        <li>
+            <a href="<%= Routes.user_section_path(@conn, :index) %>">
+                Sections
+            </a>
+        </li>
+        <li>
+             <a href="">
+                CourseTitleAndNum
+            </a>
+        </li>
+        <li>
+            <span>
+                <%= @topic.title %>
+            </span>
+        </li>
+        <li>
+            <span>
+                <%= @submission.title %>
+            </span>
+        </li>
+    </ul>
+</div>
