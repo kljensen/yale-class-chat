@@ -4,9 +4,7 @@
         <% if !is_nil(@submission.image_url) do %>        
             <img src="<%= @submission.image_url %>">
         <% end %>
-        <%= for para <- split_newlines(@submission.description) do %>
-            <p><%= para %></p>
-        <% end %>
+        <%= render AppWeb.HelperView, "multiparagraph_text.html", text: @submission.description %>
         <div class="submission-stats">
             <%= if @topic.anonymous do %>
             <% else %>
