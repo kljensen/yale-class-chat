@@ -1,7 +1,7 @@
 <div class="uk-margin-bottom">
     <div class="uk-padding-small topic-title">
     <h1 class="uk-heading-divider"><%= @topic.title %></h1>
-    <p><%= @topic.description %></p>
+    <%= render AppWeb.HelperView, "multiparagraph_text.html", text: @topic.description %>
     </div>
     <div class="uk-padding-small topic-details">
     <% topic_status = cond do
@@ -40,9 +40,7 @@
                     </div>
                     <div class="uk-card-body">
                         <div class="uk-width-expand">
-                            <p>
-                                <%= submission.description %>
-                            </p>
+                            <%= render AppWeb.HelperView, "multiparagraph_text.html", text: submission.description %>
                         </div>
                     </div>
                     <div class="uk-card-footer">

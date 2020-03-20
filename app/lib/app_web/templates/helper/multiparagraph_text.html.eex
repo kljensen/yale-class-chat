@@ -1,0 +1,3 @@
+<%= for para <- split_newlines(@text) do %>
+    <p><%= para %></p>
+<% end %>
