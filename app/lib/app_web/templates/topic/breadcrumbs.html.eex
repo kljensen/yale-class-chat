@@ -2,14 +2,25 @@
     <ul class="breadcrumb uk-breadcrumb">
         <li>
             <a href="<%= Routes.user_section_path(@conn, :index) %>">
-                Sections
+                Courses
             </a>
         </li>
         <li>
-             <a href="<%= Routes.course_path(@conn, :show, @course) %>">
+             <%= if App.Accounts.can_edit_course(@current_user, @course) do %>
+             <a href="<%= Routes.course_path(@conn, :show, @course.id) %>">
+             <% else %>
+             <a href="<%= Routes.section_path(@conn, :show, @section.id) %>">
+            <% end %>
                 <%= @course.department <> " " <> Integer.to_string(@course.number) %>
             </a>
         </li>
+        <%= if !is_nil(assigns[:section]) do %>
+        <li>
+            <a href="<%= Routes.section_path(@conn, :show, @section.id) %>">
+                <%= @section.title %>
+            </a>
+        </li>
+        <% end %>
         <%= if !is_nil(assigns[:topic]) do %>
         <li>
             <span>
