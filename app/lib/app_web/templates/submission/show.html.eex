@@ -1,7 +1,7 @@
 <div class="uk-margin-bottom">
     <div class="uk-padding-small submission-body">
         <h1 class="uk-heading-divider"><%= @submission.title %></h1>
-        <% if !is_nil(@submission.image_url) do %>        
+        <%= if !is_nil(@submission.image_url) do %>
             <img src="<%= @submission.image_url %>">
         <% end %>
         <%= render AppWeb.HelperView, "multiparagraph_text.html", text: @submission.description %>
