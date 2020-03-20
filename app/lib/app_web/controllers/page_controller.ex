@@ -10,7 +10,7 @@ defmodule AppWeb.PageController do
         render(conn, "index.html", [current_user: nil, is_faculty: false])
 
       uid ->
-        case IO.inspect(App.Accounts.get_user_by(uid)) do
+        case App.Accounts.get_user_by(uid) do
           nil ->
             conn
             |> configure_session(drop: true)
