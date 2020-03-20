@@ -11,7 +11,7 @@ defmodule AppWeb.PageViewTest do
       current_user: nil,
       is_faculty: false)
 
-    assert String.contains?(content, "Welcome")
+    assert String.contains?(content, "WELCOME")
 
   end
 end

@@ -1,38 +1,62 @@
-<section class="phx-hero">
-  <h1><%= gettext "Welcome to %{name}!", name: "Yale Class Chat" %></h1>
+<section class="uk-section uk-section-small">
+    <div class="uk-height-large uk-cover-container uk-border-rounded">
+      <img src="/images/som-class-of-2020.jpg" alt="Alt img" data-uk-cover="" class="uk-cover" style="height: 450px; width: 1170px;">
+      <div class="uk-overlay uk-overlay-primary uk-position-cover uk-flex uk-flex-center uk-flex-middle uk-light uk-text-center">
+        <div data-uk-scrollspy="cls: uk-animation-slide-bottom-small" class="uk-scrollspy-inview uk-animation-slide-bottom-small" style="">
+          <span style="letter-spacing: 0.2em; font-size: 0.725rem">WELCOME</span>
+          <h1 class="uk-margin-top uk-margin-small-bottom uk-margin-remove-adjacent">Yale Chat</h1>
+          <p>Seamless in-class communication between students and professors - say goodbye to Zoom chatrooms, ad-hoc Slack channels, and Slido!</p>
+          <a href="/auth/cas" class="uk-button uk-button-default uk-margin-top">LOG IN</a>
+        </div>
+      </div>
+    </div>
 </section>
-<section class="row">
-  <article class="column">
-  </article>
-</section>
+<section class="uk-section uk-section-muted uk-padding-remove-bottom">
+			<div class="uk-container uk-container-small">
+				<header class="uk-text-center">
+					<h1 class="uk-heading-primary">Features</h1>
+				</header>
+				<div class="uk-grid uk-grid-small uk-child-width-1-3@m uk-margin-medium-top uk-grid-match uk-grid-stack" data-uk-scrollspy="cls: uk-animation-slide-bottom-small; target: > div > .uk-card; delay: 200" data-uk-grid="">
 
-<%= if !is_nil(@current_user) do %>
-<section class="row">
-  <article class="column">
-    <h2>Quick Links</h2>
-    <ul>
-      <li>
-        <%= if @current_user.is_faculty do %>
-        <%= link "My Courses", to: Routes.course_path(@conn, :index) %>
-        <%= else %>
-        <%= link "My Courses", to: Routes.user_section_path(@conn, :index) %>
-        <%= end %>
-      </li>
-    </ul>
-  </article>
-  <article class="column">
-    <h2>Help</h2>
-    <ul>
-      <li>
-        <a href="https://elixirforum.com/c/phoenix-forum">Forum</a>
-      </li>
-      <li>
-        <a href="https://webchat.freenode.net/?channels=elixir-lang">#elixir-lang on Freenode IRC</a>
-      </li>
-      <li>
-        <a href="https://twitter.com/elixirphoenix">Twitter @elixirphoenix</a>
-      </li>
-    </ul>
-  </article>
-</section>
-<%= end %>
+					<!-- feature card -->
+					<div class="uk-first-column">
+						<div class="uk-card uk-card-default uk-card-hover uk-flex uk-flex-column uk-scrollspy-inview uk-animation-slide-left-small" data-uk-scrollspy-class="uk-animation-slide-left-small" style="">
+							<div class="uk-card-header uk-text-center">
+								<h4 class="uk-text-bold">Mobile-friendly</h4>
+							</div>
+							<div class="uk-card-body uk-flex-1">
+								<p>Designed for mobile first, Yale Chat is easy to use on any device.</p>
+							</div>
+						</div>
+					</div>
+					<!-- /feature card -->
+          <!-- feature card -->
+					<div class="uk-first-column">
+						<div class="uk-card uk-card-default uk-card-hover uk-flex uk-flex-column uk-scrollspy-inview uk-animation-slide-left-small" data-uk-scrollspy-class="uk-animation-slide-left-small" style="">
+							<div class="uk-card-header uk-text-center">
+								<h4 class="uk-text-bold">Customized for Yale</h4>
+							</div>
+							<div class="uk-card-body uk-flex-1">
+								<p>You'll log in with your net id and have access to all your classes that use Yale Chat from one convenient dashboard.<br/><br/>Since it's developed by a team at Yale SOM, new features tailored to your class needs can be implemented quickly.</p>
+							</div>
+						</div>
+					</div>
+					<!-- /feature card -->
+          <!-- feature card -->
+					<div class="uk-first-column">
+						<div class="uk-card uk-card-default uk-card-hover uk-flex uk-flex-column uk-scrollspy-inview uk-animation-slide-left-small" data-uk-scrollspy-class="uk-animation-slide-left-small" style="">
+							<div class="uk-card-header uk-text-center">
+								<h4 class="uk-text-bold">Simple</h4>
+							</div>
+							<div class="uk-card-body uk-flex-1">
+								<p>Free from the clutter of many similar apps (looking at you, Slack), Yale Chat is solely focused on in-class communication between students and professors.</p>
+							</div>
+						</div>
+					</div>
+					<!-- /feature card -->
+
+				</div>
+				<div class="uk-text-center uk-text-small uk-text-muted uk-section uk-section-small"><a href="/auth/cas">Log in</a> to get started!
+				</div>
+			</div>
+		</section>
