@@ -89,7 +89,6 @@ defmodule App.Submissions do
                         allow_ranking: su.allow_ranking,
                         visible: su.visible,
                         image_url: su.image_url,
-                        slug: su.slug,
                         inserted_at: su.inserted_at,
                         avg_rating: avg(ra.score),
                         rating_count: count(ra.id, :distinct),
@@ -122,7 +121,6 @@ defmodule App.Submissions do
                         allow_ranking: su.allow_ranking,
                         visible: su.visible,
                         image_url: su.image_url,
-                        slug: su.slug,
                         inserted_at: su.inserted_at,
                         avg_rating: avg(ra.score),
                         rating_count: count(ra.id, :distinct),
@@ -206,7 +204,7 @@ defmodule App.Submissions do
               where: su.topic_id == ^tid,
               where: su.user_id == ^uid,
               group_by: su.id,
-              select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, slug: su.slug, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id}
+              select: %{id: su.id, title: su.title, description: su.description, allow_ranking: su.allow_ranking, visible: su.visible, image_url: su.image_url, inserted_at: su.inserted_at, avg_rating: avg(ra.score), user_id: su.user_id}
     Repo.all(query)
   end
 
@@ -279,7 +277,6 @@ defmodule App.Submissions do
                                         allow_ranking: su.allow_ranking,
                                         visible: su.visible,
                                         image_url: su.image_url,
-                                        slug: su.slug,
                                         inserted_at: su.inserted_at,
                                         avg_rating: avg(ra.score),
                                         rating_count: count(ra.id, :distinct),
@@ -324,7 +321,6 @@ defmodule App.Submissions do
                                         allow_ranking: su.allow_ranking,
                                         visible: su.visible,
                                         image_url: su.image_url,
-                                        slug: su.slug,
                                         inserted_at: su.inserted_at,
                                         avg_rating: avg(ra.score),
                                         rating_count: count(ra.id, :distinct),

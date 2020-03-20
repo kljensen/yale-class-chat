@@ -22,14 +22,6 @@
 </div>
 
 <div class="uk-margin">
-  <%= label f, :slug %>
-  <div class="uk-form-controls">
-  <%= text_input f, :slug, class: "uk-input" %>
-  <%= error_tag f, :slug %>
-  </div>
-</div>
-
-<div class="uk-margin">
   <%= label f, :image_url %>
   <div class="uk-form-controls">
   <%= text_input f, :image_url, class: "uk-input" %>

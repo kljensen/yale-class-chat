@@ -185,8 +185,7 @@ defmodule App.DatabaseSeeder do
             {:ok, topic} = Topics.create_topic(topic_writer, section, attrs)
             Enum.each(1..5, fn x ->
                 submitter = Accounts.get_user_by!(Map.get(Enum.random(@student_list), :net_id))
-                slug = to_string(topic.id) <> to_string(x)
-                attrs = %{description: Enum.random(@random_description_list), image_url: Enum.random(@random_image_url_list), slug: slug, title: Enum.random(@random_title_list), allow_ranking: true, visible: true}
+                attrs = %{description: Enum.random(@random_description_list), image_url: Enum.random(@random_image_url_list), title: Enum.random(@random_title_list), allow_ranking: true, visible: true}
                 Submissions.create_submission(submitter, topic, attrs)
             end)
           end
@@ -222,8 +221,7 @@ defmodule App.DatabaseSeeder do
             {:ok, topic} = Topics.create_topic(topic_writer, section, attrs)
             Enum.each(1..5, fn b ->
                 submitter = Accounts.get_user_by!(Map.get(Enum.random(@student_list), :net_id))
-                slug = to_string(topic.id) <> to_string(b)
-                attrs = %{description: Enum.random(@random_description_list), image_url: Enum.random(@random_image_url_list), slug: slug, title: Enum.random(@random_title_list), allow_ranking: true, visible: true}
+                attrs = %{description: Enum.random(@random_description_list), image_url: Enum.random(@random_image_url_list), title: Enum.random(@random_title_list), allow_ranking: true, visible: true}
                 {:ok, submission} = Submissions.create_submission(submitter, topic, attrs)
 
                 Enum.each(1..5, fn c ->
@@ -265,8 +263,7 @@ defmodule App.DatabaseSeeder do
             {:ok, topic} = Topics.create_topic(topic_writer, section, attrs)
             Enum.each(1..5, fn b ->
                 submitter = Accounts.get_user_by!(Map.get(Enum.random(@student_list), :net_id))
-                slug = to_string(topic.id) <> to_string(b)
-                attrs = %{description: Enum.random(@random_description_list), image_url: Enum.random(@random_image_url_list), slug: slug, title: Enum.random(@random_title_list), allow_ranking: true, visible: true}
+                attrs = %{description: Enum.random(@random_description_list), image_url: Enum.random(@random_image_url_list), title: Enum.random(@random_title_list), allow_ranking: true, visible: true}
                 {:ok, submission} = Submissions.create_submission(submitter, topic, attrs)
 
                 Enum.each(1..5, fn d ->
@@ -313,8 +310,7 @@ defmodule App.DatabaseSeeder do
             {:ok, topic} = Topics.create_topic(topic_writer, section, attrs)
             Enum.each(1..5, fn b ->
               submitter = Accounts.get_user_by!(Map.get(Enum.random(short_student_list), :net_id))
-              slug = to_string(topic.id) <> to_string(b)
-              attrs = %{description: Enum.random(@random_description_list), image_url: Enum.random(@random_image_url_list), slug: slug, title: Enum.random(@random_title_list), allow_ranking: true, visible: true}
+              attrs = %{description: Enum.random(@random_description_list), image_url: Enum.random(@random_image_url_list), title: Enum.random(@random_title_list), allow_ranking: true, visible: true}
               {:ok, submission} = Submissions.create_submission(submitter, topic, attrs)
 
               Enum.each(1..5, fn c ->

@@ -30,9 +30,9 @@ defmodule App.SubmissionsTest do
   describe "submissions" do
     alias App.Submissions.Submission
 
-    @valid_attrs %{description: "some description", image_url: "http://i.imgur.com/u3vyMCW.jpg", slug: "some slug", title: "some title", allow_ranking: true, visible: true}
-    @update_attrs %{description: "some updated description", image_url: "http://i.imgur.com/zF7rPAf.jpg", slug: "some updated slug", title: "some updated title", allow_ranking: false, visible: false}
-    @invalid_attrs %{description: nil, image_url: nil, slug: nil, title: nil, allow_ranking: nil, hidden: nil}
+    @valid_attrs %{description: "some description", image_url: "http://i.imgur.com/u3vyMCW.jpg", title: "some title", allow_ranking: true, visible: true}
+    @update_attrs %{description: "some updated description", image_url: "http://i.imgur.com/zF7rPAf.jpg", title: "some updated title", allow_ranking: false, visible: false}
+    @invalid_attrs %{description: nil, image_url: nil, title: nil, allow_ranking: nil, hidden: nil}
 
     def role_fixture(attrs \\ %{}) do
       {:ok, current_time} = DateTime.now("Etc/UTC")
@@ -63,7 +63,6 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.id == submission.id
       assert retrieved_submission.description == submission.description
       assert retrieved_submission.image_url == submission.image_url
-      assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
     end
 
@@ -78,7 +77,6 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.id == submission.id
       assert retrieved_submission.description == submission.description
       assert retrieved_submission.image_url == submission.image_url
-      assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
     end
 
@@ -93,7 +91,6 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.id == submission.id
       assert retrieved_submission.description == submission.description
       assert retrieved_submission.image_url == submission.image_url
-      assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
     end
 
@@ -207,14 +204,13 @@ defmodule App.SubmissionsTest do
 
     test "list_user_own_submissions/1 returns all submissions by the given user", context do
       submission = submission_fixture(context[:submitter], context[:topic])
-      submission2 = submission_fixture(context[:student], context[:topic], %{slug: "student slug"})
+      submission2 = submission_fixture(context[:student], context[:topic])
       retrieved_submissions = Submissions.list_user_own_submissions(context[:submitter])
       assert length(retrieved_submissions) == 1
       retrieved_submission = List.first(retrieved_submissions)
       assert retrieved_submission.id == submission.id
       assert retrieved_submission.description == submission.description
       assert retrieved_submission.image_url == submission.image_url
-      assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
       retrieved_submissions = Submissions.list_user_own_submissions(context[:student])
       assert length(retrieved_submissions) == 1
@@ -222,13 +218,12 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.id == submission2.id
       assert retrieved_submission.description == submission2.description
       assert retrieved_submission.image_url == submission2.image_url
-      assert retrieved_submission.slug == submission2.slug
       assert retrieved_submission.title == submission2.title
     end
 
     test "list_user_own_submissions/2 returns all submissions by the given user for the given topic", context do
       submission = submission_fixture(context[:submitter], context[:topic])
-      submission2 = submission_fixture(context[:student], context[:topic], %{slug: "student slug"})
+      submission2 = submission_fixture(context[:student], context[:topic])
       {:ok, topic2} = App.Topics.create_topic(context[:user_faculty], context[:section], %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2100-04-17T14:00:00Z", description: "some other description", opened_at: "2010-04-17T14:00:00Z", slug: "some other slug", sort: "some other sort", title: "some other title", user_submission_limit: 42})
       retrieved_submissions = Submissions.list_user_own_submissions(context[:submitter], topic2)
       assert length(retrieved_submissions) == 0
@@ -240,7 +235,6 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.id == submission.id
       assert retrieved_submission.description == submission.description
       assert retrieved_submission.image_url == submission.image_url
-      assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
       retrieved_submissions = Submissions.list_user_own_submissions(context[:student], context[:topic])
       assert length(retrieved_submissions) == 1
@@ -248,13 +242,12 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.id == submission2.id
       assert retrieved_submission.description == submission2.description
       assert retrieved_submission.image_url == submission2.image_url
-      assert retrieved_submission.slug == submission2.slug
       assert retrieved_submission.title == submission2.title
     end
 
     test "count_user_submissions/2 returns count of all submissions by the given user for the given topic", context do
       submission_fixture(context[:submitter], context[:topic])
-      submission_fixture(context[:student], context[:topic], %{slug: "student slug"})
+      submission_fixture(context[:student], context[:topic])
       {:ok, topic2} = App.Topics.create_topic(context[:user_faculty], context[:section], %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2100-04-17T14:00:00Z", description: "some other description", opened_at: "2010-04-17T14:00:00Z", slug: "some other slug", sort: "some other sort", title: "some other title", user_submission_limit: 42})
       assert Submissions.count_user_submissions(context[:submitter], topic2) == [0]
       assert Submissions.count_user_submissions(context[:student], topic2) == [0]
@@ -268,7 +261,6 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.id == submission.id
       assert retrieved_submission.description == submission.description
       assert retrieved_submission.image_url == submission.image_url
-      assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
     end
 
@@ -279,7 +271,6 @@ defmodule App.SubmissionsTest do
       assert {:ok, %Submission{} = submission} = Submissions.create_submission(submitter, topic, @valid_attrs)
       assert submission.description == "some description"
       assert submission.image_url == "http://i.imgur.com/u3vyMCW.jpg"
-      assert submission.slug == "some slug"
       assert submission.title == "some title"
     end
 
@@ -289,7 +280,6 @@ defmodule App.SubmissionsTest do
       assert {:error, changeset = submission} = Submissions.create_submission(submitter, topic, @invalid_attrs)
       assert %{title: ["can't be blank"]} = errors_on(changeset)
       assert %{description: ["can't be blank"]} = errors_on(changeset)
-      assert %{slug: ["can't be blank"]} = errors_on(changeset)
     end
 
     test "create_submission/3 with unauthorized user returns error", context do
@@ -346,7 +336,6 @@ defmodule App.SubmissionsTest do
       assert {:ok, %Submission{} = submission} = Submissions.update_submission(submitter, submission, @update_attrs)
       assert submission.description == "some updated description"
       assert submission.image_url == "http://i.imgur.com/zF7rPAf.jpg"
-      assert submission.slug == "some updated slug"
       assert submission.title == "some updated title"
     end
 
@@ -358,7 +347,6 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.id == submission.id
       assert retrieved_submission.description == submission.description
       assert retrieved_submission.image_url == submission.image_url
-      assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
     end
 
@@ -370,7 +358,6 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.id == submission.id
       assert retrieved_submission.description == submission.description
       assert retrieved_submission.image_url == submission.image_url
-      assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
     end
 
@@ -394,7 +381,6 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.id == submission.id
       assert retrieved_submission.description == submission.description
       assert retrieved_submission.image_url == submission.image_url
-      assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
     end
 
@@ -409,7 +395,6 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.id == submission.id
       assert retrieved_submission.description == submission.description
       assert retrieved_submission.image_url == submission.image_url
-      assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
     end
 
@@ -426,7 +411,6 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.id == submission.id
       assert retrieved_submission.description == submission.description
       assert retrieved_submission.image_url == submission.image_url
-      assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
     end
 
@@ -445,7 +429,6 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.id == submission.id
       assert retrieved_submission.description == submission.description
       assert retrieved_submission.image_url == submission.image_url
-      assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
     end
 
@@ -469,7 +452,6 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.id == submission.id
       assert retrieved_submission.description == submission.description
       assert retrieved_submission.image_url == submission.image_url
-      assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
     end
 
@@ -484,7 +466,6 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.id == submission.id
       assert retrieved_submission.description == submission.description
       assert retrieved_submission.image_url == submission.image_url
-      assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
     end
 
@@ -501,7 +482,6 @@ defmodule App.SubmissionsTest do
       assert retrieved_submission.id == submission.id
       assert retrieved_submission.description == submission.description
       assert retrieved_submission.image_url == submission.image_url
-      assert retrieved_submission.slug == submission.slug
       assert retrieved_submission.title == submission.title
     end
 
@@ -541,7 +521,7 @@ defmodule App.SubmissionsTest do
 
     test "list_comments/1 returns all comments for the given submission", context do
       submission = submission_fixture(context[:submitter], context[:topic])
-      submission2 = submission_fixture(context[:submitter], context[:topic], %{slug: "some other slug"})
+      submission2 = submission_fixture(context[:submitter], context[:topic])
       comment = comment_fixture(context[:student], submission)
       comment2 = comment_fixture(context[:student], submission2)
 
@@ -559,7 +539,7 @@ defmodule App.SubmissionsTest do
 
     test "list_user_comments/3 returns all comments for the given submission", context do
       submission = submission_fixture(context[:submitter], context[:topic])
-      submission2 = submission_fixture(context[:submitter], context[:topic], %{slug: "some other slug"})
+      submission2 = submission_fixture(context[:submitter], context[:topic])
       comment = comment_fixture(context[:student], submission)
       user_faculty = Accounts.get_user_by!("faculty net id")
       student = context[:student]
@@ -624,7 +604,7 @@ defmodule App.SubmissionsTest do
 
     test "list_user_own_comments/1 returns all comments by the given user", context do
       submission = submission_fixture(context[:submitter], context[:topic])
-      submission2 = submission_fixture(context[:submitter], context[:topic], %{slug: "some other slug"})
+      submission2 = submission_fixture(context[:submitter], context[:topic])
       comment = comment_fixture(context[:student], submission)
       comment2 = comment_fixture(context[:student], submission2)
       student = context[:student]
@@ -645,7 +625,7 @@ defmodule App.SubmissionsTest do
 
     test "list_user_own_comments/2 returns all comments by the given user for the given submission", context do
       submission = submission_fixture(context[:submitter], context[:topic])
-      submission2 = submission_fixture(context[:submitter], context[:topic], %{slug: "some other slug"})
+      submission2 = submission_fixture(context[:submitter], context[:topic])
       comment = comment_fixture(context[:student], submission)
       comment2 = comment_fixture(context[:student], submission2)
       student = context[:student]
@@ -930,7 +910,7 @@ defmodule App.SubmissionsTest do
 
     test "list_ratings/1 returns all ratings for the given submission", context do
       submission = submission_fixture(context[:submitter], context[:topic])
-      submission2 = submission_fixture(context[:submitter], context[:topic], %{slug: "some other slug"})
+      submission2 = submission_fixture(context[:submitter], context[:topic])
       rating = rating_fixture(context[:student], submission)
       rating2 = rating_fixture(context[:student], submission2)
 
@@ -948,7 +928,7 @@ defmodule App.SubmissionsTest do
 
     test "list_user_ratings/3 returns all ratings for the given submission", context do
       submission = submission_fixture(context[:submitter], context[:topic])
-      submission2 = submission_fixture(context[:submitter], context[:topic], %{slug: "some other slug"})
+      submission2 = submission_fixture(context[:submitter], context[:topic])
       rating = rating_fixture(context[:student], submission)
       user_faculty = Accounts.get_user_by!("faculty net id")
       student = context[:student]
@@ -1013,7 +993,7 @@ defmodule App.SubmissionsTest do
 
     test "list_user_own_ratings/1 returns all ratings by the given user", context do
       submission = submission_fixture(context[:submitter], context[:topic])
-      submission2 = submission_fixture(context[:submitter], context[:topic], %{slug: "some other slug"})
+      submission2 = submission_fixture(context[:submitter], context[:topic])
       rating = rating_fixture(context[:student], submission)
       rating2 = rating_fixture(context[:student], submission2)
       student = context[:student]
@@ -1034,7 +1014,7 @@ defmodule App.SubmissionsTest do
 
     test "list_user_own_ratings/2 returns all ratings by the given user for the given submission", context do
       submission = submission_fixture(context[:submitter], context[:topic])
-      submission2 = submission_fixture(context[:submitter], context[:topic], %{slug: "some other slug"})
+      submission2 = submission_fixture(context[:submitter], context[:topic])
       rating = rating_fixture(context[:student], submission)
       rating2 = rating_fixture(context[:student], submission2)
       student = context[:student]

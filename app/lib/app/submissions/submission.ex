@@ -5,7 +5,6 @@ defmodule App.Submissions.Submission do
   schema "submissions" do
     field :description, :string
     field :image_url, EctoFields.URL
-    field :slug, :string
     field :title, :string
     field :allow_ranking, :boolean, default: false
     field :visible, :boolean, default: true
@@ -20,8 +19,8 @@ defmodule App.Submissions.Submission do
   @doc false
   def changeset(submission, attrs) do
     submission
-    |> cast(attrs, [:title, :description, :slug, :image_url, :allow_ranking, :visible, :topic_id, :user_id])
-    |> validate_required([:title, :description, :slug, :allow_ranking, :visible])
+    |> cast(attrs, [:title, :description, :image_url, :allow_ranking, :visible, :topic_id, :user_id])
+    |> validate_required([:title, :description, :allow_ranking, :visible])
     |> foreign_key_constraint(:topic_id)
     |> assoc_constraint(:topic)
     |> foreign_key_constraint(:user_id)
