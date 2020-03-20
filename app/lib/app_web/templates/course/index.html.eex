@@ -1,4 +1,7 @@
 <div class="uk-grid-column-medium uk-grid-row-medium uk-child-width-1-3@s uk-grid-match" uk-grid>
+    <%= if length(@courses) == 0 do %>
+        <span>Looks like you don't have any courses yet! Create one to get started.</span>
+    <% end %>
     <%= for {course, i} <- Enum.with_index(@courses) do %>
     <div>
         <div class="uk-card uk-card-small uk-card-default uk-card-hover">
@@ -9,7 +12,7 @@
                     </h3>
                     <p class="uk-text-meta uk-margin-remove-top uk-margin-remove-bottom">
                       <%= course.name %> &mdash;
-                      <%= Map.get(@semesters, :"#{course.semester_id}") %> 
+                      <%= Map.get(@semesters, :"#{course.semester_id}") %>
                     </p>
                 </div>
             </div>
