@@ -6,6 +6,10 @@ set -a
 . ./.env
 set +a
 
+function create_letsencrypt_volume {
+    docker volume create letsencrypt
+}
+
 ACTION=$1
 case $ACTION in
     up)
@@ -24,18 +28,26 @@ case $ACTION in
         # Bring up all our processes in production
         docker-compose -f docker-compose.prod.yaml down
         ;;
-    prod-init-certs)
-	# Get our TLS certs from LetsEncrypt
-        docker volume create letsencrypt
-        docker run \
+    http-init-certs)
+        # Get our TLS certs from LetsEncrypt using the HTTP challenge method
+        create_letsencrypt_volume
+        docker run --rm \
 	    -p 80:80 -it \
 	    -v letsencrypt:/etc/letsencrypt \
 	    certbot/certbot \
 	    certonly \
-            --standalone \
+        --standalone \
 	    --preferred-challenges http \
 	    -d $DOMAIN
 	;;
+    dns-init-certs)
+        # Get our TLS certs from LetsEncrypt using the DNS challenge method
+        create_letsencrypt_volume
+        docker run --rm \
+            -v /docker/dnsrobocert:/etc/dnsrobocert \
+            -v /docker/letsencrypt:/etc/letsencrypt \
+            adferrand/dnsrobocert
+    ;;
     ls-letsencrypt)
 	# List the contents of the letsencrypt volume
         docker run --rm -i -v=letsencrypt:/etc/letsencrypt busybox find /etc/letsencrypt

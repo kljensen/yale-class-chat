@@ -54,15 +54,37 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-  tls:
-    image: certbot/certbot:v1.3.0
-    entrypoint: /certbot.sh
+  certbot:
+    build: certbot
+    entrypoint:
+        - /run.sh
+    command: renew
     depends_on:
       - app
     environment:
       - MIX_ENV=prod
+      - CHALLENGE_METHOD=${CERTBOT_CHALLENGE_METHOD}
+      - EMAIL=${CERTBOT_EMAIL}
+      - AWS_SECRET_ACCESS_KEY=${CERTBOT_AWS_SECRET_ACCESS_KEY}
+      - AWS_ACCESS_KEY_ID=${CERTBOT_AWS_ACCESS_KEY_ID}
+      - EXTRA_OPTIONS=${CERTBOT_EXTRA_OPTIONS}
+      - DOMAIN=${DOMAIN}
+      - ONCE=${CERTBOT_ONCE}
     volumes:
       - letsencrypt:/etc/letsencrypt/
-      - "./tls/certbot.sh:/certbot.sh"
+      - "./certbot/run.sh:/run.sh"
+      - acme_challenge:/tmp/webroot/.well-known/acme-challenge/
+  tls-dns:
+    image: adferrand/dnsrobocert:3.0.1
+    entrypoint: /certbot-dns.sh
+    depends_on:
+      - app
+    environment:
+      - MIX_ENV=prod
+      - CERTBOT_CHALLENGE_METHOD=${CERTBOT_CHALLENGE_METHOD}
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+    volumes:
+      - letsencrypt:/etc/letsencrypt/
+      - "./tls/certbot-dns.sh:/certbot-dns.sh"
       - acme_challenge:/tmp/webroot/.well-known/acme-challenge/
 
