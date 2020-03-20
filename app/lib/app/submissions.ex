@@ -597,13 +597,15 @@ defmodule App.Submissions do
               where: t.show_user_submissions,
               where: su.visible,
               where: su.id == ^suid,
+              order_by: [asc: co.inserted_at],
               select: co
 
     query = if inherit_course_role do
       auth_role = App.Accounts.get_current_course__role(user, topic)
       if Enum.member?(@course_admin_roles, auth_role) do
         from co in Comment,
-          where: co.submission_id == ^suid
+          where: co.submission_id == ^suid,
+          order_by: [asc: co.inserted_at]
       else
         query
       end
