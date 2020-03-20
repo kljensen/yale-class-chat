@@ -38,7 +38,7 @@ services:
       - node_deps:/app/assets/node_modules
       - acme_challenge:/app/priv/static/.well-known/acme-challenge/
       - letsencrypt:/etc/letsencrypt/
-      - "./tls/dhparam.pem:/etc/dhparam.pem"
+      - "./certbot/dhparam.pem:/etc/dhparam.pem"
     ports:
       - "0.0.0.0:80:80"
       - "0.0.0.0:443:443"
@@ -73,18 +73,5 @@ services:
     volumes:
       - letsencrypt:/etc/letsencrypt/
       - "./certbot/run.sh:/run.sh"
-      - acme_challenge:/tmp/webroot/.well-known/acme-challenge/
-  tls-dns:
-    image: adferrand/dnsrobocert:3.0.1
-    entrypoint: /certbot-dns.sh
-    depends_on:
-      - app
-    environment:
-      - MIX_ENV=prod
-      - CERTBOT_CHALLENGE_METHOD=${CERTBOT_CHALLENGE_METHOD}
-      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
-    volumes:
-      - letsencrypt:/etc/letsencrypt/
-      - "./tls/certbot-dns.sh:/certbot-dns.sh"
       - acme_challenge:/tmp/webroot/.well-known/acme-challenge/
 
