@@ -1,5 +1,6 @@
 defmodule AppWeb.Helpers do
   require Decimal
+  use Phoenix.HTML
 
   def truncate_text(string, num) do
     if String.length(string) > num + 3 do
@@ -30,7 +31,15 @@ defmodule AppWeb.Helpers do
             ""
     end
     String.duplicate("★", whole_stars) <> fraction_string
+  end
 
+  def xform_for(form_data, action, options \\ [], fun) do
+    options = Keyword.merge(options, [class: "uk-form-stacked"])
+    form_for(form_data, action, options, fun)
+  end
+
+  def split_newlines(text) do
+     Regex.split(~r{\n\s*\n}, text, trim: true)
   end
 
 end
