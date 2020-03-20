@@ -14,7 +14,6 @@ defmodule AppWeb.PageControllerTest do
     conn = conn
         |> init_test_session(uid: "faculty net id")
         |> get(Routes.page_path(conn, :index))
-    assert html_response(conn, 200) =~ "Welcome"
-    assert html_response(conn, 200) =~ "My Courses"
+    assert html_response(conn, 200) =~ "New Course"
   end
 end
