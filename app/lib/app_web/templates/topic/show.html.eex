@@ -26,7 +26,7 @@
 
 
 
-<div class="uk-grid-column-medium uk-grid-row-medium uk-child-width-1-2@s uk-grid-match" uk-grid>
+<div class="uk-grid-column-medium uk-grid-row-medium uk-child-width-1-2@s " uk-grid>
     <%= for {submission, i} <- Enum.with_index(@submissions) do %>
         <div>
             <a href="<%= Routes.submission_path(@conn, :show, submission.id) %>">
@@ -50,13 +50,19 @@
                             <b><%= submission.user_display_name %></b>
                             /
                             <% end %>
-                            <%= submission.rating_count |> Integer.to_string %> ratings
                             <%= if submission.rating_count > 0 do %>
-                            , avg = <%= submission.avg_rating |> Decimal.round(2) |> Decimal.to_string %>
+                            <%= stars submission.avg_rating %>
+                            (<%= submission.rating_count |> Integer.to_string %>
+                             <%= if submission.rating_count > 1 do %>ratings<% else %>rating<% end %>)
+                            <% else %>
+                                No ratings yet.
                             <% end %>
-                            /
-                            <%= submission.comment_count |> Integer.to_string %> comments
-                            /
+                            <span class="comment-icon-count">
+                                <span class="comment-icon" uk-icon="icon:  comments; ratio: 0.7"></span>
+                                <%= submission.comment_count |> Integer.to_string %> 
+                            </span>
+                           
+                            |
                             <span>Posted at: </span><span class="rating"><%= submission.inserted_at %>
                         </div>
                     </div>
@@ -69,7 +75,6 @@
 <div class="uk-position-fixed uk-position-z-index absolute uk-dark uk-position-bottom-right">
 <a href=<%= Routes.topic_submission_path(@conn, :new, @topic.id) %> class="add uk-box-shadow-small uk-box-shadow-hover-large" uk-marker></a>
 </div>
-
 
 
 
