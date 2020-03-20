@@ -73,6 +73,15 @@ body {
     background-color: white;
 }
 
+.submission-stats {
+    font-size: 0.8em;
+    color: #999;
+}
+
+span.comment-count {
+    color: #999;
+}
+
 a {
     color: #00356b;
 }

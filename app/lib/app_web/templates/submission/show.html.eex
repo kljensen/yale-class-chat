@@ -3,32 +3,38 @@
         <h1 class="uk-heading-divider"><%= @submission.title %></h1>
         <img src="<%= @submission.image_url %>">
         <p><%= @submission.description %></p>
+        <div class="submission-stats">
+            <%= if @topic.anonymous do %>
+            <% else %>
+            <b><%= @submission.user_display_name %></b>
+            /
+            <% end %>
+            <%= if @submission.rating_count > 0 do %>
+            <%= stars @submission.avg_rating %>
+            (<%= @submission.rating_count |> Integer.to_string %>
+             <%= if @submission.rating_count > 1 do %>ratings<% else %>rating<% end %>)
+            <% else %>
+                No ratings yet.
+            <% end %>
+            |
+            <span>Posted at </span><span class="rating"><%= @submission.inserted_at %>
         </div>
-        <%= if @topic.anonymous do %>
-        <% else %>
-        <b><%= @submission.user_display_name %></b>
-        /
+        <%= if @can_edit do %>
+        <div>
+        <%= link "Edit", to: Routes.submission_path(@conn, :edit, @submission.id) %>
+        |
+        <%= link "Delete", to: Routes.submission_path(@conn, :delete, @submission.id), method: :delete, data: [confirm: "Are you sure?"] %>
+        </div>
         <% end %>
-        <%= @submission.rating_count |> Integer.to_string %> ratings
-        <%= if @submission.rating_count > 0 do %>
-        (avg = <%= @submission.avg_rating |> Decimal.round(2) |> Decimal.to_string %>)
-        <% end %>
-        /
-        <%= @submission.comment_count |> Integer.to_string %> comments
-        /
-        <span>Posted at: </span><span class="rating"><%= @submission.inserted_at %>
-    <%= if @can_edit do %>
-    <div>
-    <%= link "Edit", to: Routes.submission_path(@conn, :edit, @submission.id) %>
-    |
-    <%= link "Delete", to: Routes.submission_path(@conn, :delete, @submission.id), method: :delete, data: [confirm: "Are you sure?"] %>
     </div>
-    <% end %>
 </div>
 
-<h2>Comments</h2>
 
 <%= if length(@comments) != 0 do %>
+    <h2>
+    Comments
+    <span class="comment-count">(<%= @submission.comment_count |> Integer.to_string %>)</span>
+    </h2>
     <ul class="uk-comment-list">
         <%= for {comment, i} <- Enum.with_index(@comments) do %>
             <li class="comment">
@@ -59,6 +65,14 @@
             </li>
         <% end %>
     </ul>
+<% else %>
+<h2>
+Comments
+</h2>
+
+<p>
+    None yet ;P
+</p>
 <% end %>
 
 <div class="form">
