@@ -14,7 +14,7 @@
 </div>
 
 <div class="uk-margin">
-  <%= label f, :description %>
+  <%= label f, :description, class: "uk-form-label" %>
   <div class="uk-form-controls">
       <%= textarea f, :description, class: "uk-textarea" %>
       <%= error_tag f, :description %>
@@ -22,7 +22,7 @@
 </div>
 
 <div class="uk-margin">
-  <%= label f, :image_url %>
+  <%= label f, :image_url, class: "uk-form-label" %>
   <div class="uk-form-controls">
   <%= text_input f, :image_url, class: "uk-input" %>
   <%= error_tag f, :image_url %>
