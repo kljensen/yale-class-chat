@@ -4,6 +4,7 @@ defmodule App.Courses.Semester do
 
   schema "semesters" do
     field :name, :string
+    field :term_code, :string
     has_many :courses, App.Courses.Course
 
     timestamps()
@@ -12,8 +13,8 @@ defmodule App.Courses.Semester do
   @doc false
   def changeset(semester, attrs) do
     semester
-    |> cast(attrs, [:name])
-    |> validate_required([:name])
+    |> cast(attrs, [:name, :term_code])
+    |> validate_required([:name, :term_code])
     |> unique_constraint(:name)
   end
 end
