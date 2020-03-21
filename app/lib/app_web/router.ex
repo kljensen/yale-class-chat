@@ -42,6 +42,8 @@ defmodule AppWeb.Router do
       resources "/sections", SectionController, only: [:new]
       resources "/course_roles", Course_RoleController
       resources "/topics", TopicController, only: [:new, :create]
+      get "/add_course_roles", Course_RoleController, :bulk_new
+      post "/add_course_roles", Course_RoleController, :bulk_create
     end
 
     resources "/sections", SectionController, except: [:index, :new] do
