@@ -35,11 +35,6 @@ run_migrations(){
   mix ecto.create
   mix ecto.migrate
 
-  # Seed database in dev mode
-  if [ $MIX_ENV == 'dev' ]
-  then
-    mix run priv/repo/seeds.exs
-  fi
 }
 
 setup_dialyzer (){
