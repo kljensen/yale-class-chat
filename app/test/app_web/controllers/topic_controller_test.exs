@@ -56,6 +56,20 @@ defmodule AppWeb.TopicControllerTest do
       assert html_response(conn, 200) =~ @create_attrs.title
     end
 
+    test "creates exactly one topic per selected section", %{conn: conn, section: section} do
+      course = App.Courses.get_course!(section.course_id)
+      user_faculty = App.Accounts.get_user_by!("faculty net id")
+      {:ok, section2} = App.Courses.create_section(user_faculty, course, %{crn: "some updated crn", title: "some updated title"})
+      section_ids = [Integer.to_string(section.id), Integer.to_string(section2.id)]
+      attrs = Map.merge(@create_attrs, %{sections: section_ids})
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> post(Routes.course_topic_path(conn, :create, course), topic: attrs)
+
+      assert length(App.Topics.list_topics(section)) == 1
+      assert length(App.Topics.list_topics(section2)) == 1
+    end
+
     test "renders errors when data is invalid", %{conn: conn, section: section} do
       course = App.Courses.get_course!(section.course_id)
       section_ids = [Integer.to_string(section.id)]

@@ -85,15 +85,17 @@ defmodule AppWeb.TopicController do
             render(conn, "new.html", changeset: changeset, course: course, sections: sections, selected_sections: selected_sections, current_time: current_time, sort_list: @sort_list)
 
           _ ->
-            section_id = List.first(section_ids)
+            {section_id, section_ids} = List.pop_at(section_ids, 0)
             section = Courses.get_section!(section_id)
             case Topics.create_topic(user, section, topic_params) do
               {:ok, topic} ->
-                for section_id <- section_ids do
-                                section_id = String.to_integer(section_id)
-                                section = Courses.get_section!(section_id)
-                                Topics.create_topic(user, section, topic_params)
-                              end
+                if length(section_ids) > 0 do
+                  for section_id <- section_ids do
+                    section_id = String.to_integer(section_id)
+                    section = Courses.get_section!(section_id)
+                    Topics.create_topic(user, section, topic_params)
+                  end
+                end
                 conn
                 |> put_flash(:info, "Topic(s) created successfully.")
                 |> redirect(to: Routes.topic_path(conn, :show, topic))
