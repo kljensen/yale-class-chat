@@ -1,6 +1,6 @@
 <h1>Listing Course roles</h1>
 
-<table>
+<table class="uk-table">
   <thead>
     <tr>
       <th>User</th>
@@ -29,4 +29,4 @@
   </tbody>
 </table>
 
-<span><%= link "New Course  role", to: Routes.course_course__role_path(@conn, :new, @course) %></span>
+<span><%= link "Add Course Roles", to: Routes.course_course__role_path(@conn, :bulk_new, @course) %></span>

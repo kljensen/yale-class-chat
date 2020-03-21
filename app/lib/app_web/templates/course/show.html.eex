@@ -1,73 +1,107 @@
 <h1><%= @course.department %> <%= @course.number %>: <%= @course.name %></h1>
-<section class="row">
-<article class="column">
-<h2>Course Details</h2>
 
-<ul>
-  <li>
-    <strong>Student viewing:</strong>
-    <%= if @course.allow_read do %>
-      Allowed
-    <%= else %>
-      Not allowed
-    <%= end %>
-  </li>
+<div class="uk-grid-medium uk-child-width-1-3@s" uk-grid>
+  <div>
+  <div class="uk-card uk-card-small uk-card-default uk-card-hover">
+    <div class="uk-card-header">
+      <h3 class="uk-card-title uk-margin-remove-bottom">Course Details</h3>
+    </div>
+    <div class="uk-card-body">
+      <ul>
+        <li>
+          <strong>Student viewing:</strong>
+          <%= if @course.allow_read do %>
+            Allowed
+          <%= else %>
+            Not allowed
+          <%= end %>
+        </li>
 
-  <li>
-    <strong>Student participation:</strong>
-    <%= if @course.allow_write do %>
-      Allowed
-    <%= else %>
-      Not allowed
-    <%= end %>
-  </li>
+        <li>
+          <strong>Student participation:</strong>
+          <%= if @course.allow_write do %>
+            Allowed
+          <%= else %>
+            Not allowed
+          <%= end %>
+        </li>
 
-  <li>
-    <strong>Semester:</strong>
-    <%= @semester.name %>
-  </li>
+        <li>
+          <strong>Semester:</strong>
+          <%= @semester.name %>
+        </li>
 
-</ul>
-</article>
+      </ul>
+    </div>
+    <div class="uk-card-footer">
+      <div class="details uk-width-expand">
+        <%= link "Edit Course Details", to: Routes.course_path(@conn, :edit, @course) %>
+      </div>
+    </div>
+  </div>
+  </div>
+<div>
+<div class="uk-card uk-card-small uk-card-default uk-card-hover">
+    <div class="uk-card-header">
+      <h3 class="uk-card-title uk-margin-remove-bottom">Administration</h3>
+    </div>
+    <div class="uk-card-body">
+      Topics
+      <ul>
+        <li><%= link "Create Topic", to: Routes.course_topic_path(@conn, :new, @course) %></li>
+      </ul>
+      Course Roles (Professors/TAs)
+      <ul class="uk-margin-remove-top">
+        <li><%= link "View Existing Course Roles", to: Routes.course_course__role_path(@conn, :index, @course) %></li>
+        <li><%= link "Add New Course Roles", to: Routes.course_course__role_path(@conn, :bulk_new, @course) %></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="uk-card uk-card-small uk-card-default uk-card-hover">
+    <div class="uk-card-header">
+      <h3 class="uk-card-title uk-margin-remove-bottom">Sections in <%= @course.name %></h3>
+    </div>
+    <div class="uk-card-body">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Crn</th>
+
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+        <%= for section <- @sections do %>
+          <tr>
+            <td><%= section.title %></td>
+            <td><%= section.crn %></td>
+
+            <td>
+              <span><%= link "Show", to: Routes.section_path(@conn, :show, section) %></span>
+              <span><%= link "Edit", to: Routes.section_path(@conn, :edit, section) %></span>
+              <span><%= link "Delete", to: Routes.section_path(@conn, :delete, section), method: :delete, data: [confirm: "Are you sure?"] %></span>
+            </td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+    <div class="uk-card-footer">
+      <div class="details uk-width-expand">
+        <%= link "Create Section", to: Routes.course_section_path(@conn, :new, @course) %>
+      </div>
+    </div>
+  </div>
+</div>
 
 
-<article class="column">
-<h2>Administration</h2>
-<ul>
-<li><%= link "Create Section", to: Routes.course_section_path(@conn, :new, @course) %></li>
-<li><%= link "Create Topic", to: Routes.course_topic_path(@conn, :new, @course) %></li>
-<li><%= link "Edit Course Details", to: Routes.course_path(@conn, :edit, @course) %></li>
-<li><%= link "View Course Roles", to: Routes.course_course__role_path(@conn, :index, @course) %></li>
-</ul>
-</article>
-</section>
 
-<h2>Sections in <%= @course.name %></h2>
 
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Crn</th>
-
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-<%= for section <- @sections do %>
-    <tr>
-      <td><%= section.title %></td>
-      <td><%= section.crn %></td>
-
-      <td>
-        <span><%= link "Show", to: Routes.section_path(@conn, :show, section) %></span>
-        <span><%= link "Edit", to: Routes.section_path(@conn, :edit, section) %></span>
-        <span><%= link "Delete", to: Routes.section_path(@conn, :delete, section), method: :delete, data: [confirm: "Are you sure?"] %></span>
-      </td>
-    </tr>
-<% end %>
-  </tbody>
-</table>
+</div>
 
 <span><%= link "Return to Course List", to: Routes.course_path(@conn, :index) %></span>
 

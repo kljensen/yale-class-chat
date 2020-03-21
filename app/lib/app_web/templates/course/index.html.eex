@@ -19,8 +19,7 @@
             <%= if course.allow_write do %>
                 <div class="uk-card-body">
                     <p class="uk-margin-small">
-                        <%= link "View", to: Routes.course_path(@conn, :show, course), class: "uk-button uk-button-default" %>
-                        <%= link "Edit", to: Routes.course_path(@conn, :edit, course), class: "uk-button uk-button-default"  %>
+                        <%= link "View / Edit", to: Routes.course_path(@conn, :show, course), class: "uk-button uk-button-default" %>
                         <%= link "Delete", to: Routes.course_path(@conn, :delete, course), method: :delete, data: [confirm: "Are you sure?"], class: "uk-button uk-button-default"  %>
                     </p>
                 </div>
