@@ -5,7 +5,7 @@
   number?)
   it will help us do fancy stuff in the future.
   You can look up your CRN at
-  <a href="https://courses.yale.edu/">https://courses.yale.edu/</a>.
+  <a href="https://courses.yale.edu/">https://courses.yale.edu/</a> or <a href="https://portal.som.yale.edu/academics-student-life/courses">https://portal.som.yale.edu/academics-student-life/courses</a>.
 </div>
 
 <%= form_for @changeset, @action, [class: "uk-form-stacked"], fn f -> %>

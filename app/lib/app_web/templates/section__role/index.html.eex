@@ -1,6 +1,6 @@
 <h1>Listing Section roles</h1>
 
-<table>
+<table class="uk-table">
   <thead>
     <tr>
       <th>User</th>
@@ -27,6 +27,6 @@
   </tbody>
 </table>
 
-<span><%= link "Add Student to Section", to: Routes.section_section__role_path(@conn, :new, @section) %></span>
-<span><%= link "Add Multiple Students to Section", to: Routes.section_section__role_path(@conn, :bulk_new, @section) %></span>
+<span><%= link "Add Section Roles", to: Routes.section_section__role_path(@conn, :bulk_new, @section) %></span>
+|
 <span><%= link "Back", to: Routes.section_path(@conn, :show, @section) %></span>
