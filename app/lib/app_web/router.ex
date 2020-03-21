@@ -61,7 +61,6 @@ defmodule AppWeb.Router do
     end
 
 
-    resources "/semesters", SemesterController
     resources "/users", UserController, only: [:edit, :show, :update]
     resources "/topics", TopicController, only: [:edit, :show, :update, :delete]
     resources "/submissions", SubmissionController, only: [:edit, :show, :update, :delete]
