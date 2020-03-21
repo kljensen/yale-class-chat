@@ -46,6 +46,16 @@
       <%= render @view_module, @view_template, assigns %>
       </div>
     </main>
+    <footer>
+    <section class="container uk-section-muted uk-padding-small uk-padding-remove-bottom uk-padding-remove-right ">
+        <div class="uk-container uk-container-small">
+				<div class="uk-text-center uk-text-small uk-text-muted uk-section uk-section-small">
+				This is an open source project under active development by Nick Peranzi and Kyle Jensen.
+        <br/>Have a feature request or bug report? Please <a href="https://github.com/kljensen/yale-class-chat/issues/new">open an issue on GitHub</a> or <a href="mailto:nick.peranzi@yale.edu;kyle.jensen@yale.edu?Subject=Yale.chat%20Feature%20Request" target="_top">contact us</a>.
+				</div>
+			</div>
+      </section>
+    </footer>
     <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </body>
 </html>
