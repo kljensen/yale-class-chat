@@ -8,7 +8,7 @@
     </div>
   <% end %>
 
-  <div class="uk-margin">
+<div class="uk-margin">
   <%= label f, :role, class: "uk-form-label" %>
   <div class="uk-form-controls">
   <%= select f, :role, @role_list, class: "uk-select" %>

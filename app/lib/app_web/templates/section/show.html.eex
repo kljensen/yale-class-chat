@@ -1,40 +1,88 @@
 <%= if @can_edit do %>
-<h1>Section <%= @section.title %></h1>
-<h2>Administration</h2>
-<div>
-<section class="row">
-      <article class="column"><span><%= link "Edit Section Details", to: Routes.section_path(@conn, :edit, @section) %></span></article>
-      <article class="column"><span><span><%= link "Post New Topic", to: Routes.course_topic_path(@conn, :new, @section.course_id) %></span></article>
-      <article class="column"><span><%= link "Add Students to Section", to: Routes.section_section__role_path(@conn, :bulk_new, @section) %></span></article>
-      <article class="column"><span><%= link "View Section Roles", to: Routes.section_section__role_path(@conn, :index, @section) %></span></article>
-      <article class="column"><span><%= link "Back", to: Routes.course_path(@conn, :show, @section.course_id) %></span></article>
-</section>
+
+<div class="uk-grid-medium uk-child-width-1-2@s" uk-grid>
+    <div>
+        <div class="uk-card uk-card-small uk-card-default uk-card-hover">
+            <div class="uk-card-header">
+            <h3 class="uk-card-title uk-margin-remove-bottom">Section Details</h3>
+            </div>
+            <div class="uk-card-body">
+                <ul>
+                    <li>
+                    <strong>Title:</strong>
+                    <%= @section.title %>
+                    </li>
+
+                    <li>
+                    <strong>CRN:</strong>
+                    <%= @section.crn %>
+                    </li>
+
+                    <li>
+                    <strong>Course:</strong>
+                    <%= @course.department <> Integer.to_string(@course.number) <> ": " <> @course.name %>
+                    </li>
+
+                </ul>
+            </div>
+            <div class="uk-card-footer">
+                <div class="details uk-width-expand">
+                    <%= link "Edit Section Details", to: Routes.section_path(@conn, :edit, @section) %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="uk-card uk-card-small uk-card-default uk-card-hover">
+            <div class="uk-card-header">
+            <h3 class="uk-card-title uk-margin-remove-bottom">Administration</h3>
+            </div>
+            <div class="uk-card-body">
+            Topics
+            <ul>
+                <li><%= link "Create Topic", to: Routes.course_topic_path(@conn, :new, @course) %></li>
+            </ul>
+            Section Roles (Students/Guests)
+            <ul class="uk-margin-remove-top">
+                <li><%= link "View Existing Section Roles", to: Routes.section_section__role_path(@conn, :index, @section) %></li>
+                <li><%= link "Add Students to Section", to: Routes.section_section__role_path(@conn, :bulk_new, @section) %></li>
+            </ul>
+            </div>
+        </div>
+    </div>
+
 </div>
+
 <%= end %>
 
 <h2>Topics in Section</h2>
 <div class="uk-grid-column-medium uk-grid-row-medium uk-child-width-1-2@s uk-grid-match" uk-grid>
-<%= for topic <- @topics do %>
-    <a href="<%= Routes.topic_path(@conn, :show, topic) %>">
-    <div class="uk-card uk-card-small uk-card-default uk-card-hover color-<%= 1 + rem topic.id, 20 %>">
-        <div class="uk-card-header">
-            <div class="uk-width-expand">
-                <h3 class="uk-card-title uk-margin-remove-bottom">
-                    <%= topic.title %>
-                </h3>
-                <%= render AppWeb.HelperView, "multiparagraph_text.html", text: topic.description, truncate: true, pclass: "uk-text-meta uk-margin-remove-top uk-margin-remove-bottom" %>
-            </div>
-            <%= if @can_edit do %>
-              <section class="row">
-              <article class="column"><span><%= link "Show", to: Routes.topic_path(@conn, :show, topic) %></span></article>
-              <%= if @can_edit do %>
-              <article class="column"><span><%= link "Edit", to: Routes.topic_path(@conn, :edit, topic) %></span></article>
-              <article class="column"><span><%= link "Delete", to: Routes.topic_path(@conn, :delete, topic), method: :delete, data: [confirm: "Are you sure?"] %></span></article>
-              <%= end %>
-              </section>
-            <% end %>
+    <%= for topic <- @topics do %>
+        <div>
+            <a href="<%= Routes.topic_path(@conn, :show, topic) %>">
+                <div class="uk-card uk-card-small uk-card-default uk-card-hover color-<%= 1 + rem topic.id, 20 %>">
+                    <div class="uk-card-header">
+                        <div class="uk-width-expand">
+                            <h3 class="uk-card-title uk-margin-remove-bottom">
+                                <%= topic.title %>
+                            </h3>
+                            <%= render AppWeb.HelperView, "multiparagraph_text.html", text: topic.description, truncate: true, pclass: "uk-text-meta uk-margin-remove-top uk-margin-remove-bottom" %>
+                        </div>
+                    </div>
+                    <%= if @can_edit do %>
+                    <div class="uk-card-footer">
+                        <div class="details uk-width-expand">
+                            <%= link "Edit", to: Routes.topic_path(@conn, :edit, topic) %>
+                            |
+                            <%= link "Delete", to: Routes.topic_path(@conn, :delete, topic), method: :delete, data: [confirm: "Are you sure?"] %>
+                        </div>
+                    </div>
+                    <% end %>
+                </div>
+            </a>
         </div>
-    </div>
-    </a>
-<% end %>
+    <% end %>
 </div>
+
+<%= link "Back", to: Routes.course_path(@conn, :show, @section.course_id) %>
