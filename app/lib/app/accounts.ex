@@ -43,6 +43,7 @@ defmodule App.Accounts do
     auth_role = get_current_course__role(user, course)
     if Enum.member?(@course_admin_roles, auth_role) do
       query = from u in "users",
+                order_by: u.net_id,
                 select: [u.id, u.net_id]
       Repo.all(query)
     else
