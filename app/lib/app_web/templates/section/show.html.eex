@@ -1,6 +1,7 @@
 <%= if @can_edit do %>
 <h1>Section <%= @section.title %></h1>
 <h2>Administration</h2>
+<div>
 <section class="row">
       <article class="column"><span><%= link "Edit Section Details", to: Routes.section_path(@conn, :edit, @section) %></span></article>
       <article class="column"><span><span><%= link "Post New Topic", to: Routes.course_topic_path(@conn, :new, @section.course_id) %></span></article>
@@ -8,8 +9,10 @@
       <article class="column"><span><%= link "View Section Roles", to: Routes.section_section__role_path(@conn, :index, @section) %></span></article>
       <article class="column"><span><%= link "Back", to: Routes.course_path(@conn, :show, @section.course_id) %></span></article>
 </section>
+</div>
 <%= end %>
 
+<h2>Topics in Section</h2>
 <div class="uk-grid-column-medium uk-grid-row-medium uk-child-width-1-2@s uk-grid-match" uk-grid>
 <%= for topic <- @topics do %>
     <a href="<%= Routes.topic_path(@conn, :show, topic) %>">
@@ -22,8 +25,6 @@
                 <%= render AppWeb.HelperView, "multiparagraph_text.html", text: topic.description, truncate: true, pclass: "uk-text-meta uk-margin-remove-top uk-margin-remove-bottom" %>
             </div>
             <%= if @can_edit do %>
-              <h2><%= topic.title %></h2>
-              <span><%= topic.description %></span>
               <section class="row">
               <article class="column"><span><%= link "Show", to: Routes.topic_path(@conn, :show, topic) %></span></article>
               <%= if @can_edit do %>

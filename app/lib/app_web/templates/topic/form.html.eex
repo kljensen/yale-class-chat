@@ -80,6 +80,22 @@
 </div>
 
 <div class="uk-margin">
+  <%= label f, :show_submission_comments, class: "uk-form-label" %>
+  <div class="uk-form-controls">
+  <%= checkbox f, :show_submission_comments, class: "uk-checkbox" %>
+  <%= error_tag f, :show_submission_comments %>
+  </div>
+</div>
+
+<div class="uk-margin">
+  <%= label f, :show_submission_ratings, class: "uk-form-label" %>
+  <div class="uk-form-controls">
+  <%= checkbox f, :show_submission_ratings, class: "uk-checkbox" %>
+  <%= error_tag f, :show_submission_ratings %>
+  </div>
+</div>
+
+<div class="uk-margin">
   <%= label f, "Allow students to view submissions from other students", class: "uk-form-label" %>
   <div class="uk-form-controls">
   <%= checkbox f, :show_user_submissions, class: "uk-checkbox" %>

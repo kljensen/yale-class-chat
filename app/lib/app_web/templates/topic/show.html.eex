@@ -2,8 +2,7 @@
     <div class="uk-padding-small topic-title">
     <h1 class="uk-heading-divider"><%= @topic.title %></h1>
     <%= render AppWeb.HelperView, "multiparagraph_text.html", text: @topic.description %>
-    </div>
-    <div class="uk-padding-small topic-details">
+
     <% topic_status = cond do
     @topic.closed_at <= current_time(0) ->
     "closed"
@@ -13,6 +12,12 @@
     "open"
     end %>
 
+    <%= if @can_edit do %>
+    <hr>
+    <div>
+    <%= link "Edit", to: Routes.topic_path(@conn, :edit, @topic.id) %>
+    |
+    <%= link "Delete", to: Routes.topic_path(@conn, :delete, @topic.id), method: :delete, data: [confirm: "Are you sure?"] %>
     <p><%= if @topic.anonymous, do: "posted submissions are anonymous / " %>
     <%= "topic is " <> topic_status <>" / " %>
     <%= "submissions: "%><%= if @topic.allow_submissions == false, do: "not "%><%= "allowed /"%>
@@ -22,6 +27,10 @@
     <%= "submission limit: "%><%= Integer.to_string(@topic.user_submission_limit) %>
     </p>
     </div>
+    <% end %>
+
+    </div>
+
 </div>
 
 
@@ -59,9 +68,9 @@
                             <% end %>
                             <span class="comment-icon-count">
                                 <span class="comment-icon" uk-icon="icon:  comments; ratio: 0.7"></span>
-                                <%= submission.comment_count |> Integer.to_string %> 
+                                <%= submission.comment_count |> Integer.to_string %>
                             </span>
-                           
+
                             |
                             <span>Posted at: </span><span class="rating"><%= submission.inserted_at %>
                         </div>

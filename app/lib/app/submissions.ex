@@ -268,9 +268,11 @@ defmodule App.Submissions do
                             on: su.id == ra.submission_id,
                             left_join: co in App.Submissions.Comment,
                             on: su.id == co.submission_id,
+                            left_join: u in App.Accounts.User,
+                            on: su.user_id == u.id,
                             where: c.allow_read == true,
                             where: su.id == ^id,
-                            group_by: su.id,
+                            group_by: [su.id, u.display_name],
                             select: %{id: su.id,
                                         title: su.title,
                                         description: su.description,
@@ -282,6 +284,7 @@ defmodule App.Submissions do
                                         rating_count: count(ra.id, :distinct),
                                         comment_count: count(co.id, :distinct),
                                         user_id: su.user_id,
+                                        user_display_name: u.display_name,
                                         topic_id: su.topic_id}
                   Repo.one(query)
                 false ->
@@ -303,6 +306,8 @@ defmodule App.Submissions do
                             on: su.id == ra.submission_id,
                             left_join: co in App.Submissions.Comment,
                             on: su.id == co.submission_id,
+                            left_join: u in App.Accounts.User,
+                            on: su.user_id == u.id,
                             where: r.user_id == ^uid,
                             where: r.valid_from <= from_now(0, "day"),
                             where: r.valid_to >= from_now(0, "day"),
@@ -314,7 +319,7 @@ defmodule App.Submissions do
                             where: su.visible,
                             where: su.id == ^id,
                             where: t.id == ^tid,
-                            group_by: su.id,
+                            group_by: [su.id, u.display_name],
                             select: %{id: su.id,
                                         title: su.title,
                                         description: su.description,
@@ -326,6 +331,7 @@ defmodule App.Submissions do
                                         rating_count: count(ra.id, :distinct),
                                         comment_count: count(co.id, :distinct),
                                         user_id: su.user_id,
+                                        user_display_name: u.display_name,
                                         topic_id: su.topic_id}
                     Repo.one(query)
               end
@@ -573,17 +579,19 @@ defmodule App.Submissions do
     suid = submission.id
     allowed_section_roles = @section_read_roles
 
-    query = from r in App.Accounts.Section_Role,
+    query = from co in Comment,
+              join: su in Submission,
+              on: co.submission_id == su.id,
+              join: t in App.Topics.Topic,
+              on: su.topic_id == t.id,
               join: s in App.Courses.Section,
-              on: r.section_id == s.id,
+              on: t.section_id == s.id,
               join: c in App.Courses.Course,
               on: s.course_id == c.id,
-              join: t in App.Topics.Topic,
-              on: t.section_id == s.id,
-              join: su in Submission,
-              on: su.topic_id == t.id,
-              join: co in Comment,
-              on: co.submission_id == su.id,
+              join: r in App.Accounts.Section_Role,
+              on: r.section_id == s.id,
+              left_join: u in App.Accounts.User,
+              on: co.user_id == u.id,
               where: r.user_id == ^uid,
               where: r.valid_from <= from_now(0, "day"),
               where: r.valid_to >= from_now(0, "day"),
@@ -591,24 +599,36 @@ defmodule App.Submissions do
               where: c.allow_read == true,
               where: t.visible,
               where: t.show_user_submissions,
-              where: t.show_submission_comments or co.user_id == ^uid,
+              where: t.show_submission_comments == true or co.user_id == ^uid,
               where: su.visible,
               where: su.id == ^suid,
               order_by: [asc: co.inserted_at],
               select: co
 
+    query = query
+            |> preload([co, su, t, s, c, r, u], [user: u])
+
     query = if inherit_course_role do
       auth_role = App.Accounts.get_current_course__role(user, topic)
       if Enum.member?(@course_admin_roles, auth_role) do
-        from co in Comment,
-          where: co.submission_id == ^suid,
-          order_by: [asc: co.inserted_at]
+        querytmp = from co in Comment,
+                      left_join: u in App.Accounts.User,
+                      on: co.user_id == u.id,
+                      where: co.submission_id == ^suid,
+                      order_by: [asc: co.inserted_at]
+
+        querytmp = querytmp
+        |> preload([co, u], [user: u])
+
+        querytmp
       else
         query
       end
     else
       query
     end
+
+
 
     Repo.all(query)
   end
@@ -703,7 +723,6 @@ defmodule App.Submissions do
                                             where: s.id == ^sid,
                                             where: t.visible,
                                             where: t.show_user_submissions,
-                                            where: t.show_submission_comments or co.user_id == ^uid,
                                             where: su.visible,
                                             where: su.id == ^id,
                                             where: t.id == ^tid,
@@ -922,7 +941,7 @@ defmodule App.Submissions do
               where: c.allow_read == true,
               where: t.visible,
               where: t.show_user_submissions,
-              where: t.show_submission_ratings or ra.user_id == ^uid,
+              where: t.show_submission_ratings == true or ra.user_id == ^uid,
               where: su.visible,
               where: su.id == ^suid,
               select: ra
@@ -1034,7 +1053,6 @@ defmodule App.Submissions do
                             where: s.id == ^sid,
                             where: t.visible,
                             where: t.show_user_submissions,
-                            where: t.show_submission_ratings or ra.user_id == ^uid,
                             where: su.visible,
                             where: su.id == ^id,
                             where: t.id == ^tid,
