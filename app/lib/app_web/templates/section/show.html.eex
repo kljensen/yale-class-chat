@@ -19,9 +19,7 @@
                 <h3 class="uk-card-title uk-margin-remove-bottom">
                     <%= topic.title %>
                 </h3>
-                <p class="uk-text-meta uk-margin-remove-top uk-margin-remove-bottom">
-                    <%= topic.description %>
-                </p>
+                <%= render AppWeb.HelperView, "multiparagraph_text.html", text: topic.description, truncate: true, pclass: "uk-text-meta uk-margin-remove-top uk-margin-remove-bottom" %>
             </div>
             <%= if @can_edit do %>
               <h2><%= topic.title %></h2>

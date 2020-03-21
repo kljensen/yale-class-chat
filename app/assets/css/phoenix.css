@@ -195,6 +195,11 @@ div.comment-author-odd {
     text-transform: lower;
     font-variant-caps: small-caps;
 }
+.read-more {
+    text-transform: lower;
+    font-variant-caps: small-caps;
+    color: #999;
+}
 
 // https://flatuicolors.com/palette/defo
 .color-1{ border-left: 10px solid #1abc9c;}

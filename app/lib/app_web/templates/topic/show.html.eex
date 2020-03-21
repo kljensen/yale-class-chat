@@ -40,7 +40,7 @@
                     </div>
                     <div class="uk-card-body">
                         <div class="uk-width-expand">
-                            <%= render AppWeb.HelperView, "multiparagraph_text.html", text: submission.description %>
+                            <%= render AppWeb.HelperView, "multiparagraph_text.html", text: submission.description, truncate: true %>
                         </div>
                     </div>
                     <div class="uk-card-footer">
