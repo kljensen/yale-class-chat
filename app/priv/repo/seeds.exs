@@ -31,8 +31,8 @@ defmodule App.DatabaseSeeder do
     %{display_name: "Student 5", email: "stud5@yale.edu", net_id: "stud5", is_faculty: false}
   ]
   @semester_list [
-    %{name: "Fall 2019"},
-    %{name: "Spring 2020"}
+    %{name: "Fall 2019", term_code: "201903"},
+    %{name: "Spring 2020", term_code: "202001"}
   ]
   @course_list [
     %{department: "MGT", name: "Managing Software Development", number: 656, allow_write: true, allow_read: true},
