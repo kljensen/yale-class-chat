@@ -8,9 +8,9 @@ defmodule App.CoursesTest do
   describe "semesters" do
     alias App.Courses.Semester
 
-    @valid_attrs %{name: "some name"}
-    @update_attrs %{name: "some updated name"}
-    @invalid_attrs %{name: nil}
+    @valid_attrs %{name: "some name", term_code: "202001"}
+    @update_attrs %{name: "some updated name", term_code: "202002"}
+    @invalid_attrs %{name: nil, term_code: nil}
 
     def semester_fixture(attrs \\ %{}) do
       params =
@@ -47,6 +47,7 @@ defmodule App.CoursesTest do
       user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
       assert {:error, changeset = semester} = Courses.create_semester(user_faculty, @invalid_attrs)
       assert %{name: ["can't be blank"]} = errors_on(changeset)
+      assert %{term_code: ["can't be blank"]} = errors_on(changeset)
     end
 
     test "create_semester/2 by non-faculty user returns error" do
@@ -59,6 +60,7 @@ defmodule App.CoursesTest do
       user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
       assert {:ok, %Semester{} = semester} = Courses.update_semester(user_faculty, semester, @update_attrs)
       assert semester.name == "some updated name"
+      assert semester.term_code == "202002"
     end
 
     test "update_semester/3 with invalid data returns error changeset" do
@@ -146,7 +148,7 @@ defmodule App.CoursesTest do
       course = course_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
       semester = Courses.get_semester!(course.semester_id)
-      {:ok, semester2} = Courses.create_semester(user_faculty, %{name: "empty semester"})
+      {:ok, semester2} = Courses.create_semester(user_faculty, %{name: "empty semester", term_code: "190001"})
       course_list = Courses.list_courses(semester)
       retrieved_course = List.first(course_list)
       assert course.id == retrieved_course.id
@@ -161,7 +163,7 @@ defmodule App.CoursesTest do
       course = course_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
       semester = Courses.get_semester!(course.semester_id)
-      {:ok, semester2} = Courses.create_semester(user_faculty, %{name: "empty semester"})
+      {:ok, semester2} = Courses.create_semester(user_faculty, %{name: "empty semester", term_code: "190001"})
       user_faculty2 = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id 2"})
       course_list = Courses.list_user_courses(semester, user_faculty)
       assert length(course_list) == 1
@@ -205,7 +207,7 @@ defmodule App.CoursesTest do
       user_faculty = Accounts.get_user_by!("faculty net id")
       user_faculty2 = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id 2"})
       semester = Courses.get_semester!(course.semester_id)
-      {:ok, semester2} = Courses.create_semester(user_faculty, %{name: "empty semester"})
+      {:ok, semester2} = Courses.create_semester(user_faculty, %{name: "empty semester", term_code: "190001"})
       {:ok, current_time} = DateTime.now("Etc/UTC")
       #Expired role returns no courses
       params = %{role: "administrator", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, -7200, :second)}
@@ -292,7 +294,7 @@ defmodule App.CoursesTest do
     test "update_course/3 with changed semester changes association" do
       course = course_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
-      {:ok, semester2} = Courses.create_semester(user_faculty, @update_attrs)
+      {:ok, semester2} = Courses.create_semester(user_faculty, %{name: "some updated name", term_code: "202002"})
 
       refute course.semester_id == semester2.id
       assert {:ok, %Course{} = course} = Courses.update_course(user_faculty, course, %{semester_id: semester2.id})
