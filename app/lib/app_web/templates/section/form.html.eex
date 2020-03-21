@@ -1,21 +1,39 @@
-<%= form_for @changeset, @action, fn f -> %>
+
+<div class="uk-margin">
+  Using the form below, you can create a new section of a course
+  that you previously created. If you add the CRN (course registration
+  number?)
+  it will help us do fancy stuff in the future.
+  You can look up your CRN at
+  <a href="https://courses.yale.edu/">https://courses.yale.edu/</a>.
+</div>
+
+<%= form_for @changeset, @action, [class: "uk-form-stacked"], fn f -> %>
   <%= if @changeset.action do %>
     <div class="alert alert-danger">
       <p>Oops, something went wrong! Please check the errors below.</p>
     </div>
   <% end %>
 
-  <%= label f, :title %>
-  <%= text_input f, :title %>
-  <%= error_tag f, :title %>
+<div class="uk-margin">
+  <%= label f, :title, class: "uk-form-label"%>
+  <div class="uk-form-controls">
+    <%= text_input f, :title, class: "uk-input"%>
+    <%= error_tag f, :title %>
+  </div>
+</div>
 
-  <%= label f, :crn %>
-  <%= text_input f, :crn %>
-  <%= error_tag f, :crn %>
+<div class="uk-margin">
+  <%= label f, :crn, class: "uk-form-label"%>
+  <div class="uk-form-controls">
+    <%= text_input f, :crn, class: "uk-input"%>
+    <%= error_tag f, :crn %>
+  </div>
+</div>
 
   <%= hidden_input f, :course_id, value: @course.id %>
+<div class="uk-margin">
+    <%= submit "Save", class: "uk-button-secondary uk-button" %>
+</div>
 
-  <div>
-    <%= submit "Save" %>
-  </div>
 <% end %>

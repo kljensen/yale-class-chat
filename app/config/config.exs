@@ -17,7 +17,7 @@ config :app, AppWeb.Endpoint,
   render_errors: [view: AppWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: App.PubSub, adapter: Phoenix.PubSub.PG2],
   live_view: [
-    signing_salt: "VsnpWBYvKilpW0z7QvGcsV2mL61aRG/B"
+    signing_salt:  System.get_env("SIGNING_SALT")
   ]
 
 # Configures Elixir's Logger
