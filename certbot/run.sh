@@ -23,7 +23,6 @@ if [ -n "$ONCE" ] ; then
     $COMMAND
     exit
 fi
-exit
 
 while true 
 do 
