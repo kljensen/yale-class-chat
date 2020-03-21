@@ -13,6 +13,8 @@ defmodule App.Repo.Migrations.CreateTopics do
       add :anonymous, :boolean, default: false, null: false
       add :allow_submission_comments, :boolean, default: false, null: false
       add :allow_ranking, :boolean, default: false, null: false
+      add :show_submission_comments, :boolean, default: true, null: false
+      add :show_submission_ratings, :boolean, default: true, null: false
       add :show_user_submissions, :boolean, default: false, null: false
       add :visible, :boolean, default: true, null: false
       add :user_submission_limit, :integer

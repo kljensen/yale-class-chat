@@ -538,11 +538,13 @@ defmodule App.SubmissionsTest do
     end
 
     test "list_user_comments/3 returns all comments for the given submission", context do
-      submission = submission_fixture(context[:submitter], context[:topic])
-      submission2 = submission_fixture(context[:submitter], context[:topic])
+      topic = context[:topic]
+      submission = submission_fixture(context[:submitter], topic)
+      submission2 = submission_fixture(context[:submitter], topic)
       comment = comment_fixture(context[:student], submission)
       user_faculty = Accounts.get_user_by!("faculty net id")
       student = context[:student]
+      student2 = context[:student2]
 
       retrieved_comments = Submissions.list_user_comments(student, submission2)
       assert length(retrieved_comments) == 0
@@ -559,6 +561,17 @@ defmodule App.SubmissionsTest do
       retrieved_comment = List.first(retrieved_comments)
       assert retrieved_comment.id == comment.id
       assert retrieved_comment.description == comment.description
+
+      retrieved_comments = Submissions.list_user_comments(student2, submission)
+      assert length(retrieved_comments) == 1
+      {:ok, topic} = Topics.update_topic(user_faculty, topic, %{show_submission_comments: false})
+      IO.inspect topic.show_submission_comments
+      retrieved_comments = Submissions.list_user_comments(student2, submission)
+      assert length(retrieved_comments) == 0
+      retrieved_comments = Submissions.list_user_comments(student, submission)
+      assert length(retrieved_comments) == 1
+      retrieved_comments = Submissions.list_user_comments(user_faculty, submission)
+      assert length(retrieved_comments) == 1
     end
 
     test "list_user_comments/3 returns no comments if no valid role", context do
@@ -927,11 +940,13 @@ defmodule App.SubmissionsTest do
     end
 
     test "list_user_ratings/3 returns all ratings for the given submission", context do
-      submission = submission_fixture(context[:submitter], context[:topic])
-      submission2 = submission_fixture(context[:submitter], context[:topic])
+      topic = context[:topic]
+      submission = submission_fixture(context[:submitter], topic)
+      submission2 = submission_fixture(context[:submitter], topic)
       rating = rating_fixture(context[:student], submission)
       user_faculty = Accounts.get_user_by!("faculty net id")
       student = context[:student]
+      student2 = context[:student2]
 
       retrieved_ratings = Submissions.list_user_ratings(student, submission2)
       assert length(retrieved_ratings) == 0
@@ -948,6 +963,17 @@ defmodule App.SubmissionsTest do
       retrieved_rating = List.first(retrieved_ratings)
       assert retrieved_rating.id == rating.id
       assert retrieved_rating.score == rating.score
+
+      retrieved_ratings = Submissions.list_user_ratings(student2, submission)
+      assert length(retrieved_ratings) == 1
+      {:ok, topic} = Topics.update_topic(user_faculty, topic, %{show_submission_ratings: false})
+      IO.inspect topic.show_submission_ratings
+      retrieved_ratings = Submissions.list_user_ratings(student2, submission)
+      assert length(retrieved_ratings) == 0
+      retrieved_ratings = Submissions.list_user_ratings(student, submission)
+      assert length(retrieved_ratings) == 1
+      retrieved_ratings = Submissions.list_user_ratings(user_faculty, submission)
+      assert length(retrieved_ratings) == 1
     end
 
     test "list_user_ratings/3 returns no ratings if no valid role", context do

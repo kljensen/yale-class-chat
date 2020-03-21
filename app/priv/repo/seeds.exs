@@ -21,7 +21,7 @@ defmodule App.DatabaseSeeder do
   @prof_list [
     %{display_name: "Professor 1", email: "prof1@yale.edu", net_id: "prof1", is_faculty: true},
     %{display_name: "Professor 2", email: "prof2@yale.edu", net_id: "prof2", is_faculty: true},
-    %{display_name: "Professor 3", email: "prof3@yale.edu", net_id: "prof3", is_faculty: true}
+    %{display_name: "TA 1", email: "ta1@yale.edu", net_id: "ta1", is_faculty: false}
   ]
   @student_list [
     %{display_name: "Student 1", email: "stud1@yale.edu", net_id: "stud1", is_faculty: false},

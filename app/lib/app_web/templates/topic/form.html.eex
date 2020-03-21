@@ -48,9 +48,11 @@
 </div>
 
 <div class="uk-margin">
+
   <%= label f, :allow_submissions, class: "uk-form-label" do %>
     Allow student submissions to topic
   <% end %>
+
   <div class="uk-form-controls">
   <%= checkbox f, :allow_submissions, class: "uk-checkbox" %>
   <%= error_tag f, :allow_submissions %>
@@ -58,9 +60,11 @@
 </div>
 
 <div class="uk-margin">
+
   <%= label f, :allow_submission_voting, class: "uk-form-label" do %>
     Allow student voting/rating on others' submissions
   <% end %>
+    
   <div class="uk-form-controls">
   <%= checkbox f, :allow_submission_voting, class: "uk-checkbox" %>
   <%= error_tag f, :allow_submission_voting %>
@@ -68,9 +72,11 @@
 </div>
 
 <div class="uk-margin">
+
   <%= label f, :anonymous, class: "uk-form-label" do %>
     Student submissions are anonymous
   <% end %>
+
   <div class="uk-form-controls">
   <%= checkbox f, :anonymous, class: "uk-checkbox" %>
   <%= error_tag f, :anonymous %>
@@ -78,9 +84,11 @@
 </div>
 
 <div class="uk-margin">
+
   <%= label f, :allow_submission_comments, class: "uk-form-label" do %>
       Allow student to comment on others' submissions
   <% end %>
+
 
   <div class="uk-form-controls">
   <%= checkbox f, :allow_submission_comments, class: "uk-checkbox" %>
@@ -89,6 +97,24 @@
 </div>
 
 <div class="uk-margin">
+
+  <%= label f, :show_submission_comments, class: "uk-form-label" %>
+  <div class="uk-form-controls">
+  <%= checkbox f, :show_submission_comments, class: "uk-checkbox" %>
+  <%= error_tag f, :show_submission_comments %>
+  </div>
+</div>
+
+<div class="uk-margin">
+  <%= label f, :show_submission_ratings, class: "uk-form-label" %>
+  <div class="uk-form-controls">
+  <%= checkbox f, :show_submission_ratings, class: "uk-checkbox" %>
+  <%= error_tag f, :show_submission_ratings %>
+  </div>
+</div>
+
+<div class="uk-margin">
+
   <%= label f, "Allow students to view submissions from other students", class: "uk-form-label" %>
   <div class="uk-form-controls">
   <%= checkbox f, :show_user_submissions, class: "uk-checkbox" %>
@@ -97,9 +123,11 @@
 </div>
 
 <div class="uk-margin">
+
   <%= label f, :user_submission_limit, class: "uk-form-label" do %>
     Max number of submissions by a single student (default unlimited)
   <% end %>
+
   <div class="uk-form-controls">
   <%= number_input f, :user_submission_limit, min: 0, class: "uk-input" %>
   <%= error_tag f, :user_submission_limit %>
@@ -107,9 +135,11 @@
 </div>
 
 <div class="uk-margin">
+
   <%= label f, :sort, class: "uk-form-label" do %>
       Sort order for student submissions in this topic
   <% end %>
+
 
   <div class="uk-form-controls">
   <%= select f, :sort, @sort_list, class: "uk-select" %>

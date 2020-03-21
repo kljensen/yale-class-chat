@@ -30,6 +30,7 @@ CAS_CALLBACK_URL=http://localhost:9001/auth/cas/callback
 SECRET_KEY_BASE=a7b3f3db42a7a3264a24880906403216b944afbd9bd67365992222ad1a7961c758870182274cd442a3cd89acf5abd5fdccc76974c9ab15a200f5ac2a20eb4b5e
 DOMAIN=foo.som.yale.edu
 HOST=127.0.0.1
+SIGNING_SALT=8ebd49dc616e9d895fff338536e44d5625bd5dc53f8f5c347fb60be75ddfb707
 ```
 
 Run `./admin.sh up` to bring up the app. The app will
