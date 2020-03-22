@@ -41,6 +41,13 @@ config :app, App.Repo, migration_timestamps: [type: :utc_datetime_usec]
 # Load tzdata time zone library
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
+# Course Registration API credentials
+config :app, RegistrationAPI,
+    url: System.get_env("REGISTRATION_API_URL"),
+    username: System.get_env("REGISTRATION_API_USERNAME"),
+    password: System.get_env("REGISTRATION_API_PASSWORD")
+
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"

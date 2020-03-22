@@ -117,6 +117,38 @@ defmodule App.Accounts do
   end
 
   @doc """
+  Creates or updates a user.
+
+  ## Examples
+
+      iex> create_or_update_user(%{field: value})
+      {:ok, %User{}}
+
+      iex> create_or_update_user(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+
+  def create_or_update_user(attrs \\ %{net_id: nil, display_name: nil, email: nil}) do
+    net_id = attrs.net_id
+    user =
+      case Repo.get_by(User, net_id: net_id) do
+        nil  ->
+          create_user(attrs)
+        user ->
+          update_user(user, attrs)
+
+      end
+
+    #case result do
+    #  {:ok, model}        -> # Inserted or updated with success
+    #  {:error, changeset} -> # Something went wrong
+    #end
+
+    user
+  end
+
+  @doc """
   Creates a user upon login.
 
   ## Examples
@@ -145,7 +177,6 @@ defmodule App.Accounts do
       {stat, user}
   end
 
-  def get_or_create_user
 
   @doc """
   Updates a user.
@@ -702,6 +733,23 @@ defmodule App.Accounts do
     else
         course_role
     end
+  end
+
+  @doc """
+  Gets the list of students registered to the course via registration API.
+
+  ## Examples
+
+      iex> get_current_course__role(%User{}, %Section{})
+      %Section_Role{}
+
+      iex> get_current_course__role(%InvalidUser{}, %InvalidSection{})
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_registered_students(%App.Courses.Section{} = section) do
+    RegistationAPI.get_registered_students(section.crn)
+    "successfully called this function"
   end
 
   @doc """
