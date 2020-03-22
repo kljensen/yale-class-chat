@@ -52,30 +52,31 @@
 
             <h1 id="professors" class="uk-h2 tm-heading-fragment"><a href="#professors">Professors</a></h1>
             <h2 id="courses" class="uk-h3 tm-heading-fragment"><a href="#courses">Courses</a></h2>
-            <p>Your professors will periodically post topics to your section, like "Submit Ideas Here" or "What questions do you have for our speaker"?
-            <br/><br/>
-            You can post submissions in response.
-            (Insert images here)
-            </p>
+            <p>Your home page will show all courses you own or administrate; click New Course to create a new one.</p>
+            <img data-src="/images/about-course-home.png" width="" height="" alt="" uk-img>
+            <p>When viewing a course, you'll see a number of editable fields. You can add other professors or TAs to the course using the "Add New Course Roles" link.</p>
+            <img data-src="/images/about-course-roles.png" width="" height="" alt="" uk-img>
+            <p>Owners can add, remove, and modify course roles; generally, only professors should have this role. TAs should be administrators, which allows them to add students but not other TAs or professors to the course.</p>
+            <p>Also from the course detail page, you can create sections using the "Create Section" link. We <strong>highly</strong> recommend entering the accurate CRN for each section, as this allows you to add students to the section automatically.</p>
+            <img data-src="/images/about-add-section.png" width="" height="" alt="" uk-img>
 
             <hr class="uk-margin-medium">
 
             <h2 id="sections" class="uk-h3 tm-heading-fragment"><a href="#sections">Sections</a></h2>
-            <p>Your professors will periodically post topics to your section, like "Submit Ideas Here" or "What questions do you have for our speaker"?
-            <br/><br/>
-            You can post submissions in response.
-            (Insert images here)
-            </p>
+            <p>Once you've created a section, you can click "Show" next to it on the course view. This takes you to the section administration page.</p>
+            <img data-src="/images/about-section-admin.png" width="" height="" alt="" uk-img>
+            <p>You can add students to the section using the "Manually Add Students to Section" link (which will require you to paste a list of net ids) or the "Automatically Add Registered Students to Section" link, which uses the Yale Course API to add all registered students with one click.</p>
+            <img data-src="/images/about-section-roles.png" width="" height="" alt="" uk-img>
+            <p>When adding students to sections, pick the appropriate role ("student" can post while "defunct_student" or "guest" can only view), select the start and end date for the role, optionally decide to update student emails and names and/or to delete old section roles, then click Add All Registered Users.</p>
 
             <hr class="uk-margin-medium">
 
             <h2 id="topics" class="uk-h3 tm-heading-fragment"><a href="#topics">Topics</a></h2>
-            <p>Your professors will periodically post topics to your section, like "Submit Ideas Here" or "What questions do you have for our speaker"?
-            <br/><br/>
-            You can post submissions in response.
-            (Insert images here)
-            </p>
+            <p>You can also post topics from the section or course detail page. Click Create Topic to see the new topic form.</p>
+            <img data-src="/images/about-create-topic-1.png" width="" height="" alt="" uk-img>
+            <img data-src="/images/about-create-topic-2.png" width="" height="" alt="" uk-img>
 
+            <p>You'll see a variety of options; one of the most important is the "Post Topic to Sections" field. You can post a topic to one, many, or all sections in your course. Be sure to highlight only the sections to which you'd like to post the topic.</p>
 
           </div>
         </div>
@@ -123,20 +124,6 @@
                   </svg>
                 </span>
                 <span class="uk-text-middle">Report issue</span>
-              </a>
-            </li>
-            <li>
-              <a href="https://discordapp.com/invite/NEt4Pv7" target="_blank">
-                <span uk-icon="commenting" class="uk-margin-small-right uk-icon">
-                  <svg width="20" height="20" viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg" data-svg="commenting">
-                    <polygon fill="none" stroke="#000" points="1.5,1.5 18.5,1.5 18.5,13.5 10.5,13.5 6.5,17.5 6.5,13.5 1.5,13.5"></polygon>
-                    <circle cx="10" cy="8" r="1"></circle>
-                    <circle cx="6" cy="8" r="1"></circle>
-                    <circle cx="14" cy="8" r="1"></circle>
-                  </svg>
-                </span>
-                <span class="uk-text-middle">Get help</span>
               </a>
             </li>
           </ul>
