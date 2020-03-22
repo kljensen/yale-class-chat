@@ -64,7 +64,10 @@ defmodule App.MixProject do
       # Using tzdata for time zone conversions
       {:tzdata, "~> 1.0.1"},
       # Using EctoFields for URL and email validation
-      {:ecto_fields, "~> 1.2.0"}
+      {:ecto_fields, "~> 1.2.0"},
+      # Use tesla and hackney for external REST API requests
+      {:tesla, "~> 1.3.0"},
+      {:hackney, "~> 1.15.2"}
     ]
   end
 

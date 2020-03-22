@@ -35,6 +35,122 @@ defmodule AppWeb.Section_RoleController do
     render(conn, "new.html", changeset: changeset, section: section, role_list: @section_read_roles, user_list: user_list, course: course)
   end
 
+  def api_new(conn, %{"section_id" => section_id}) do
+    section = Courses.get_section!(section_id)
+    user = conn.assigns.current_user
+    case App.Accounts.can_edit_section(user, section) do
+      true ->
+        course = Courses.get_course!(section.course_id)
+        semester = Courses.get_semester!(course.semester_id)
+        changeset = Accounts.change_section__role(%Section_Role{})
+        render(conn, "api_new.html", changeset: changeset, section: section, role_list: @section_read_roles, course: course)
+        #Connect to API
+        #IO.inspect RegistrationAPI.get_registered_student_user_netids(section.crn, semester.term_code)
+
+      false ->
+        conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+      end
+  end
+
+  def api_create(conn, %{"section__role" => section__role_params, "section_id" => section_id}) do
+    section = Courses.get_section!(section_id)
+    user_auth = conn.assigns.current_user
+    case App.Accounts.can_edit_section(user_auth, section) do
+      true ->
+        course = Courses.get_course!(section.course_id)
+        semester = Courses.get_semester!(course.semester_id)
+        update_existing = case section__role_params["update_existing"] do
+                            "true" -> true
+                            _ -> false
+                          end
+        #overwrite_roles = case section__role_params["overwrite_roles"] do
+        #  "true" -> true
+        #  _ -> false
+        #end
+        case RegistrationAPI.get_registered_student_user_netids(section.crn, semester.term_code, update_existing) do
+          {:ok, user_ids} ->
+            IO.inspect "User IDs incoming!"
+            case IO.inspect(user_ids) do
+              "" ->
+                changeset = Accounts.change_section__role(%Section_Role{})
+                conn
+                |> put_flash(:error, "Must submit at least one net_id")
+                |> render("bulk_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
+
+              nil ->
+                changeset = Accounts.change_section__role(%Section_Role{})
+                conn
+                |> put_flash(:error, "Must submit at least one net_id")
+                |> render("bulk_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
+
+              _ ->
+                net_id_list = user_ids
+                netid1 = List.first(net_id_list)
+                {:ok, user1} = App.Accounts.create_user_on_login(netid1)
+                #First try to create one section role; if an error changeset is returned, show the errors
+                case Accounts.create_section__role(user_auth, user1, section, section__role_params) do
+                  {:ok, _section__role} ->
+                    net_id_list = List.delete(net_id_list, netid1)
+                    case length(net_id_list) do
+                      0 ->
+                        conn
+                        |> put_flash(:info, "Section  role created successfully.")
+                        |> redirect(to: Routes.section_path(conn, :show, section))
+                      _ ->
+
+                        #Now that we know the section role is valid, attempt to add the role for all users
+                        initial_map = %{}
+                        initial_map = Map.put(initial_map, netid1, "ok")
+                        result_map = Enum.reduce net_id_list, initial_map, fn net_id, acc ->
+                          {:ok, user} = App.Accounts.create_user_on_login(net_id)
+                          {stat, _result} = Accounts.create_section__role(user_auth, user, section, section__role_params)
+                          Map.put(acc, net_id, Atom.to_string(stat))
+                        end
+
+                        result_list = Enum.map(result_map, fn {a, b} -> [a <> "=", b <> "; \n"] end)
+
+                        case Map.values(result_map) |> Enum.member?("error") do
+                          true ->
+                            conn
+                            |> put_flash(:error, result_list)
+                            |> redirect(to: Routes.section_section__role_path(conn, :index, section))
+
+                          false ->
+                            conn
+                            |> put_flash(:info, result_list)
+                            |> redirect(to: Routes.section_section__role_path(conn, :index, section))
+                          end
+                      end
+
+                  {:error, %Ecto.Changeset{} = changeset} ->
+                    render(conn, "bulk_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
+
+                  {:error, message} ->
+                    changeset = Accounts.change_section__role(%Section_Role{})
+                    conn
+                    |> put_flash(:error, message)
+                    |> render("bulk_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
+                  end
+                end
+
+            {:error, message} ->
+              changeset = Accounts.change_section__role(%Section_Role{})
+              conn
+              |> put_flash(:error, message)
+              |> render("bulk_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
+            end
+
+      false ->
+        conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+      end
+  end
+
   def bulk_new(conn, %{"section_id" => section_id}) do
     section = Courses.get_section!(section_id)
     course = Courses.get_course!(section.course_id)
@@ -59,11 +175,17 @@ defmodule AppWeb.Section_RoleController do
       true ->
         user_ids = section__role_params["user_id_list"]
         case user_ids do
+          "" ->
+            changeset = Accounts.change_section__role(%Section_Role{})
+            conn
+            |> put_flash(:error, "Must submit at least one net_id")
+            |> render("bulk_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
+
           nil ->
-            changeset = %Ecto.Changeset{}
-              |> Ecto.Changeset.apply_action(:create)
-              |> Ecto.Changeset.add_error(:user_id_list, "Must submit at least one net_id")
-            render(conn, "bulk_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
+            changeset = Accounts.change_section__role(%Section_Role{})
+            conn
+            |> put_flash(:error, "Must submit at least one net_id")
+            |> render("bulk_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
 
           _ ->
             net_id_list = String.split(user_ids, [" ", ",",";"], trim: true)
