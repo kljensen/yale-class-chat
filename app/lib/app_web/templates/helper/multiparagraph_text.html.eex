@@ -4,13 +4,14 @@
     <%= for para <- paragraphs do %>
         <p class="<%= assigns[:pclass] %>">
             <%= para %>
-            <%= if was_truncated do %>
-            <span class="read-more">
-                ... Read More.
-            </span>
-            <% end %>
         </p>
     <% end %>
+    <%= if was_truncated do %>
+    <span class="read-more">
+        ... Read More.
+    </span>
+    <% end %>
+
 <% else %>
     <%= for para <- split_newlines(@text) do %>
         <p class="assigns[:pclass]">
