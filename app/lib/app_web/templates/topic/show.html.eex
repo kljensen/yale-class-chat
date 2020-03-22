@@ -4,9 +4,10 @@
     <%= render AppWeb.HelperView, "multiparagraph_text.html", text: @topic.description %>
 
     <% topic_status = cond do
-    @topic.closed_at <= current_time(0) ->
+
+    DateTime.compare(@topic.closed_at, current_time(0)) == :lt ->
     "closed"
-    @topic.opened_at >= current_time(0) ->
+    DateTime.compare(@topic.opened_at, current_time(0)) == :gt ->
     "closed"
     true ->
     "open"
