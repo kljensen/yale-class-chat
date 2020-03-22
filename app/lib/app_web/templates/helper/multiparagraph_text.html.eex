@@ -1,15 +1,15 @@
 <% truncate = assigns[:truncate] %>
 <%= if !is_nil(truncate) && truncate == true do %>
     <% {was_truncated, paragraphs} = truncate_text(@text, 300, 400) %>
-    <%= for para <- paragraphs do %>
+    <%= for {para, i} <-  Enum.with_index(paragraphs) do %>
         <p class="<%= assigns[:pclass] %>">
             <%= para %>
+            <%= if was_truncated && length(paragraphs) == i+1 do %>
+            <span class="read-more">
+                &hellip;[read&nbsp;more].
+            </span>
+            <% end %>
         </p>
-    <% end %>
-    <%= if was_truncated do %>
-    <span class="read-more">
-        ... Read More.
-    </span>
     <% end %>
 
 <% else %>
