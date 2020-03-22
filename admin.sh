@@ -24,9 +24,13 @@ case $ACTION in
         # Bring up all our processes in production
         docker-compose -f docker-compose.prod.yaml up
         ;;
-    prod-down)
+    prod-upd)
         # Bring up all our processes in production
-        docker-compose -f docker-compose.prod.yaml down
+        docker-compose -f docker-compose.prod.yaml up -d
+        ;;
+    prod-stop)
+        # Stop all our processes in production
+        docker-compose -f docker-compose.prod.yaml stop
         ;;
     http-init-certs)
         # Get our TLS certs from LetsEncrypt using the HTTP challenge method
