@@ -16,7 +16,7 @@
 <div class="uk-margin">
   <%= label f, :description, class: "uk-form-label" %>
   <div class="uk-form-controls">
-  <%= text_input f, :description, class: "uk-input" %>
+  <%= textarea f, :description, class: "uk-textarea" %>
   <%= error_tag f, :description %>
   </div>
 </div>
@@ -49,6 +49,18 @@
 
 <div class="uk-margin">
 
+  <%= label f, :visible, class: "uk-form-label" do %>
+    Topic is visible to students (uncheck to hide)
+  <% end %>
+
+  <div class="uk-form-controls">
+  <%= checkbox f, :visible, class: "uk-checkbox" %>
+  <%= error_tag f, :visible %>
+  </div>
+</div>
+
+<div class="uk-margin">
+
   <%= label f, :allow_submissions, class: "uk-form-label" do %>
     Allow student submissions to topic
   <% end %>
@@ -74,7 +86,7 @@
 <div class="uk-margin">
 
   <%= label f, :anonymous, class: "uk-form-label" do %>
-    Student submissions are anonymous
+    Student submissions are anonymous (by default names are shown)
   <% end %>
 
   <div class="uk-form-controls">
@@ -98,7 +110,9 @@
 
 <div class="uk-margin">
 
-  <%= label f, :show_submission_comments, class: "uk-form-label" %>
+  <%= label f, :show_submission_comments, class: "uk-form-label" do %>
+    Allow students to see each others' comments
+  <% end %>
   <div class="uk-form-controls">
   <%= checkbox f, :show_submission_comments, class: "uk-checkbox" %>
   <%= error_tag f, :show_submission_comments %>
@@ -106,7 +120,9 @@
 </div>
 
 <div class="uk-margin">
-  <%= label f, :show_submission_ratings, class: "uk-form-label" %>
+  <%= label f, :show_submission_ratings, class: "uk-form-label" do %>
+    Allow students to see the average rating for each submission
+  <% end %>
   <div class="uk-form-controls">
   <%= checkbox f, :show_submission_ratings, class: "uk-checkbox" %>
   <%= error_tag f, :show_submission_ratings %>
@@ -115,7 +131,9 @@
 
 <div class="uk-margin">
 
-  <%= label f, "Allow students to view submissions from other students", class: "uk-form-label" %>
+  <%= label f, :show_user_submissions, class: "uk-form-label" do %>
+    Allow students to see each others' submissions
+  <% end %>
   <div class="uk-form-controls">
   <%= checkbox f, :show_user_submissions, class: "uk-checkbox" %>
   <%= error_tag f, :show_user_submissions %>
