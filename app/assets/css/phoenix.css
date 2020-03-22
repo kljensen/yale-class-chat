@@ -227,4 +227,50 @@ div.comment-author-odd {
     margin-right: 0.5rem;
 }
 
+// Fix sidebars in UIKit
+.tm-sidebar-left {
+    position: fixed;
+    top: 80px;
+    bottom: 0;
+    box-sizing: border-box;
+    width: 240px !important;
+    padding: 40px 40px 60px 40px;
+    border-right: 1px #e5e5e5 solid;
+    overflow: auto
+}
+
+.tm-sidebar-right {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 0px);
+    width: 200px;
+}
+
+@media (min-width:960px) {
+    .tm-sidebar-left+.tm-main {
+        padding-left: 240px
+    }
+}
+
+@media (min-width:1200px) {
+    .tm-sidebar-right {
+        left: calc(100% + 0px)
+    }
+    .tm-sidebar-left+.tm-main {
+        padding-left: 40px
+    }
+}
+
+@media (min-width:1400px) {
+    .tm-sidebar-left {
+        width: 300px !important;
+        padding: 45px 45px 60px 45px
+    }
+    .tm-sidebar-right {
+        left: calc(100% + 60px);
+    }
+    .tm-sidebar-left+.tm-main {
+        padding-left: 40px
+    }
+}
 
