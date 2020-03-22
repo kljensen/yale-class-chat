@@ -9,7 +9,7 @@
                     <div class="uk-card-header">
                         <div class="uk-width-expand">
                             <h3 class="uk-card-title uk-margin-remove-bottom">
-                            <%= section.course_dept %><%=  Integer.to_string(section.course_num)  %>
+                            <%= section.course_dept %><%=  Integer.to_string(section.course_num)  %>: <%= section.title %>
                             </h3>
                             <p class="uk-text-meta uk-margin-remove-top uk-margin-remove-bottom">
                             <%= section.course_name %> &mdash;
