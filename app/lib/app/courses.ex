@@ -458,8 +458,9 @@ defmodule App.Courses do
   """
   def list_user_sections(%App.Accounts.User{} = user) do
     uid = user.id
-    query = from r in App.Accounts.Section_Role,
-              left_join: s in Section,
+
+    query = from s in Section,
+              left_join: r in App.Accounts.Section_Role,
               on: r.section_id == s.id,
               left_join: c in Course,
               on: s.course_id == c.id,
@@ -467,8 +468,9 @@ defmodule App.Courses do
               on: cr.course_id == c.id,
               left_join: se in Semester,
               on: c.semester_id == se.id,
-              where: (r.user_id == ^uid and r.valid_from <= from_now(0, "day") and r.valid_to >= from_now(0, "day")) or (cr.user_id == ^uid and cr.valid_from <= from_now(0, "day") and cr.valid_to >= from_now(0, "day")),
-              where: c.allow_read == true,
+              where: (r.user_id == ^uid and r.valid_from <= from_now(0, "day") and r.valid_to >= from_now(0, "day") and c.allow_read == true),
+              or_where: (cr.user_id == ^uid and cr.valid_from <= from_now(0, "day") and cr.valid_to >= from_now(0, "day")),
+              group_by: [s.id, s.title, s.crn, c.number, c.department, c.name, se.name],
               select: %{id: s.id,
                 title: s.title,
                 crn: s.crn,
