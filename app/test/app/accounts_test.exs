@@ -350,6 +350,13 @@ defmodule App.AccountsTest do
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_section__role!(section__role.id) end
     end
 
+    test "delete_section__role/2 by student holding role deletes the section__role" do
+      section__role = section__role_fixture()
+      user_student = Accounts.get_user_by!("some net_id")
+      assert {:ok, %Section_Role{}} = Accounts.delete_section__role(user_student, section__role)
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_section__role!(section__role.id) end
+    end
+
     test "delete_section__role/2 by unauthorized user returns error" do
       section__role = section__role_fixture()
       user_noauth = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
@@ -360,7 +367,7 @@ defmodule App.AccountsTest do
       assert section__role.valid_to == retrieved_section_role.valid_to
     end
 
-    test "delete_section__role/3 by unauthorized user returns error" do
+    test "delete_section__role/2 on non-writeable course returns error" do
       section__role = section__role_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
       section = Courses.get_section!(section__role.section_id)
@@ -372,6 +379,39 @@ defmodule App.AccountsTest do
       assert section__role.id == retrieved_section_role.id
       assert section__role.valid_from == retrieved_section_role.valid_from
       assert section__role.valid_to == retrieved_section_role.valid_to
+    end
+
+    test "delete_all_section__roles/2 deletes the section__role" do
+      section__role = section__role_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      section = Courses.get_section!(section__role.section_id)
+      {:ok, section__role2} = Accounts.create_section__role(user_faculty, user_faculty, section, %{role: "some role", valid_from: "2010-04-17T14:00:00Z", valid_to: "2010-04-17T14:00:00Z"})
+      assert {2, nil} = Accounts.delete_all_section__roles(user_faculty, section)
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_section__role!(section__role.id) end
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_section__role!(section__role2.id) end
+      assert length(Accounts.list_section_all_section_roles(user_faculty, section)) == 0
+    end
+
+    test "delete_all_section__roles/2 by unauthorized user returns error" do
+      section__role = section__role_fixture()
+      user_noauth = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      section = Courses.get_section!(section__role.section_id)
+      {:ok, section__role2} = Accounts.create_section__role(user_faculty, user_faculty, section, %{role: "some role", valid_from: "2010-04-17T14:00:00Z", valid_to: "2010-04-17T14:00:00Z"})
+      assert {:error, "unauthorized"} = Accounts.delete_all_section__roles(user_noauth, section)
+      assert length(Accounts.list_section_all_section_roles(user_faculty, section)) == 2
+    end
+
+    test "delete_all_section__roles/2 on non-writeable course returns error" do
+      section__role = section__role_fixture()
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      section = Courses.get_section!(section__role.section_id)
+      {:ok, section__role2} = Accounts.create_section__role(user_faculty, user_faculty, section, %{role: "some role", valid_from: "2010-04-17T14:00:00Z", valid_to: "2010-04-17T14:00:00Z"})
+      course = Courses.get_course!(section.course_id)
+      Courses.update_course(user_faculty, course, %{allow_write: false})
+
+      assert {:error, "course write not allowed"} = Accounts.delete_all_section__roles(user_faculty, section)
+      assert length(Accounts.list_section_all_section_roles(user_faculty, section)) == 2
     end
 
     test "change_section__role/1 returns a section__role changeset" do

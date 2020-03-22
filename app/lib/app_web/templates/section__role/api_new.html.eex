@@ -42,7 +42,7 @@
   </div>
 </div>
 
-<!--<div class="uk-margin">
+<div class="uk-margin">
   <%= label f, :overwrite_roles, class: "uk-form-label" do %>
     Overwrite all existing students in section with API results
   <% end %>
@@ -51,7 +51,7 @@
   <%= checkbox f, :overwrite_roles, class: "uk-checkbox" %>
   <%= error_tag f, :overwrite_roles %>
   </div>
-</div>-->
+</div>
 
 <div class="uk-margin">
   <div>

@@ -53,6 +53,7 @@ defmodule AppWeb.Router do
       get "/add_section_roles_api", Section_RoleController, :api_new
       post "/add_section_roles_api", Section_RoleController, :api_create
       resources "/section_roles", Section_RoleController
+      delete "/leave_section", Section_RoleController, :self_delete
     end
 
     resources "/topics", TopicController, only: [:show] do
