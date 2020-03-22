@@ -839,8 +839,8 @@ defmodule App.Accounts do
     cond do
       course.allow_write == false ->
         {:error, "course write not allowed"}
-      Enum.member?(@course_admin_roles, auth_role) == false ->
-        {:error, "unauthorized"}#
+      Enum.member?(@course_admin_roles, auth_role) == false && section__role.user_id != user_auth.id ->
+        {:error, "unauthorized"}
       true ->
         do_delete_section__role(section__role)
     end
@@ -848,6 +848,37 @@ defmodule App.Accounts do
 
   defp do_delete_section__role(%Section_Role{} = section__role) do
     Repo.delete(section__role)
+  end
+
+  @doc """
+  Deletes all section__roles in section.
+
+  ## Examples
+
+      iex> delete_all_section__roles(user, section)
+      {:ok, %Section_Role{}}
+
+      iex> delete_section__role(section__role)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_all_section__roles(%App.Accounts.User{} = user_auth, %App.Courses.Section{} = section) do
+    course = App.Courses.get_course!(section.course_id)
+    auth_role = App.Accounts.get_current_course__role(user_auth, course)
+
+    cond do
+      course.allow_write == false ->
+        {:error, "course write not allowed"}
+      Enum.member?(@course_admin_roles, auth_role) == false ->
+        {:error, "unauthorized"}
+      true ->
+        do_delete_all_section__roles(section)
+    end
+  end
+
+  defp do_delete_all_section__roles(%App.Courses.Section{} = section) do
+    sid = section.id
+    from(sr in Section_Role, where: sr.section_id == ^sid) |> Repo.delete_all
   end
 
   @doc """

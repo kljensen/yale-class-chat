@@ -66,25 +66,24 @@ defmodule AppWeb.Section_RoleController do
                             "true" -> true
                             _ -> false
                           end
-        #overwrite_roles = case section__role_params["overwrite_roles"] do
-        #  "true" -> true
-        #  _ -> false
-        #end
+        overwrite_roles = case section__role_params["overwrite_roles"] do
+          "true" -> true
+          _ -> false
+        end
         case RegistrationAPI.get_registered_student_user_netids(section.crn, semester.term_code, update_existing) do
           {:ok, user_ids} ->
-            IO.inspect "User IDs incoming!"
-            case IO.inspect(user_ids) do
+            case user_ids do
               "" ->
                 changeset = Accounts.change_section__role(%Section_Role{})
                 conn
-                |> put_flash(:error, "Must submit at least one net_id")
-                |> render("bulk_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
+                |> put_flash(:error, "Course Registration API returned 0 students")
+                |> render("api_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
 
               nil ->
                 changeset = Accounts.change_section__role(%Section_Role{})
                 conn
-                |> put_flash(:error, "Must submit at least one net_id")
-                |> render("bulk_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
+                |> put_flash(:error, "Course Registration API returned 0 students")
+                |> render("api_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
 
               _ ->
                 net_id_list = user_ids
@@ -94,45 +93,64 @@ defmodule AppWeb.Section_RoleController do
                 case Accounts.create_section__role(user_auth, user1, section, section__role_params) do
                   {:ok, _section__role} ->
                     net_id_list = List.delete(net_id_list, netid1)
-                    case length(net_id_list) do
-                      0 ->
+                    #Delete all existing section roles, then recreate the first one again
+                    result = if overwrite_roles do
+                                Accounts.delete_all_section__roles(user_auth, section)
+                              else
+                                  {0, nil}
+                              end
+                    case result do
+                      {:error, message} ->
+                        changeset = Accounts.change_section__role(%Section_Role{})
                         conn
-                        |> put_flash(:info, "Section  role created successfully.")
-                        |> redirect(to: Routes.section_path(conn, :show, section))
-                      _ ->
+                        |> put_flash(:error, message)
+                        |> render("api_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
 
-                        #Now that we know the section role is valid, attempt to add the role for all users
-                        initial_map = %{}
-                        initial_map = Map.put(initial_map, netid1, "ok")
-                        result_map = Enum.reduce net_id_list, initial_map, fn net_id, acc ->
-                          {:ok, user} = App.Accounts.create_user_on_login(net_id)
-                          {stat, _result} = Accounts.create_section__role(user_auth, user, section, section__role_params)
-                          Map.put(acc, net_id, Atom.to_string(stat))
+                      {int, _} ->
+                        if int > 0 do
+                          #recreate deleted section role
+                          Accounts.create_section__role(user_auth, user1, section, section__role_params)
+                        end
+                        case length(net_id_list) do
+                          0 ->
+                            conn
+                            |> put_flash(:info, "Section  role created successfully.")
+                            |> redirect(to: Routes.section_path(conn, :show, section))
+                          _ ->
+
+                            #Now that we know the section role is valid, attempt to add the role for all users
+                            initial_map = %{}
+                            initial_map = Map.put(initial_map, netid1, "ok")
+                            result_map = Enum.reduce net_id_list, initial_map, fn net_id, acc ->
+                              {:ok, user} = App.Accounts.create_user_on_login(net_id)
+                              {stat, _result} = Accounts.create_section__role(user_auth, user, section, section__role_params)
+                              Map.put(acc, net_id, Atom.to_string(stat))
+                            end
+
+                            result_list = Enum.map(result_map, fn {a, b} -> [a <> "=", b <> "; \n"] end)
+
+                            case Map.values(result_map) |> Enum.member?("error") do
+                              true ->
+                                conn
+                                |> put_flash(:error, result_list)
+                                |> redirect(to: Routes.section_section__role_path(conn, :index, section))
+
+                              false ->
+                                conn
+                                |> put_flash(:info, result_list)
+                                |> redirect(to: Routes.section_section__role_path(conn, :index, section))
+                              end
+                          end
                         end
 
-                        result_list = Enum.map(result_map, fn {a, b} -> [a <> "=", b <> "; \n"] end)
-
-                        case Map.values(result_map) |> Enum.member?("error") do
-                          true ->
-                            conn
-                            |> put_flash(:error, result_list)
-                            |> redirect(to: Routes.section_section__role_path(conn, :index, section))
-
-                          false ->
-                            conn
-                            |> put_flash(:info, result_list)
-                            |> redirect(to: Routes.section_section__role_path(conn, :index, section))
-                          end
-                      end
-
                   {:error, %Ecto.Changeset{} = changeset} ->
-                    render(conn, "bulk_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
+                    render(conn, "api_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
 
                   {:error, message} ->
                     changeset = Accounts.change_section__role(%Section_Role{})
                     conn
                     |> put_flash(:error, message)
-                    |> render("bulk_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
+                    |> render("api_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
                   end
                 end
 
@@ -140,7 +158,7 @@ defmodule AppWeb.Section_RoleController do
               changeset = Accounts.change_section__role(%Section_Role{})
               conn
               |> put_flash(:error, message)
-              |> render("bulk_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
+              |> render("api_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
             end
 
       false ->
