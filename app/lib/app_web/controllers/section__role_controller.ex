@@ -35,6 +35,25 @@ defmodule AppWeb.Section_RoleController do
     render(conn, "new.html", changeset: changeset, section: section, role_list: @section_read_roles, user_list: user_list, course: course)
   end
 
+  def api_new(conn, %{"section_id" => section_id}) do
+    section = Courses.get_section!(section_id)
+    course = Courses.get_course!(section.course_id)
+    semester = Courses.get_semester!(course.semester_id)
+    user = conn.assigns.current_user
+    case App.Accounts.can_edit_section(user, section) do
+      true ->
+        #Connect to API
+        IO.inspect RegistrationAPI.get_registered_student_user_ids(section.crn, semester.term_code)
+
+
+      false ->
+        conn
+            |> put_status(:forbidden)
+            |> put_view(AppWeb.ErrorView)
+            |> render("403.html")
+      end
+  end
+
   def bulk_new(conn, %{"section_id" => section_id}) do
     section = Courses.get_section!(section_id)
     course = Courses.get_course!(section.course_id)

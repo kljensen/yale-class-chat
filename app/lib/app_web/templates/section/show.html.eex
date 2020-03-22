@@ -46,7 +46,8 @@
             Section Roles (Students/Guests)
             <ul class="uk-margin-remove-top">
                 <li><%= link "View Existing Section Roles", to: Routes.section_section__role_path(@conn, :index, @section) %></li>
-                <li><%= link "Add Students to Section", to: Routes.section_section__role_path(@conn, :bulk_new, @section) %></li>
+                <li><%= link "Manually Add Students to Section", to: Routes.section_section__role_path(@conn, :bulk_new, @section) %></li>
+                <li><%= link "Automatically Add Registered Students to Section", to: Routes.section_section__role_path(@conn, :api_new, @section) %> <br/>(uses course registration API to add students automatically)</li>
             </ul>
             </div>
         </div>

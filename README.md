@@ -31,6 +31,9 @@ SECRET_KEY_BASE=a7b3f3db42a7a3264a24880906403216b944afbd9bd67365992222ad1a7961c7
 DOMAIN=foo.som.yale.edu
 HOST=127.0.0.1
 SIGNING_SALT=8ebd49dc616e9d895fff338536e44d5625bd5dc53f8f5c347fb60be75ddfb707
+REGISTRATION_API_URL=http://example.com
+REGISTRATION_API_USERNAME=user_for_reg_api
+REGISTRATION_API_PASSWORD=random-string-of-words-or-characters
 ```
 
 Run `./admin.sh up` to bring up the app. The app will
