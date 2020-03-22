@@ -1,0 +1,64 @@
+<h1>Add Section Roles From Course Registrations</h1>
+
+<%= form_for @changeset, Routes.section_section__role_path(@conn, :api_create, @section.id), [class: "uk-form-stacked"], fn f -> %>
+  <%= if @changeset.action do %>
+    <div class="alert alert-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
+
+<div class="uk-margin">
+  <%= label f, :role, class: "uk-form-label" %>
+  <div class="uk-form-controls">
+  <%= select f, :role, @role_list, class: "uk-select" %>
+  <%= error_tag f, :role %>
+  </div>
+</div>
+
+<div class="uk-margin">
+  <%= label f, :valid_from, class: "uk-form-label" %>
+  <div class="uk-form-controls">
+  <%= datetime_select f, :valid_from %>
+  <%= error_tag f, :valid_from %>
+  </div>
+</div>
+
+<div class="uk-margin">
+  <%= label f, :valid_to, class: "uk-form-label" %>
+  <div class="uk-form-controls">
+  <%= datetime_select f, :valid_to %>
+  <%= error_tag f, :valid_to %>
+  </div>
+</div>
+
+<div class="uk-margin">
+  <%= label f, :update_existing, class: "uk-form-label" do %>
+    Update student display names and emails for existing students
+  <% end %>
+
+  <div class="uk-form-controls">
+  <%= checkbox f, :update_existing, class: "uk-checkbox" %>
+  <%= error_tag f, :update_existing %>
+  </div>
+</div>
+
+<!--<div class="uk-margin">
+  <%= label f, :overwrite_roles, class: "uk-form-label" do %>
+    Overwrite all existing students in section with API results
+  <% end %>
+
+  <div class="uk-form-controls">
+  <%= checkbox f, :overwrite_roles, class: "uk-checkbox" %>
+  <%= error_tag f, :overwrite_roles %>
+  </div>
+</div>-->
+
+<div class="uk-margin">
+  <div>
+    <%= submit "Add All Registered Users", class: "uk-button-secondary uk-button" %>
+  </div>
+
+  <% end %>
+
+
+<span><%= link "Back", to: Routes.section_section__role_path(@conn, :index, @section) %></span>

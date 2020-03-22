@@ -51,6 +51,7 @@ defmodule AppWeb.Router do
       get "/add_section_roles", Section_RoleController, :bulk_new
       post "/add_section_roles", Section_RoleController, :bulk_create
       get "/add_section_roles_api", Section_RoleController, :api_new
+      post "/add_section_roles_api", Section_RoleController, :api_create
       resources "/section_roles", Section_RoleController
     end
 

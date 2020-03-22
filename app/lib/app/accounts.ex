@@ -133,11 +133,12 @@ defmodule App.Accounts do
     net_id = attrs.net_id
     user =
       case Repo.get_by(User, net_id: net_id) do
-        nil  -> %User{net_id: net_id, display_name: attrs.display_name, email: attrs.email} # User not found, we build one
-        user -> user    # User exists, let's use it
+        nil  ->
+          create_user(attrs)
+        user ->
+          update_user(user, attrs)
+
       end
-      |> User.changeset(attrs)
-      |> Repo.insert()
 
     #case result do
     #  {:ok, model}        -> # Inserted or updated with success
