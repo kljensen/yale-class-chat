@@ -350,6 +350,23 @@ defmodule AppWeb.Section_RoleController do
     end
   end
 
+  def self_delete(conn, %{"section_id" => section_id}) do
+    section = Courses.get_section!(section_id)
+    user = conn.assigns.current_user
+
+    #get all section roles
+    roles = Accounts.list_user_section_section_roles(user, section)
+
+    #delete each role
+    for role <- roles do
+      {:ok, _section__role} = Accounts.delete_section__role(user, role)
+    end
+
+    conn
+    |> put_flash(:info, "Successfully left section.")
+    |> redirect(to: Routes.page_path(conn, :index))
+  end
+
   def delete(conn, %{"id" => id}) do
     section__role = Accounts.get_section__role!(id)
     section = Courses.get_section!(section__role.section_id)

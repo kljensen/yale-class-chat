@@ -350,6 +350,13 @@ defmodule App.AccountsTest do
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_section__role!(section__role.id) end
     end
 
+    test "delete_section__role/2 by student holding role deletes the section__role" do
+      section__role = section__role_fixture()
+      user_student = Accounts.get_user_by!("some net_id")
+      assert {:ok, %Section_Role{}} = Accounts.delete_section__role(user_student, section__role)
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_section__role!(section__role.id) end
+    end
+
     test "delete_section__role/2 by unauthorized user returns error" do
       section__role = section__role_fixture()
       user_noauth = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})

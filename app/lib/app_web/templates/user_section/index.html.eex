@@ -17,6 +17,11 @@
                             </p>
                         </div>
                     </div>
+                    <div class="uk-card-footer">
+                        <div class="details uk-width-expand">
+                            <%= link "Leave Section", to: Routes.section_section__role_path(@conn, :self_delete, section.id), method: :delete, data: [confirm: "Are you sure? This cannot be undone; please only leave sections if you have been accidentally assigned."] %>
+                        </div>
+                    </div>
                 </div>
             </a>
         </div>
