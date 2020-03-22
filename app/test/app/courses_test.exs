@@ -394,6 +394,25 @@ defmodule App.CoursesTest do
       assert length(section_list) == 0
     end
 
+    test "list_user_sections/1 returns all sections for which a user has a valid course role" do
+      section = section_fixture()
+      course = Courses.get_course!(section.course_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      user_student = ATest.user_fixture(%{is_faculty: false, net_id: "student net id"})
+      user_student2 = ATest.user_fixture(%{is_faculty: false, net_id: "other student net id"})
+      {:ok, current_time} = DateTime.now("Etc/UTC")
+      params = %{role: "administrator", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      Accounts.create_course__role(user_faculty, user_student, course, params)
+      section_list = Courses.list_user_sections(user_student)
+      assert length(section_list) == 1
+      retrieved_section = List.first(section_list)
+      assert retrieved_section.id == section.id
+      assert retrieved_section.crn == section.crn
+      assert retrieved_section.title == section.title
+      section_list = Courses.list_user_sections(user_student2)
+      assert length(section_list) == 0
+    end
+
     test "list_sections/1 returns all sections for a given course" do
       section = section_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")

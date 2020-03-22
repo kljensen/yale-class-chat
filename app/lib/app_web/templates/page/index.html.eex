@@ -1,12 +1,12 @@
 <section class="uk-section uk-section-small">
     <div class="uk-height-large uk-cover-container uk-border-rounded">
-      <img src="/images/som-class-of-2020.jpg" alt="Alt img" data-uk-cover="" class="uk-cover" style="height: 450px; width: 1170px;">
+      <img src="/images/som-class-of-2020.jpg" alt="Class of 2020" data-uk-cover="" class="uk-cover" style="height: 450px; width: 1170px;">
       <div class="uk-overlay uk-overlay-primary uk-position-cover uk-flex uk-flex-center uk-flex-middle uk-light uk-text-center">
         <div data-uk-scrollspy="cls: uk-animation-slide-bottom-small" class="uk-scrollspy-inview uk-animation-slide-bottom-small" style="">
           <span style="letter-spacing: 0.2em; font-size: 0.725rem">WELCOME</span>
           <h1 class="uk-margin-top uk-margin-small-bottom uk-margin-remove-adjacent">Yale Chat</h1>
           <p>Seamless in-class communication between students and professors - say goodbye to Zoom chatrooms, ad-hoc Slack channels, and Slido!</p>
-          <a href="/auth/cas" class="uk-button uk-button-default uk-margin-top">LOG IN</a>
+          <a href="/about" class="uk-button uk-button-default uk-margin-top">Learn More</a>
         </div>
       </div>
     </div>
