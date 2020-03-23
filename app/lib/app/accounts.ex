@@ -313,7 +313,7 @@ defmodule App.Accounts do
                 left_join: u in "users",
                 on: u_r.user_id == u.id,
                 where: u_r.course_id == ^cid,
-                select: [u.id, u.net_id]
+                select: [u.id, fragment("concat(?, ': ', ?)", u.display_name, u.net_id)]
       Repo.all(query)
     else
       []
