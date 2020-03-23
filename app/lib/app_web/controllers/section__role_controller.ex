@@ -114,7 +114,7 @@ defmodule AppWeb.Section_RoleController do
                         case length(net_id_list) do
                           0 ->
                             conn
-                            |> put_flash(:info, "Section  role created successfully.")
+                            |> put_flash(:success, "Section  role created successfully.")
                             |> redirect(to: Routes.section_path(conn, :show, section))
                           _ ->
 
@@ -137,7 +137,7 @@ defmodule AppWeb.Section_RoleController do
 
                               false ->
                                 conn
-                                |> put_flash(:info, result_list)
+                                |> put_flash(:success, result_list)
                                 |> redirect(to: Routes.section_section__role_path(conn, :index, section))
                               end
                           end
@@ -216,7 +216,7 @@ defmodule AppWeb.Section_RoleController do
                 case length(net_id_list) do
                   0 ->
                     conn
-                    |> put_flash(:info, "Section  role created successfully.")
+                    |> put_flash(:success, "Section  role created successfully.")
                     |> redirect(to: Routes.section_path(conn, :show, section))
                   _ ->
 
@@ -239,7 +239,7 @@ defmodule AppWeb.Section_RoleController do
 
                       false ->
                         conn
-                        |> put_flash(:info, result_list)
+                        |> put_flash(:success, result_list)
                         |> redirect(to: Routes.section_section__role_path(conn, :index, section))
                       end
                   end
@@ -274,7 +274,7 @@ defmodule AppWeb.Section_RoleController do
     case Accounts.create_section__role(user_auth, user, section, section__role_params) do
       {:ok, section__role} ->
         conn
-        |> put_flash(:info, "Section  role created successfully.")
+        |> put_flash(:success, "Section  role created successfully.")
         |> redirect(to: Routes.section_section__role_path(conn, :show, section, section__role))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -328,7 +328,7 @@ defmodule AppWeb.Section_RoleController do
         section = Courses.get_section!(section__role.section_id)
         course = Courses.get_course!(section.course_id)
         conn
-        |> put_flash(:info, "Section  role updated successfully.")
+        |> put_flash(:success, "Section  role updated successfully.")
         |> redirect(to: Routes.section_section__role_path(conn, :show, section, section__role))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -363,7 +363,7 @@ defmodule AppWeb.Section_RoleController do
     end
 
     conn
-    |> put_flash(:info, "Successfully left section.")
+    |> put_flash(:success, "Successfully left section.")
     |> redirect(to: Routes.page_path(conn, :index))
   end
 
@@ -375,7 +375,7 @@ defmodule AppWeb.Section_RoleController do
     {:ok, _section__role} = Accounts.delete_section__role(user, section__role)
 
     conn
-    |> put_flash(:info, "Section  role deleted successfully.")
+    |> put_flash(:success, "Section  role deleted successfully.")
     |> redirect(to: Routes.section_section__role_path(conn, :index, section))
   end
 end

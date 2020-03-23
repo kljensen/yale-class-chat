@@ -18,7 +18,7 @@ defmodule AppWeb.UserController do
     case Accounts.create_user(user_params) do
       {:ok, user} ->
         conn
-        |> put_flash(:info, "User created successfully.")
+        |> put_flash(:success, "User created successfully.")
         |> redirect(to: Routes.user_path(conn, :show, user))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -60,7 +60,7 @@ defmodule AppWeb.UserController do
         case Accounts.update_user(user, user_params) do
           {:ok, user} ->
             conn
-            |> put_flash(:info, "User updated successfully.")
+            |> put_flash(:success, "User updated successfully.")
             |> redirect(to: Routes.user_path(conn, :show, user))
 
           {:error, %Ecto.Changeset{} = changeset} ->
@@ -81,7 +81,7 @@ defmodule AppWeb.UserController do
         {:ok, _user} = Accounts.delete_user(user)
 
         conn
-        |> put_flash(:info, "User deleted successfully.")
+        |> put_flash(:success, "User deleted successfully.")
         |> redirect(to: "/")
       false ->
         conn

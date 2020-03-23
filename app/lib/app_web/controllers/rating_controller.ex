@@ -25,7 +25,7 @@ defmodule AppWeb.RatingController do
     case Submissions.create_rating(user, submission, rating_params) do
       {:ok, rating} ->
         conn
-        |> put_flash(:info, "Rating created successfully.")
+        |> put_flash(:success, "Rating created successfully.")
         |> redirect(to: Routes.submission_path(conn, :show, submission))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -102,7 +102,7 @@ defmodule AppWeb.RatingController do
         case Submissions.update_rating(user, rating, rating_params) do
           {:ok, rating} ->
             conn
-            |> put_flash(:info, "Rating updated successfully.")
+            |> put_flash(:success, "Rating updated successfully.")
             |> redirect(to: Routes.submission_path(conn, :show, submission))
 
           {:error, %Ecto.Changeset{} = changeset} ->
@@ -145,7 +145,7 @@ defmodule AppWeb.RatingController do
       true ->
         {:ok, _rating} = Submissions.delete_rating(user, rating)
         conn
-        |> put_flash(:info, "Rating deleted successfully.")
+        |> put_flash(:success, "Rating deleted successfully.")
         |> redirect(to: Routes.submission_path(conn, :show, submission))
 
       false ->

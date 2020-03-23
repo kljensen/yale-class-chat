@@ -43,7 +43,7 @@ defmodule AppWeb.CourseController do
     case Courses.create_course(user, semester, course_params) do
       {:ok, course} ->
         conn
-        |> put_flash(:info, "Course created successfully.")
+        |> put_flash(:success, "Course created successfully.")
         |> redirect(to: Routes.course_path(conn, :show, course))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -125,7 +125,7 @@ defmodule AppWeb.CourseController do
     case Courses.update_course(user, course, course_params) do
       {:ok, course} ->
         conn
-        |> put_flash(:info, "Course updated successfully.")
+        |> put_flash(:success, "Course updated successfully.")
         |> redirect(to: Routes.course_path(conn, :show, course))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -148,7 +148,7 @@ defmodule AppWeb.CourseController do
       true ->
         {:ok, _course} = Courses.delete_course(user, course)
         conn
-        |> put_flash(:info, "Course deleted successfully.")
+        |> put_flash(:success, "Course deleted successfully.")
         |> redirect(to: Routes.course_path(conn, :index))
 
       false ->
