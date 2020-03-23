@@ -28,12 +28,19 @@
         </div>
         </a>
         <nav class="navigation">
-            <%= if is_nil((@conn.assigns[:current_user])) do %>
-                    <li><a href="/auth/cas">Log In</a></span>
-                  <% else %>
-                    <li><%= link @conn.private.plug_session["uid"], to: Routes.user_path(@conn, :show, @conn.assigns.current_user) %></li>
-                  <% end %>
-            <span uk-icon="icon: user; ratio: 0.7" class="icon"></span>
+            <span uk-icon="icon: table; ratio: 1" class="icon"></span>
+            <div uk-dropdown>
+                <ul class="uk-nav uk-dropdown-nav">
+                    <li class=""><a href="/">Home</a></li>
+                    <li class=""><a href="/about">About</a></li>
+                    <li class="uk-nav-divider"></li>
+                    <%= if is_nil((@conn.assigns[:current_user])) do %>
+                      <li><a href="/auth/cas">Log In</a></span>
+                    <% else %>
+                      <li><%= link @conn.private.plug_session["uid"], to: Routes.user_path(@conn, :show, @conn.assigns.current_user) %></li>
+                    <% end %>
+                </ul>
+            </div>
         </nav>
 
       </section>
