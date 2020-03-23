@@ -20,7 +20,7 @@
   <body>
     <header>
       <section class="container top-matter uk-padding-small uk-padding-remove-vertical uk-padding-remove-right ">
-        <a href="/">
+        <!--<a href="/">
         <div class="row">
             <div class="column">
                 Yale Chat
@@ -37,13 +37,40 @@
                     <%= if is_nil((@conn.assigns[:current_user])) do %>
                       <li><a href="/auth/cas">Log In</a></span>
                     <% else %>
-                      <li><%= link @conn.private.plug_session["uid"], to: Routes.user_path(@conn, :show, @conn.assigns.current_user) %></li>
+                      <li class="uk-nav-header"><%= @conn.private.plug_session["uid"] %></li>
+                      <li><%= link "Profile", to: Routes.user_path(@conn, :show, @conn.assigns.current_user) %></li>
+                      <li><%= link "Log Out", to: Routes.auth_path(@conn, :delete, @conn.assigns.current_user) %></li>
                     <% end %>
                 </ul>
             </div>
-        </nav>
+        </nav>-->
+      <nav class="uk-navbar-container uk-navbar-transparent uk-margin-remove-top" uk-navbar>
+        <div class="uk-navbar-left">
+          <a class="uk-navbar-item uk-logo top-matter" href="/">Yale Chat</a>
+        </div>
 
-      </section>
+        <div class="uk-navbar-right">
+          <ul class="uk-navbar-nav">
+            <li><a href="/about">About</a></li>
+            <%= if is_nil((@conn.assigns[:current_user])) do %>
+              <li><a href="/auth/cas">Log In<span uk-icon="icon: user; ratio: 0.6" class="icon"></span></a></li>
+            <% else %>
+              <li>
+                <a href="#"><%= @conn.private.plug_session["uid"] %><span uk-icon="icon: user; ratio: 0.6" class="icon"></span></a>
+                <div class="uk-navbar-dropdown">
+                  <ul class="uk-nav uk-navbar-dropdown-nav">
+                    <li><%= link "Profile", to: Routes.user_path(@conn, :show, @conn.assigns.current_user) %></li>
+                    <li><%= link "Log Out", to: Routes.auth_path(@conn, :delete, @conn.assigns.current_user) %></li>
+                  </ul>
+                </div>
+              </li>
+            <% end %>
+
+
+          </ul>
+        </div>
+    </nav>
+    </section>
     </header>
     <%= render_existing @view_module, "breadcrumbs.html", assigns %>
     <main role="main" class="container">
