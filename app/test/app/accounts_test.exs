@@ -75,7 +75,7 @@ defmodule App.AccountsTest do
   describe "course_roles" do
     alias App.Accounts.Course_Role
 
-    @valid_attrs %{role: "some role", valid_from: "2010-04-17T14:00:00Z", valid_to: "2010-04-17T14:00:00Z"}
+    @valid_attrs %{role: "some role", valid_from: "2010-04-17T14:00:00Z", valid_to: "2110-04-17T14:00:00Z"}
     @update_attrs %{role: "some updated role", valid_from: "2011-05-18T15:01:01Z", valid_to: "2011-05-18T15:01:01Z"}
     @invalid_attrs %{role: nil, valid_from: nil, valid_to: nil}
 
@@ -109,6 +109,24 @@ defmodule App.AccountsTest do
       assert retrieved_course_role.id == course__role.id
     end
 
+    test "get_current_course__role/2 returns correct role for course, section, topic, submission, comment, and rating" do
+      course__role = course__role_fixture()
+      course = Courses.get_course!(course__role.course_id)
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      {:ok, section} = Courses.create_section(user_faculty, course, %{crn: "some crn", title: "some title"})
+      {:ok, topic} = App.Topics.create_topic(user_faculty, section, %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2100-04-17T14:00:00Z", description: "some description", opened_at: "2010-04-17T14:00:00Z", slug: "some slug", sort: "some sort", title: "some title", user_submission_limit: 42, allow_ranking: true, show_user_submissions: true, visible: true, type: "general"})
+      {:ok, submission} = App.Submissions.create_submission(user_faculty, topic, %{description: "some description", image_url: "http://i.imgur.com/u3vyMCW.jpg", title: "some title", allow_ranking: true, visible: true})
+      {:ok, comment} = App.Submissions.create_comment(user_faculty, submission, %{description: "some description"})
+      {:ok, rating} = App.Submissions.create_rating(user_faculty, submission, %{score: 5})
+      user = Accounts.get_user_by!("some net_id")
+      assert Accounts.get_current_course__role(user, course) == "some role"
+      assert Accounts.get_current_course__role(user, section) == "some role"
+      assert Accounts.get_current_course__role(user, topic) == "some role"
+      assert Accounts.get_current_course__role(user, submission) == "some role"
+      assert Accounts.get_current_course__role(user, comment) == "some role"
+      assert Accounts.get_current_course__role(user, rating) == "some role"
+    end
+
     test "create_course__role/4 with valid data creates a course__role" do
       user = user_fixture()
       course = CTest.course_fixture()
@@ -117,7 +135,7 @@ defmodule App.AccountsTest do
       assert {:ok, %Course_Role{} = course__role} = Accounts.create_course__role(user_faculty, user, course, @valid_attrs)
       assert course__role.role == "some role"
       assert course__role.valid_from == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
-      assert course__role.valid_to == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
+      assert course__role.valid_to == DateTime.from_naive!(~N[2110-04-17T14:00:00Z], "Etc/UTC")
     end
 
     test "create_course__role/4 with invalid data returns error changeset" do

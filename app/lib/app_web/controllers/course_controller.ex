@@ -74,8 +74,9 @@ defmodule AppWeb.CourseController do
         semester = Courses.get_semester!(course.semester_id)
         user = conn.assigns.current_user
         sections = Courses.list_user_sections(course, user)
+        role = App.Accounts.get_current_course__role(user, course)
 
-        render(conn, "show.html", course: course, semester: semester, sections: sections)
+        render(conn, "show.html", course: course, semester: semester, sections: sections, role: role)
       {:error, message} ->
         case message do
           "forbidden" ->

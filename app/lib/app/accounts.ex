@@ -356,10 +356,10 @@ defmodule App.Accounts do
     cid = course.id
     query = from u_r in "course_roles",
               where: u_r.user_id == ^uid and u_r.course_id == ^cid  and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
+              limit: 1,
               select: u_r.role
 
-    results = Repo.all(query)
-    List.first(results)
+    Repo.one(query)
   end
 
   def get_current_course__role(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
@@ -368,10 +368,10 @@ defmodule App.Accounts do
     cid = section.course_id
     query = from u_r in "course_roles",
               where: u_r.user_id == ^uid and u_r.course_id == ^cid  and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
+              limit: 1,
               select: u_r.role
 
-    results = Repo.all(query)
-    List.first(results)
+    Repo.one(query)
   end
 
   def get_current_course__role(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic) do
@@ -382,10 +382,10 @@ defmodule App.Accounts do
               left_join: s in "sections",
               on: s.course_id == u_r.course_id,
               where: s.id == ^sid and u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
+              limit: 1,
               select: u_r.role
 
-    results = Repo.all(query)
-    List.first(results)
+    Repo.one(query)
   end
 
   def get_current_course__role(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission) do
@@ -398,10 +398,10 @@ defmodule App.Accounts do
               left_join: t in "topics",
               on: t.section_id == s.id,
               where: t.id == ^tid and u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
+              limit: 1,
               select: u_r.role
 
-    results = Repo.all(query)
-    List.first(results)
+    Repo.one(query)
   end
 
   def get_current_course__role(%App.Accounts.User{} = user, %App.Submissions.Comment{} = comment) do
@@ -416,10 +416,10 @@ defmodule App.Accounts do
               left_join: su in "submissions",
               on: su.topic_id == t.id,
               where: su.id == ^suid and u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
+              limit: 1,
               select: u_r.role
 
-    results = Repo.all(query)
-    List.first(results)
+    Repo.one(query)
   end
 
   def get_current_course__role(%App.Accounts.User{} = user, %App.Submissions.Rating{} = rating) do
@@ -434,10 +434,10 @@ defmodule App.Accounts do
               left_join: su in "submissions",
               on: su.topic_id == t.id,
               where: su.id == ^suid and u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
+              limit: 1,
               select: u_r.role
 
-    results = Repo.all(query)
-    List.first(results)
+    Repo.one(query)
   end
 
   @doc """
