@@ -19,34 +19,39 @@ defmodule App.DatabaseSeeder do
   alias App.Topics
 
   @prof_list [
-    %{display_name: "Professor 1", email: "prof1@yale.edu", net_id: "prof1", is_faculty: true},
-    %{display_name: "Professor 2", email: "prof2@yale.edu", net_id: "prof2", is_faculty: true},
+    %{display_name: "Professor 1", email: "pro1@yale.edu", net_id: "pro1", is_faculty: true},
+    %{display_name: "Professor 2", email: "pro2@yale.edu", net_id: "pro2", is_faculty: true},
     %{display_name: "TA 1", email: "ta1@yale.edu", net_id: "ta1", is_faculty: false}
   ]
   @student_list [
-    %{display_name: "Student 1", email: "stud1@yale.edu", net_id: "stud1", is_faculty: false},
-    %{display_name: "Student 2", email: "stud2@yale.edu", net_id: "stud2", is_faculty: false},
-    %{display_name: "Student 3", email: "stud3@yale.edu", net_id: "stud3", is_faculty: false},
-    %{display_name: "Student 4", email: "stud4@yale.edu", net_id: "stud4", is_faculty: false},
-    %{display_name: "Student 5", email: "stud5@yale.edu", net_id: "stud5", is_faculty: false}
+    %{display_name: "Student 1", email: "stu1@yale.edu", net_id: "stu1", is_faculty: false},
+    %{display_name: "Student 2", email: "stu2@yale.edu", net_id: "stu2", is_faculty: false},
+    %{display_name: "Student 3", email: "stu3@yale.edu", net_id: "stu3", is_faculty: false},
+    %{display_name: "Student 4", email: "stu4@yale.edu", net_id: "stu4", is_faculty: false},
+    %{display_name: "Student 5", email: "stu5@yale.edu", net_id: "stu5", is_faculty: false}
   ]
+  @superuser %{display_name: "SuperUser", email: "super@yale.edu", net_id: "super1", is_faculty: false, is_superuser: true}
   @semester_list [
     %{name: "Fall 2019", term_code: "201903"},
     %{name: "Spring 2020", term_code: "202001"}
   ]
   @course_list [
     %{department: "MGT", name: "Managing Software Development", number: 656, allow_write: true, allow_read: true},
-    %{department: "MGT", name: "Basics of MBA Degrees", number: 123, allow_write: true, allow_read: true},
-    %{department: "MGT", name: "Foundations of Accounting and Valuation", number: 502, allow_write: true, allow_read: true},
-    %{department: "MGT", name: "Introduction to Marketing", number: 505, allow_write: true, allow_read: true}
+    %{department: "MGT", name: "Basics of MBA Degrees", number: 123, allow_write: true, allow_read: true}
   ]
   @section_list [
     %{title: "01"},
     %{title: "02"}
   ]
   @topic_list [
-    %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2100-04-17T14:00:00Z", description: "some description", opened_at: "2010-04-17T14:00:00Z", slug: "some slug", sort: "some sort", title: "some title1", user_submission_limit: 42, allow_ranking: true, show_user_submissions: true, visible: true},
-    %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2100-04-17T14:00:00Z", description: "some description", opened_at: "2010-04-17T14:00:00Z", slug: "some slug", sort: "some sort", title: "some title2", user_submission_limit: 42, allow_ranking: true, show_user_submissions: true, visible: true}
+    %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2100-04-17T14:00:00Z", description: "This is where you should post your problems for Assignment 1. Remember: you are posting PROBLEMS that matter -- and maybe a general approach to solving them. You are NOT posting ideas -- the development of ideas will happen through the next assignments.
+
+    “If I had an hour to solve a problem I'd spend 55 minutes thinking about the problem and five minutes thinking about solutions.” - Albert Einstein", opened_at: "2010-04-17T14:00:00Z", slug: "some slug", sort: "some sort", title: "Idea Board (Assignment 1)", user_submission_limit: 42, allow_ranking: true, show_user_submissions: true, visible: true},
+    %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2100-04-17T14:00:00Z", description: "The website you're using is an experimental piece of software we hope will be helpful during the COVID crisis (and afterward!). This is being developed by SOMers Nick Peranzi and Kyle Jensen. We'd like your advice! What should an app like this include? Right now we're thinking about polls, live chat, private chat, and emojis. (Emojis are top priority.)
+
+    What do you want to see in a communications platform for class? Please tell us!
+
+    ", opened_at: "2010-04-17T14:00:00Z", slug: "some slug", sort: "some sort", title: "Help us design yale.chat!", user_submission_limit: 42, allow_ranking: true, show_user_submissions: true, visible: true}
   ]
   @random_title_list [
     "Let's vote on this idea!",
@@ -62,26 +67,36 @@ defmodule App.DatabaseSeeder do
     "How confident are you in your abilities?"
   ]
   @random_description_list [
-    "Sitting mistake towards his few country ask. You delighted two rapturous six depending objection happiness something the. Off nay impossible dispatched partiality unaffected. Norland adapted put ham cordial. Ladies talked may shy basket narrow see. Him she distrusts questions sportsmen. Tolerably pretended neglected on my earnestly by. Sex scale sir style truth ought. ",
-    "Woody equal ask saw sir weeks aware decay. Entrance prospect removing we packages strictly is no smallest he. For hopes may chief get hours day rooms. Oh no turned behind polite piqued enough at. Forbade few through inquiry blushes you. Cousin no itself eldest it in dinner latter missed no. Boisterous estimating interested collecting get conviction friendship say boy. Him mrs shy article smiling respect opinion excited. Welcomed humoured rejoiced peculiar to in an. ",
-    "How promotion excellent curiosity yet attempted happiness. Gay prosperous impression had conviction. For every delay death ask style. Me mean able my by in they. Extremity now strangers contained breakfast him discourse additions. Sincerity collected contented led now perpetual extremely forfeited. ",
-    "Received overcame oh sensible so at an. Formed do change merely to county it. Am separate contempt domestic to to oh. On relation my so addition branched. Put hearing cottage she norland letters equally prepare too. Replied exposed savings he no viewing as up. Soon body add him hill. No father living really people estate if. Mistake do produce beloved demesne if am pursuit. ",
-    "Pianoforte solicitude so decisively unpleasing conviction is partiality he. Or particular so diminution entreaties oh do. Real he me fond show gave shot plan. Mirth blush linen small hoped way its along. Resolution frequently apartments off all discretion devonshire. Saw sir fat spirit seeing valley. He looked or valley lively. If learn woody spoil of taken he cause. ",
-    "Nor hence hoped her after other known defer his. For county now sister engage had season better had waited. Occasional mrs interested far expression acceptance. Day either mrs talent pulled men rather regret admire but. Life ye sake it shed. Five lady he cold in meet up. Service get met adapted matters offence for. Principles man any insipidity age you simplicity understood. Do offering pleasure no ecstatic whatever on mr directly. ",
-    "Doubtful two bed way pleasure confined followed. Shew up ye away no eyes life or were this. Perfectly did suspicion daughters but his intention. Started on society an brought it explain. Position two saw greatest stronger old. Pianoforte if at simplicity do estimating. ",
-    "Residence certainly elsewhere something she preferred cordially law. Age his surprise formerly mrs perceive few stanhill moderate. Of in power match on truth worse voice would. Large an it sense shall an match learn. By expect it result silent in formal of. Ask eat questions abilities described elsewhere assurance. Appetite in unlocked advanced breeding position concerns as. Cheerful get shutters yet for repeated screened. An no am cause hopes at three. Prevent behaved fertile he is mistake on. ",
-    "Surprise steepest recurred landlord mr wandered amounted of. Continuing devonshire but considered its. Rose past oh shew roof is song neat. Do depend better praise do friend garden an wonder to. Intention age nay otherwise but breakfast. Around garden beyond to extent by. ",
-    "Mind what no by kept. Celebrated no he decisively thoroughly. Our asked sex point her she seems. New plenty she horses parish design you. Stuff sight equal of my woody. Him children bringing goodness suitable she entirely put far daughter. ",
-    "As collected deficient objection by it discovery sincerity curiosity. Quiet decay who round three world whole has mrs man. Built the china there tried jokes which gay why. Assure in adieus wicket it is. But spoke round point and one joy. Offending her moonlight men sweetness see unwilling. Often of it tears whole oh balls share an. ",
-    "So delightful up dissimilar by unreserved it connection frequently. Do an high room so in paid. Up on cousin ye dinner should in. Sex stood tried walls manor truth shy and three his. Their to years so child truth. Honoured peculiar families sensible up likewise by on in. ",
-    "Of friendship on inhabiting diminution discovered as. Did friendly eat breeding building few nor. Object he barton no effect played valley afford. Period so to oppose we little seeing or branch. Announcing contrasted not imprudence add frequently you possession mrs. Period saw his houses square and misery. Hour had held lain give yet. ",
-    "From they fine john he give of rich he. They age and draw mrs like. Improving end distrusts may instantly was household applauded incommode. Why kept very ever home mrs. Considered sympathize ten uncommonly occasional assistance sufficient not. Letter of on become he tended active enable to. Vicinity relation sensible sociable surprise screened no up as. ",
-    "Her old collecting she considered discovered. So at parties he warrant oh staying. Square new horses and put better end. Sincerity collected happiness do is contented. Sigh ever way now many. Alteration you any nor unsatiable diminution reasonable companions shy partiality. Leaf by left deal mile oh if easy. Added woman first get led joy not early jokes. ",
-    "Wrong do point avoid by fruit learn or in death. So passage however besides invited comfort elderly be me. Walls began of child civil am heard hoped my. Satisfied pretended mr on do determine by. Old post took and ask seen fact rich. Man entrance settling believed eat joy. Money as drift begin on to. Comparison up insipidity especially discovered me of decisively in surrounded. Points six way enough she its father. Folly sex downs tears ham green forty. ",
-    "Inhabit hearing perhaps on ye do no. It maids decay as there he. Smallest on suitable disposed do although blessing he juvenile in. Society or if excited forbade. Here name off yet she long sold easy whom. Differed oh cheerful procured pleasure securing suitable in. Hold rich on an he oh fine. Chapter ability shyness article welcome be do on service. ",
-    "Extremely we promotion remainder eagerness enjoyment an. Ham her demands removal brought minuter raising invited gay. Contented consisted continual curiosity contained get sex. Forth child dried in in aware do. You had met they song how feel lain evil near. Small she avoid six yet table china. And bed make say been then dine mrs. To household rapturous fulfilled attempted on so. ",
-    "Ought these are balls place mrs their times add she. Taken no great widow spoke of it small. Genius use except son esteem merely her limits. Sons park by do make on. It do oh cottage offered cottage in written. Especially of dissimilar up attachment themselves by interested boisterous. Linen mrs seems men table. Jennings dashwood to quitting marriage bachelor in. On as conviction in of appearance apartments boisterous. ",
-    "Suppose end get boy warrant general natural. Delightful met sufficient projection ask. Decisively everything principles if preference do impression of. Preserved oh so difficult repulsive on in household. In what do miss time be. Valley as be appear cannot so by. Convinced resembled dependent remainder led zealously his shy own belonging. Always length letter adieus add number moment she. Promise few compass six several old offices removal parties fat. Concluded rapturous it intention perfectly daughters is as. "
+    "I inadvertently went to See's Candy last week (I was in the mall looking for phone repair), and as it turns out, See's Candy now charges a dollar -- a full dollar -- for even the simplest of their wee confection offerings. I bought two chocolate lollipops and two chocolate-caramel-almond things. The total cost was four-something. I mean, the candies were tasty and all, but let's be real: A Snickers bar is fifty cents. After this dollar-per-candy revelation, I may not find myself wandering dreamily back into a See's Candy any time soon.",
+    "He was an expert but not in a discipline that anyone could fully appreciate. He knew how to hold the cone just right so that the soft server ice-cream fell into it at the precise angle to form a perfect cone each and every time. It had taken years to perfect and he could now do it without even putting any thought behind it. Nobody seemed to fully understand the beauty of this accomplishment except for the new worker who watched in amazement.",
+    "There wasn't a bird in the sky, but that was not what caught her attention. It was the clouds. The deep green that isn't the color of clouds, but came with these. She knew what was coming and she hoped she was prepared.",
+    "Dave watched as the forest burned up on the hill, only a few miles from her house. The car had been hastily packed and Marta was inside trying to round up the last of the pets. Dave went through his mental list of the most important papers and documents that they couldn't leave behind. He scolded himself for not having prepared these better in advance and hoped that he had remembered everything that was needed. He continued to wait for Marta to appear with the pets, but she still was nowhere to be seen.",
+    "Since they are still preserved in the rocks for us to see, they must have been formed quite recently, that is, geologically speaking. What can explain these striations and their common orientation? Did you ever hear about the Great Ice Age or the Pleistocene Epoch? Less than one million years ago, in fact, some 12,000 years ago, an ice sheet many thousands of feet thick rode over Burke Mountain in a southeastward direction.\n\nThe many boulders frozen to the underside of the ice sheet tended to scratch the rocks over which they rode. The scratches or striations seen in the park rocks were caused by these attached boulders. The ice sheet also plucked and rounded Burke Mountain into the shape it possesses today.",
+    "This is important to remember. Love isn't like pie. You don't need to divide it among all your friends and loved ones. No matter how much love you give, you can always give more. It doesn't run out, so don't try to hold back giving it as if it may one day run out. Give it freely and as much as you want.",
+    "I recollect that my first exploit in squirrel-shooting was in a grove of tall walnut-trees that shades one side of the valley. I had wandered into it at noontime, when all nature is peculiarly quiet, and was startled by the roar of my own gun, as it broke the Sabbath stillness around and was prolonged and reverberated by the angry echoes.",
+    "Josh had spent year and year accumulating the information. He knew it inside out and if there was ever anyone looking for an expert in the field, Josh would be the one to call. The problem was that there was nobody interested in the information besides him and he knew it. Years of information painstakingly memorized and sorted with not a sole giving even an ounce of interest in the topic.",
+    "As she sat watching the world go by, something caught her eye. It wasn't so much its color or shape, but the way it was moving. She squinted to see if she could better understand what it was and where it was going, but it didn't help. As she continued to stare into the distance, she didn't understand why this uneasiness was building inside her body. She felt like she should get up and run. If only she could make out what it was. At that moment, she comprehended what it was and where it was heading, and she knew her life would never be the same.",
+    "The words hadn't flowed from his fingers for the past few weeks. He never imagined he'd find himself with writer's block, but here he sat with a blank screen in front of him. That blank screen taunting him day after day had started to play with his mind. He didn't understand why he couldn't even type a single word, just one to begin the process and build from there. And yet, he already knew that the eight hours he was prepared to sit in front of his computer today would end with the screen remaining blank.",
+    "The cab arrived late. The inside was in as bad of shape as the outside which was concerning, and it didn't appear that it had been cleaned in months. The green tree air-freshener hanging from the rearview mirror was either exhausted of its scent or not strong enough to overcome the other odors emitting from the cab. The correct decision, in this case, was to get the hell out of it and to call another cab, but she was late and didn't have a choice.",
+    "The day had begun on a bright note. The sun finally peeked through the rain for the first time in a week, and the birds were sinf=ging in its warmth. There was no way to anticipate what was about to happen. It was a worst-case scenario and there was no way out of it.",
+    "She sat in the darkened room waiting. It was now a standoff. He had the power to put her in the room, but not the power to make her repent. It wasn't fair and no matter how long she had to endure the darkness, she wouldn't change her attitude. At three years old, Sandy's stubborn personality had already bloomed into full view.",
+    "I haven't bailed on writing. Look, I'm generating a random paragraph at this very moment in an attempt to get my writing back on track. I am making an effort. I will start writing consistently again!",
+    "He wondered if he should disclose the truth to his friends. It would be a risky move. Yes, the truth would make things a lot easier if they all stayed on the same page, but the truth might fracture the group leaving everything in even more of a mess than it was not telling the truth. It was time to decide which way to go.\n\nI recently discovered I could make fudge with just chocolate chips, sweetened condensed milk, vanilla extract, and a thick pot on slow heat. I tried it with dark chocolate chunks and I tried it with semi-sweet chocolate chips. It's better with both kinds. It comes out pretty bad with just the dark chocolate. The best add-ins are crushed almonds and marshmallows -- what you get from that is Rocky Road. It takes about twenty minutes from start to fridge, and then it takes about six months to work off the twenty pounds you gain from eating it. All things in moderation, friends. All things in moderation.",
+    "I'm heading back to Colorado tomorrow after being down in Santa Barbara over the weekend for the festival there. I will be making October plans once there and will try to arrange so I'm back here for the birthday if possible. I'll let you know as soon as I know the doctor's appointment schedule and my flight plans.",
+    "It wasn't quite yet time to panic. There was still time to salvage the situation. At least that is what she was telling himself. The reality was that it was time to panic and there wasn't time to salvage the situation, but he continued to delude himself into believing there was."
+  ]
+  @random_comment_list [
+    "He fumbled in the darkness looking for the light switch, but when he finally found it there was someone already there.",
+    "He walked into the basement with the horror movie from the night before playing in his head.",
+    "Malls are great places to shop; I can find everything I need under one roof.",
+    "I often see the time 11:11 or 12:34 on clocks.",
+    "Never underestimate the willingness of the greedy to throw you under the bus.",
+    "My dentist tells me that chewing bricks is very bad for your teeth.",
+    "I currently have 4 windows open up… and I don’t know why.",
+    "He figured a few sticks of dynamite were easier than a fishing pole to catch fish.",
+    "I am my aunt's sister's daughter.",
+    "The small white buoys marked the location of hundreds of crab pots.",
+    "I really want to go to work, but I am too sick to drive."
   ]
   @random_image_url_list [
     "http://i.imgur.com/u3vyMCW.jpg",
@@ -103,17 +118,18 @@ defmodule App.DatabaseSeeder do
   def insert_users do
     Enum.each(@prof_list, &Accounts.create_user/1)
     Enum.each(@student_list, &Accounts.create_user/1)
+    Accounts.create_user(@superuser)
   end
 
   def insert_semesters do
-    creator = Accounts.get_user_by!("prof1")
+    creator = Accounts.get_user_by!("pro1")
     for x <- @semester_list do
       Courses.create_semester(creator, x)
     end
   end
 
   def insert_courses do
-    creator = Accounts.get_user_by!("prof1")
+    creator = Accounts.get_user_by!("pro1")
     for x <- @semester_list do
       {:ok, semester} = Courses.create_semester(creator, x)
       for y <- @course_list do
@@ -123,7 +139,7 @@ defmodule App.DatabaseSeeder do
   end
 
   def insert_sections do
-    creator = Accounts.get_user_by!("prof1")
+    creator = Accounts.get_user_by!("pro1")
     for x <- @semester_list do
       {:ok, semester} = Courses.create_semester(creator, x)
       for y <- @course_list do
@@ -138,7 +154,7 @@ defmodule App.DatabaseSeeder do
   end
 
   def insert_topics do
-    creator = Accounts.get_user_by!("prof1")
+    creator = Accounts.get_user_by!("pro1")
     for x <- @semester_list do
       {:ok, semester} = Courses.create_semester(creator, x)
       for y <- @course_list do
@@ -159,7 +175,7 @@ defmodule App.DatabaseSeeder do
   end
 
   def insert_submissions do
-    creator = Accounts.get_user_by!("prof1")
+    creator = Accounts.get_user_by!("pro1")
     for x <- @semester_list do
       {:ok, semester} = Courses.create_semester(creator, x)
       for y <- @course_list do
@@ -195,7 +211,7 @@ defmodule App.DatabaseSeeder do
   end
 
   def insert_comments do
-    creator = Accounts.get_user_by!("prof1")
+    creator = Accounts.get_user_by!("pro1")
     for x <- @semester_list do
       {:ok, semester} = Courses.create_semester(creator, x)
       for y <- @course_list do
@@ -226,7 +242,7 @@ defmodule App.DatabaseSeeder do
 
                 Enum.each(1..5, fn c ->
                   student = Accounts.get_user_by!(Map.get(Enum.random(@student_list), :net_id))
-                  attrs = %{description: Enum.random(@random_description_list), title: Enum.random(@random_title_list)}
+                  attrs = %{description: Enum.random(@random_comment_list)}
                   Submissions.create_comment(student, submission, attrs)
               end)
             end)
@@ -237,7 +253,7 @@ defmodule App.DatabaseSeeder do
   end
 
   def insert_ratings do
-    creator = Accounts.get_user_by!("prof1")
+    creator = Accounts.get_user_by!("pro1")
     for x <- @semester_list do
       {:ok, semester} = Courses.create_semester(creator, x)
       for y <- @course_list do
@@ -279,7 +295,7 @@ defmodule App.DatabaseSeeder do
   end
 
   def insert_comments_and_ratings do
-    creator = Accounts.get_user_by!("prof1")
+    creator = Accounts.get_user_by!("pro1")
     for x <- @semester_list do
       {:ok, semester} = Courses.create_semester(creator, x)
       for y <- @course_list do
@@ -315,7 +331,7 @@ defmodule App.DatabaseSeeder do
 
               Enum.each(1..5, fn c ->
                 student = Accounts.get_user_by!(Map.get(Enum.random(short_student_list), :net_id))
-                attrs = %{description: Enum.random(@random_description_list), title: Enum.random(@random_title_list)}
+                attrs = %{description: Enum.random(@random_comment_list)}
                 Submissions.create_comment(student, submission, attrs)
               end)
               Enum.each(1..1, fn d ->

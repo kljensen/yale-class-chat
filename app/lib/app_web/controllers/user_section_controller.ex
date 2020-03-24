@@ -2,7 +2,6 @@ defmodule AppWeb.UserSectionController do
   use AppWeb, :controller
 
   alias App.Courses
-  alias App.Courses.Section
 
   def index(conn, _params) do
     user = conn.assigns.current_user

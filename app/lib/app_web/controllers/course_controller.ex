@@ -12,11 +12,7 @@ defmodule AppWeb.CourseController do
         list = Courses.list_semester_names()
         semesters = Map.new(Enum.map(list, fn [key, value] -> {:"#{key}", value} end))
         render(conn, "index.html", courses: courses, semesters: semesters)
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 
@@ -28,11 +24,7 @@ defmodule AppWeb.CourseController do
         list = Courses.list_semester_names()
         semesters = Enum.map(list, fn [value, key] -> {:"#{key}", value} end)
         render(conn, "new.html", [changeset: changeset, semesters: semesters])
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 
@@ -51,19 +43,7 @@ defmodule AppWeb.CourseController do
         semesters = Enum.map(list, fn [value, key] -> {:"#{key}", value} end)
         render(conn, "new.html", [changeset: changeset, semesters: semesters])
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-        end
+      {:error, message} -> render_error(conn, message)
     end
   end
 
@@ -77,19 +57,7 @@ defmodule AppWeb.CourseController do
         role = App.Accounts.get_current_course__role(user, course)
 
         render(conn, "show.html", course: course, semester: semester, sections: sections, role: role)
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-        end
+      {:error, message} -> render_error(conn, message)
     end
   end
 
@@ -98,24 +66,10 @@ defmodule AppWeb.CourseController do
     case Courses.get_user_course(user, id) do
       {:ok, course} ->
         changeset = Courses.change_course(course)
-        semester = Courses.get_semester!(course.semester_id)
-        #semesters = [{:"#{semester.name}", semester.id}]
         list = Courses.list_semester_names()
         semesters = Enum.map(list, fn [value, key] -> {:"#{key}", value} end)
         render(conn, "edit.html", course: course, changeset: changeset, semesters: semesters)
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-        end
+      {:error, message} -> render_error(conn, message)
     end
   end
 
@@ -134,11 +88,7 @@ defmodule AppWeb.CourseController do
         semesters = [{:"#{semester.name}", semester.id}]
         render(conn, "edit.html", course: course, changeset: changeset, semesters: semesters)
 
-      {:error, message} ->
-        conn
-        |> put_status(:forbidden)
-        |> put_view(AppWeb.ErrorView)
-        |> render("403.html")
+      {:error, message} -> render_error(conn, message)
     end
   end
 
@@ -152,11 +102,7 @@ defmodule AppWeb.CourseController do
         |> put_flash(:success, "Course deleted successfully.")
         |> redirect(to: Routes.course_path(conn, :index))
 
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 end

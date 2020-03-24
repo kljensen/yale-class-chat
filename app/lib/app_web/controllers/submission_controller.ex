@@ -16,19 +16,7 @@ defmodule AppWeb.SubmissionController do
         can_edit = App.Accounts.can_edit_topic(user, topic)
         render(conn, "index.html", submissions: submissions, topic: topic, can_edit: can_edit, uid: user.id, section: section, course: course)
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          end
+      {:error, message} -> render_error(conn, message)
       end
   end
 
@@ -41,19 +29,7 @@ defmodule AppWeb.SubmissionController do
         course = topic.section.course
         render(conn, "new.html", changeset: changeset, topic: topic, section: section, course: course)
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          end
+      {:error, message} -> render_error(conn, message)
       end
   end
 
@@ -65,7 +41,7 @@ defmodule AppWeb.SubmissionController do
         course = topic.section.course
 
         case Submissions.create_submission(user, topic, submission_params) do
-          {:ok, submission} ->
+          {:ok, _submission} ->
             conn
             |> put_flash(:success, "Submission created successfully.")
             |> redirect(to: Routes.topic_path(conn, :show, topic))
@@ -73,26 +49,10 @@ defmodule AppWeb.SubmissionController do
           {:error, %Ecto.Changeset{} = changeset} ->
             render(conn, "new.html", changeset: changeset, topic: topic, section: section, course: course)
 
-          {:error, message} ->
-            changeset = Submissions.change_submission(%Submission{})
-            conn
-            |> put_flash(:error, message)
-            |> render("new.html", changeset: changeset, topic: topic, section: section, course: course)
+          {:error, message} -> render_error(conn, message)
         end
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          end
+      {:error, message} -> render_error(conn, message)
       end
   end
 
@@ -125,19 +85,7 @@ defmodule AppWeb.SubmissionController do
                 rating_changeset: rating_changeset,
                 my_rating: my_rating)
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          end
+      {:error, message} -> render_error(conn, message)
       end
   end
 
@@ -151,11 +99,7 @@ defmodule AppWeb.SubmissionController do
         course = Courses.get_course!(section.course_id)
         changeset = Submissions.change_submission(submission)
         render(conn, "edit.html", submission: submission, changeset: changeset, topic: topic, section: section, course: course)
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 
@@ -175,19 +119,7 @@ defmodule AppWeb.SubmissionController do
         course = Courses.get_course!(section.course_id)
         render(conn, "edit.html", submission: submission, changeset: changeset, topic: topic, section: section, course: course)
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          end
+      {:error, message} -> render_error(conn, message)
     end
   end
 
@@ -202,11 +134,7 @@ defmodule AppWeb.SubmissionController do
         |> put_flash(:success, "Submission deleted successfully.")
         |> redirect(to: Routes.topic_path(conn, :show, topic))
 
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 end

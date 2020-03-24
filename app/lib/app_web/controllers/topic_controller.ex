@@ -6,33 +6,9 @@ defmodule AppWeb.TopicController do
   alias App.Courses
   alias App.Submissions
 
+
+
   @sort_list ["date - ascending", "date - descending", "rating - ascending", "rating - descending", "rating - ascending", "random"]
-
-  def index(conn, %{"section_id" => section_id}) do
-    user = conn.assigns.current_user
-    case Courses.get_user_section(user, section_id) do
-      {:ok, section} ->
-        course = section.course
-        can_edit = App.Accounts.can_edit_section(user, section)
-
-        topics = Topics.list_user_topics(user, section)
-        render(conn, "index.html", topics: topics, section: section, can_edit: can_edit, course: course)
-
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          end
-      end
-  end
 
   def new(conn, %{"course_id" => course_id}) do
     course = Courses.get_course!(course_id)
@@ -47,11 +23,7 @@ defmodule AppWeb.TopicController do
         {:ok, current_time} = DateTime.now("America/New_York")
         render(conn, "new.html", changeset: changeset, course: course, sections: sections, selected_sections: selected_sections, current_time: current_time, sort_list: @sort_list)
 
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 
@@ -65,18 +37,9 @@ defmodule AppWeb.TopicController do
         sections = Enum.map(section_map, fn [value, key] -> {:"#{key}", value} end)
         selected_sections = Map.values(Map.new(sections))
         {:ok, current_time} = DateTime.now("America/New_York")
-        opened_at_raw = topic_params["opened_at"]
-        {:ok, opened_at} = NaiveDateTime.new(String.to_integer(opened_at_raw["year"]), String.to_integer(opened_at_raw["month"]), String.to_integer(opened_at_raw["day"]), String.to_integer(opened_at_raw["hour"]), String.to_integer(opened_at_raw["minute"]), 0)
-        {:ok, opened_at} = DateTime.from_naive(opened_at, "America/New_York")
-        {:ok, opened_at} = DateTime.shift_zone(opened_at, "Etc/UTC")
 
-        closed_at_raw = topic_params["closed_at"]
-        {:ok, closed_at} = NaiveDateTime.new(String.to_integer(closed_at_raw["year"]), String.to_integer(closed_at_raw["month"]), String.to_integer(closed_at_raw["day"]), String.to_integer(closed_at_raw["hour"]), String.to_integer(closed_at_raw["minute"]), 0)
-        {:ok, closed_at} = DateTime.from_naive(closed_at, "America/New_York")
-        {:ok, closed_at} = DateTime.shift_zone(closed_at, "Etc/UTC")
-
-        topic_params = Map.put(topic_params, "opened_at", opened_at)
-        topic_params = Map.put(topic_params, "closed_at", opened_at)
+        topic_params = Map.put(topic_params, "opened_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db(topic_params["opened_at"]))
+        topic_params = Map.put(topic_params, "closed_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db(topic_params["closed_at"]))
 
         case section_ids do
           nil ->
@@ -103,27 +66,11 @@ defmodule AppWeb.TopicController do
               {:error, %Ecto.Changeset{} = changeset} ->
                 render(conn, "new.html", changeset: changeset, course: course, sections: sections, selected_sections: selected_sections, current_time: current_time, sort_list: @sort_list)
 
-              {:error, message} ->
-                changeset = Topics.change_topic(%Topic{})
-                conn
-                |> put_flash(:error, message)
-                |> render("new.html", changeset: changeset, course: course, sections: sections, selected_sections: selected_sections, current_time: current_time, sort_list: @sort_list)
+              {:error, message} -> render_error(conn, message)
             end
         end
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          end
+      {:error, message} -> render_error(conn, message)
       end
   end
 
@@ -147,19 +94,7 @@ defmodule AppWeb.TopicController do
           end
         render(conn, "show.html", topic: topic, submissions: submissions, can_edit: can_edit, uid: user.id, section: section, course: course)
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          end
+      {:error, message} -> render_error(conn, message)
       end
   end
 
@@ -175,26 +110,10 @@ defmodule AppWeb.TopicController do
             {:ok, current_time} = DateTime.now("America/New_York")
             render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time, section: section, sort_list: @sort_list, section: section, course: course)
 
-          false ->
-            conn
-                |> put_status(:forbidden)
-                |> put_view(AppWeb.ErrorView)
-                |> render("403.html")
+          false -> render_error(conn, "forbidden")
           end
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          end
+        {:error, message} -> render_error(conn, message)
         end
   end
 
@@ -214,19 +133,7 @@ defmodule AppWeb.TopicController do
         {:ok, current_time} = DateTime.now("America/New_York")
         render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time, section: section, sort_list: @sort_list, course: section.course)
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          end
+      {:error, message} -> render_error(conn, message)
     end
   end
 
@@ -241,19 +148,7 @@ defmodule AppWeb.TopicController do
         |> put_flash(:success, "Topic deleted successfully.")
         |> redirect(to: Routes.section_path(conn, :show, topic.section))
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          end
-        end
+      {:error, message} -> render_error(conn, message)
+      end
   end
 end

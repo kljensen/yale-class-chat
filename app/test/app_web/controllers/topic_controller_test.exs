@@ -3,6 +3,7 @@ defmodule AppWeb.TopicControllerTest do
 
   alias App.Topics
   import Plug.Test
+  import AppWeb.ControllerHelpers
 
   @create_attrs %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2120"}, description: "some description", opened_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "3", "year" => "2020"}, slug: "some slug", sort: "some sort", title: "some title", user_submission_limit: 42, visible: true, show_user_submissions: true, type: "general"}
   @update_attrs %{allow_submission_comments: false, allow_submission_voting: false, allow_submissions: false, anonymous: false, closed_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, description: "some updated description", opened_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, slug: "some updated slug", sort: "some updated sort", title: "some updated title", user_submission_limit: 43, visible: false, show_user_submissions: false, type: "qa"}
@@ -41,6 +42,24 @@ defmodule AppWeb.TopicControllerTest do
   describe "create topic" do
     setup [:create_section]
 
+    test "creates topic with correct vars", %{conn: conn, section: section} do
+      course = App.Courses.get_course!(section.course_id)
+      section_ids = [Integer.to_string(section.id)]
+      attrs = Map.merge(@create_attrs, %{sections: section_ids})
+      conn = conn
+        |> init_test_session(uid: "faculty net id")
+        |> post(Routes.course_topic_path(conn, :create, course), topic: attrs)
+
+      assert %{id: id} = redirected_params(conn)
+      topic = Topics.get_topic!(id)
+      attrstest = Map.put(@create_attrs, :opened_at, convert_NYC_datetime_to_db(@create_attrs.opened_at))
+      attrstest = Map.put(attrstest, :closed_at, convert_NYC_datetime_to_db(@create_attrs.closed_at))
+      Enum.each  attrstest,  fn {k, v} ->
+        assert Map.get(topic, k) == v
+      end
+
+    end
+
     test "redirects to show when data is valid", %{conn: conn, section: section} do
       course = App.Courses.get_course!(section.course_id)
       section_ids = [Integer.to_string(section.id)]
@@ -62,7 +81,7 @@ defmodule AppWeb.TopicControllerTest do
       {:ok, section2} = App.Courses.create_section(user_faculty, course, %{crn: "some updated crn", title: "some updated title"})
       section_ids = [Integer.to_string(section.id), Integer.to_string(section2.id)]
       attrs = Map.merge(@create_attrs, %{sections: section_ids})
-      conn = conn
+      conn
         |> init_test_session(uid: "faculty net id")
         |> post(Routes.course_topic_path(conn, :create, course), topic: attrs)
 

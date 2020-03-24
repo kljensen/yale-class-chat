@@ -24,14 +24,15 @@ defmodule AppWeb.CommentControllerTest do
   #  end
   #end
 
-  describe "new comment" do
-    test "renders form", %{conn: conn, submission: submission} do
-      conn = conn
-        |> init_test_session(uid: "faculty net id")
-        |> get(Routes.submission_comment_path(conn, :new, submission))
-      assert html_response(conn, 200) =~ "New Comment"
-    end
-  end
+  #Disabling as we no longer have a separate new comment route
+  #describe "new comment" do
+  #  test "renders form", %{conn: conn, submission: submission} do
+  #    conn = conn
+  #      |> init_test_session(uid: "faculty net id")
+  #      |> get(Routes.submission_comment_path(conn, :new, submission))
+  #    assert html_response(conn, 200) =~ "New Comment"
+  #  end
+  #end
 
   describe "create comment" do
     test "redirects to show when data is valid", %{conn: conn, submission: submission} do
@@ -74,7 +75,7 @@ defmodule AppWeb.CommentControllerTest do
         |> put(Routes.comment_path(conn, :update, comment), comment: @update_attrs)
       assert redirected_to(conn) == Routes.submission_path(conn, :show, comment.submission_id)
 
-      conn = get(conn, Routes.comment_path(conn, :show, comment))
+      conn = get(conn, Routes.submission_path(conn, :show, comment.submission_id))
       assert html_response(conn, 200) =~ "some updated description"
     end
 
@@ -95,8 +96,8 @@ defmodule AppWeb.CommentControllerTest do
         |> init_test_session(uid: "faculty net id")
         |> delete(Routes.comment_path(conn, :delete, comment))
       assert redirected_to(conn) == Routes.submission_path(conn, :show, submission)
-      assert_error_sent 404, fn ->
-        get(conn, Routes.submission_comment_path(conn, :show, comment, submission))
+      assert_raise Ecto.NoResultsError, fn ->
+        Submissions.get_comment!(comment.id)
       end
     end
   end

@@ -7,6 +7,7 @@ defmodule AppWeb.Router do
     plug :fetch_live_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :store_path_in_session
     plug AppWeb.Plug.SetCurrentUser
   end
 
@@ -62,16 +63,19 @@ defmodule AppWeb.Router do
     end
 
     resources "/submissions", SubmissionController, only: [:show] do
-      resources "/comments", CommentController, except: [:index]
-      resources "/ratings", RatingController
+      resources "/comments", CommentController, except: [:index, :show, :new]
+      resources "/ratings", RatingController, except: [:index, :show, :new, :edit]
     end
 
 
     resources "/users", UserController, only: [:edit, :show, :update]
     resources "/topics", TopicController, only: [:edit, :show, :update, :delete]
     resources "/submissions", SubmissionController, only: [:edit, :show, :update, :delete]
-    resources "/comments", CommentController, only: [:edit, :show, :update, :delete]
-    resources "/ratings", RatingController, only: [:edit, :show, :update, :delete]
+    resources "/comments", CommentController, only: [:edit, :update, :delete]
+    resources "/ratings", RatingController, only: [:edit, :update, :delete]
+
+    get "/superuser", SuperuserController, :index
+    get "/superuser/switch", SuperuserController, :switch
   end
 
 

@@ -1,0 +1,28 @@
+<h1>Superuser Role Change</h1>
+
+<p>Select "Switch" next to any user below to imitate them throughout the app. Please be careful!</p>
+
+<section class="container uk-padding-small uk-padding-remove-left">
+    <%= link "Switch Back (" <> @true_netid <> ")", to: Routes.superuser_path(@conn, :switch, %{net_id: @true_netid}), class: "uk-button uk-button-secondary" %>
+</section>
+
+<section class="container">
+    <table class="uk-table">
+        <thead>
+            <tr>
+            <th>NetID</th>
+            <th>Name</th>
+            <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        <%= for user <- @users do %>
+            <tr>
+            <td><%= user.net_id %></td>
+            <td><%= user.display_name %></td>
+            <td><%= link "Switch", to: Routes.superuser_path(@conn, :switch, %{net_id: user.net_id}) %></td>
+            </tr>
+        <% end %>
+        </tbody>
+    </table>
+</section>

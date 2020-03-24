@@ -7,6 +7,7 @@ defmodule App.Accounts.User do
     field :email, :string
     field :net_id, :string
     field :is_faculty, :boolean, default: false
+    field :is_superuser, :boolean, default: false
     has_many :course_roles, App.Accounts.Course_Role
     has_many :section_roles, App.Accounts.Section_Role
     has_many :submissions, App.Submissions.Submission
@@ -19,7 +20,7 @@ defmodule App.Accounts.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:net_id, :display_name, :email, :is_faculty])
+    |> cast(attrs, [:net_id, :display_name, :email, :is_faculty, :is_superuser])
     |> validate_required([:net_id, :display_name, :email, :is_faculty])
     |> unique_constraint(:net_id)
     |> validate_format(:email, ~r/@/)

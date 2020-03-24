@@ -29,13 +29,9 @@ defmodule AppWeb.UserController do
   def show(conn, %{"id" => id}) do
     case id == to_string(conn.assigns.current_user.id) do
       true ->
-        user = unless id == "new", do: user = Accounts.get_user!(id)
+        user = unless id == "new", do: Accounts.get_user!(id)
         render(conn, "show.html", user: user)
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
     end
   end
 
@@ -45,11 +41,7 @@ defmodule AppWeb.UserController do
         user = Accounts.get_user!(id)
         changeset = Accounts.change_user(user)
         render(conn, "edit.html", user: user, changeset: changeset)
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 
@@ -66,11 +58,7 @@ defmodule AppWeb.UserController do
           {:error, %Ecto.Changeset{} = changeset} ->
             render(conn, "edit.html", user: user, changeset: changeset)
         end
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
     end
   end
 
@@ -83,11 +71,7 @@ defmodule AppWeb.UserController do
         conn
         |> put_flash(:success, "User deleted successfully.")
         |> redirect(to: "/")
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
     end
   end
 end

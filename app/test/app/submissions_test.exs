@@ -564,8 +564,7 @@ defmodule App.SubmissionsTest do
 
       retrieved_comments = Submissions.list_user_comments(student2, submission)
       assert length(retrieved_comments) == 1
-      {:ok, topic} = Topics.update_topic(user_faculty, topic, %{show_submission_comments: false})
-      IO.inspect topic.show_submission_comments
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{show_submission_comments: false})
       retrieved_comments = Submissions.list_user_comments(student2, submission)
       assert length(retrieved_comments) == 0
       retrieved_comments = Submissions.list_user_comments(student, submission)
@@ -966,8 +965,7 @@ defmodule App.SubmissionsTest do
 
       retrieved_ratings = Submissions.list_user_ratings(student2, submission)
       assert length(retrieved_ratings) == 1
-      {:ok, topic} = Topics.update_topic(user_faculty, topic, %{show_submission_ratings: false})
-      IO.inspect topic.show_submission_ratings
+      {:ok, _topic} = Topics.update_topic(user_faculty, topic, %{show_submission_ratings: false})
       retrieved_ratings = Submissions.list_user_ratings(student2, submission)
       assert length(retrieved_ratings) == 0
       retrieved_ratings = Submissions.list_user_ratings(student, submission)

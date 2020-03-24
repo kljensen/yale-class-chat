@@ -56,6 +56,6 @@ defmodule AppWeb.Helpers do
     was_truncated = truncated_words ||  truncated_string
     {was_truncated, paragraphs}
   end
-  
+
 
 end

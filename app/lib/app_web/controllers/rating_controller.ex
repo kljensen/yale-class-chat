@@ -3,7 +3,6 @@ defmodule AppWeb.RatingController do
 
   alias App.Submissions
   alias App.Submissions.Rating
-  alias App.Submissions.Submission
 
   def index(conn, %{"submission_id" => submission_id}) do
     submission = Submissions.get_submission!(submission_id)
@@ -23,7 +22,7 @@ defmodule AppWeb.RatingController do
     user = conn.assigns.current_user
     submission = Submissions.get_submission!(submission_id)
     case Submissions.create_rating(user, submission, rating_params) do
-      {:ok, rating} ->
+      {:ok, _rating} ->
         conn
         |> put_flash(:success, "Rating created successfully.")
         |> redirect(to: Routes.submission_path(conn, :show, submission))
@@ -31,35 +30,14 @@ defmodule AppWeb.RatingController do
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset, submission: submission)
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          _ ->
-            changeset = Submissions.change_submission(%Submission{})
-            conn
-            |> put_flash(:error, message)
-            |> render("new.html", changeset: changeset, submission: submission)
-          end
+      {:error, message} -> render_error(conn, message)
     end
   end
 
   def show(conn, %{"id" => id}) do
     user = conn.assigns.current_user
     case App.Submissions.get_user_rating(user, id) do
-      nil ->
-        conn
-        |> put_status(:not_found)
-        |> put_view(AppWeb.ErrorView)
-        |> render("404.html")
+      nil -> render_error(conn, "not found")
 
       rating ->
         submission = Submissions.get_submission!(rating.submission_id)
@@ -71,11 +49,7 @@ defmodule AppWeb.RatingController do
   def edit(conn, %{"id" => id}) do
     user = conn.assigns.current_user
     case App.Submissions.get_user_rating(user, id) do
-      nil ->
-        conn
-        |> put_status(:not_found)
-        |> put_view(AppWeb.ErrorView)
-        |> render("404.html")
+      nil -> render_error(conn, "not found")
 
       rating ->
         case App.Accounts.can_edit_rating(user, rating) do
@@ -84,11 +58,7 @@ defmodule AppWeb.RatingController do
             changeset = Submissions.change_rating(rating)
             render(conn, "edit.html", rating: rating, changeset: changeset, submission: submission)
 
-          false ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+          false -> render_error(conn, "forbidden")
         end
       end
   end
@@ -100,7 +70,7 @@ defmodule AppWeb.RatingController do
       true ->
         submission = Submissions.get_submission!(rating.submission_id)
         case Submissions.update_rating(user, rating, rating_params) do
-          {:ok, rating} ->
+          {:ok, _rating} ->
             conn
             |> put_flash(:success, "Rating updated successfully.")
             |> redirect(to: Routes.submission_path(conn, :show, submission))
@@ -108,31 +78,10 @@ defmodule AppWeb.RatingController do
           {:error, %Ecto.Changeset{} = changeset} ->
             render(conn, "edit.html", rating: rating, changeset: changeset, submission: submission)
 
-          {:error, message} ->
-            case message do
-              "forbidden" ->
-                conn
-                |> put_status(:forbidden)
-                |> put_view(AppWeb.ErrorView)
-                |> render("403.html")
-              "not found" ->
-                conn
-                |> put_status(:not_found)
-                |> put_view(AppWeb.ErrorView)
-                |> render("404.html")
-              _ ->
-                changeset = Submissions.change_rating(%Rating{})
-                conn
-                |> put_flash(:error, message)
-                |> render("edit.html", rating: rating, changeset: changeset, submission: submission)
-              end
+          {:error, message} -> render_error(conn, message)
         end
 
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 
@@ -148,11 +97,7 @@ defmodule AppWeb.RatingController do
         |> put_flash(:success, "Rating deleted successfully.")
         |> redirect(to: Routes.submission_path(conn, :show, submission))
 
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 end

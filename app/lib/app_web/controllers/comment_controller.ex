@@ -3,7 +3,6 @@ defmodule AppWeb.CommentController do
 
   alias App.Submissions
   alias App.Submissions.Comment
-  alias App.Submissions.Submission
 
   def index(conn, %{"submission_id" => submission_id}) do
     submission = Submissions.get_submission!(submission_id)
@@ -23,7 +22,7 @@ defmodule AppWeb.CommentController do
     user = conn.assigns.current_user
     submission = Submissions.get_submission!(submission_id)
     case Submissions.create_comment(user, submission, comment_params) do
-      {:ok, comment} ->
+      {:ok, _comment} ->
         conn
         |> put_flash(:success, "Comment created successfully.")
         |> redirect(to: Routes.submission_path(conn, :show, submission))
@@ -31,24 +30,7 @@ defmodule AppWeb.CommentController do
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset, submission: submission)
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          _ ->
-            changeset = Submissions.change_submission(%Submission{})
-            conn
-            |> put_flash(:error, message)
-            |> render("new.html", changeset: changeset, submission: submission)
-          end
+      {:error, message} -> render_error(conn, message)
     end
   end
 
@@ -60,19 +42,7 @@ defmodule AppWeb.CommentController do
         can_edit = App.Accounts.can_edit_comment(user, comment)
         render(conn, "show.html", comment: comment, submission: submission, can_edit: can_edit, uid: user.id)
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          end
+      {:error, message} -> render_error(conn, message)
     end
   end
 
@@ -85,26 +55,10 @@ defmodule AppWeb.CommentController do
             submission = Submissions.get_submission!(comment.submission_id)
             changeset = Submissions.change_comment(comment)
             render(conn, "edit.html", comment: comment, changeset: changeset, submission: submission)
-          false ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+          false -> render_error(conn, "forbidden")
         end
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          end
+      {:error, message} -> render_error(conn, message)
     end
   end
 
@@ -116,7 +70,7 @@ defmodule AppWeb.CommentController do
           true ->
             submission = Submissions.get_submission!(comment.submission_id)
             case Submissions.update_comment(user, comment, comment_params) do
-              {:ok, comment} ->
+              {:ok, _comment} ->
                 conn
                 |> put_flash(:success, "Comment updated successfully.")
                 |> redirect(to: Routes.submission_path(conn, :show, submission))
@@ -124,46 +78,13 @@ defmodule AppWeb.CommentController do
               {:error, %Ecto.Changeset{} = changeset} ->
                 render(conn, "edit.html", comment: comment, changeset: changeset, submission: submission)
 
-              {:error, message} ->
-                case message do
-                  "forbidden" ->
-                    conn
-                    |> put_status(:forbidden)
-                    |> put_view(AppWeb.ErrorView)
-                    |> render("403.html")
-                  "not found" ->
-                    conn
-                    |> put_status(:not_found)
-                    |> put_view(AppWeb.ErrorView)
-                    |> render("404.html")
-                  _ ->
-                    changeset = Submissions.change_comment(%Comment{})
-                    conn
-                    |> put_flash(:error, message)
-                    |> render("edit.html", comment: comment, changeset: changeset, submission: submission)
-                  end
+              {:error, message} -> render_error(conn, message)
 
-          false ->
-            conn
-                |> put_status(:forbidden)
-                |> put_view(AppWeb.ErrorView)
-                |> render("403.html")
+          false -> render_error(conn, "forbidden")
           end
         end
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          end
+      {:error, message} -> render_error(conn, message)
       end
   end
 
@@ -178,11 +99,7 @@ defmodule AppWeb.CommentController do
         |> put_flash(:success, "Comment deleted successfully.")
         |> redirect(to: Routes.submission_path(conn, :show, submission))
 
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 end

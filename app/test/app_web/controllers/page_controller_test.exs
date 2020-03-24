@@ -10,7 +10,7 @@ defmodule AppWeb.PageControllerTest do
   end
 
   test "Renders with valid user", %{conn: conn} do
-    user_faculty = ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
+    ATest.user_fixture(%{is_faculty: true, net_id: "faculty net id"})
     conn = conn
         |> init_test_session(uid: "faculty net id")
         |> get(Routes.page_path(conn, :index))

@@ -25,6 +25,7 @@ defmodule AppWeb do
       import AppWeb.Gettext
       alias AppWeb.Router.Helpers, as: Routes
       import Phoenix.LiveView.Controller
+      import AppWeb.ControllerHelpers
     end
   end
 
@@ -54,6 +55,7 @@ defmodule AppWeb do
       import Plug.Conn
       import Phoenix.Controller
       import Phoenix.LiveView.Router
+      import AppWeb.FriendlyRedirect
     end
   end
 

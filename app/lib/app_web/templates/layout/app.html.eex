@@ -61,12 +61,14 @@
                   <ul class="uk-nav uk-navbar-dropdown-nav">
                     <li><%= link "Profile", to: Routes.user_path(@conn, :show, @conn.assigns.current_user) %></li>
                     <li><%= link "Log Out", to: Routes.auth_path(@conn, :delete, @conn.assigns.current_user) %></li>
+                    <%= if @conn.private.plug_session["is_superuser"] do %>
+                    <li class="uk-nav-divider"></li>
+                    <li><a href="<%= Routes.superuser_path(@conn, :index) %>">Switch User</a></li>
+                    <% end %>
                   </ul>
                 </div>
               </li>
             <% end %>
-
-
           </ul>
         </div>
     </nav>

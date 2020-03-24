@@ -17,11 +17,7 @@ defmodule AppWeb.Section_RoleController do
         section_roles = Accounts.list_section_all_section_roles(user, section)
         render(conn, "index.html", section_roles: section_roles, section: section, user_list: user_list, course: course)
 
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 
@@ -41,17 +37,10 @@ defmodule AppWeb.Section_RoleController do
     case App.Accounts.can_edit_section(user, section) do
       true ->
         course = Courses.get_course!(section.course_id)
-        semester = Courses.get_semester!(course.semester_id)
         changeset = Accounts.change_section__role(%Section_Role{})
         render(conn, "api_new.html", changeset: changeset, section: section, role_list: @section_read_roles, course: course)
-        #Connect to API
-        #IO.inspect RegistrationAPI.get_registered_student_user_netids(section.crn, semester.term_code)
 
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 
@@ -146,26 +135,14 @@ defmodule AppWeb.Section_RoleController do
                   {:error, %Ecto.Changeset{} = changeset} ->
                     render(conn, "api_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
 
-                  {:error, message} ->
-                    changeset = Accounts.change_section__role(%Section_Role{})
-                    conn
-                    |> put_flash(:error, message)
-                    |> render("api_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
+                  {:error, message} -> render_error(conn, message)
                   end
                 end
 
-            {:error, message} ->
-              changeset = Accounts.change_section__role(%Section_Role{})
-              conn
-              |> put_flash(:error, message)
-              |> render("api_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
+              {:error, message} -> render_error(conn, message)
             end
 
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 
@@ -177,11 +154,7 @@ defmodule AppWeb.Section_RoleController do
       true ->
         changeset = Accounts.change_section__role(%Section_Role{})
         render(conn, "bulk_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 
@@ -247,19 +220,11 @@ defmodule AppWeb.Section_RoleController do
               {:error, %Ecto.Changeset{} = changeset} ->
                 render(conn, "bulk_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
 
-              {:error, message} ->
-                changeset = Accounts.change_section__role(%Section_Role{})
-                conn
-                |> put_flash(:error, message)
-                |> render("bulk_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
+              {:error, message} -> render_error(conn, message)
               end
             end
 
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 
@@ -282,13 +247,7 @@ defmodule AppWeb.Section_RoleController do
         user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
         render(conn, "new.html", changeset: changeset, section: section, role_list: @section_read_roles, user_list: user_list, course: course)
 
-      {:error, message} ->
-        list = Accounts.list_users_for_section__roles(user_auth, section)
-        user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-        changeset = Accounts.change_section__role(%Section_Role{})
-        conn
-        |> put_flash(:error, message)
-        |> render("new.html", changeset: changeset, section: section, role_list: @section_read_roles, user_list: user_list, course: course)
+      {:error, message} -> render_error(conn, message)
     end
   end
 
@@ -311,11 +270,7 @@ defmodule AppWeb.Section_RoleController do
         user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
         render(conn, "edit.html", section__role: section__role, changeset: changeset, section: section, role_list: @section_read_roles, user_list: user_list, course: course)
 
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 
@@ -326,7 +281,7 @@ defmodule AppWeb.Section_RoleController do
     case Accounts.update_section__role(user, section__role, section__role_params) do
       {:ok, section__role} ->
         section = Courses.get_section!(section__role.section_id)
-        course = Courses.get_course!(section.course_id)
+        _course = Courses.get_course!(section.course_id)
         conn
         |> put_flash(:success, "Section  role updated successfully.")
         |> redirect(to: Routes.section_section__role_path(conn, :show, section, section__role))
@@ -338,15 +293,7 @@ defmodule AppWeb.Section_RoleController do
         user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
         render(conn, "edit.html", section__role: section__role, changeset: changeset, section: section, role_list: @section_read_roles, user_list: user_list, course: course)
 
-      {:error, message} ->
-        changeset = Accounts.change_section__role(%Section_Role{})
-        section = Courses.get_section!(section__role.section_id)
-        course = Courses.get_course!(section.course_id)
-        list = Accounts.list_users_for_section__roles(user, section)
-        user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-        conn
-        |> put_flash(:error, message)
-        |> render("edit.html", section__role: section__role, changeset: changeset, section: section, role_list: @section_read_roles, user_list: user_list, course: course)
+      {:error, message} -> render_error(conn, message)
     end
   end
 
@@ -370,12 +317,14 @@ defmodule AppWeb.Section_RoleController do
   def delete(conn, %{"id" => id}) do
     section__role = Accounts.get_section__role!(id)
     section = Courses.get_section!(section__role.section_id)
-    course = Courses.get_course!(section.course_id)
     user = conn.assigns.current_user
-    {:ok, _section__role} = Accounts.delete_section__role(user, section__role)
+    case Accounts.delete_section__role(user, section__role) do
+      {:ok, _section__role} ->
+        conn
+        |> put_flash(:success, "Section  role deleted successfully.")
+        |> redirect(to: Routes.section_section__role_path(conn, :index, section))
 
-    conn
-    |> put_flash(:success, "Section  role deleted successfully.")
-    |> redirect(to: Routes.section_section__role_path(conn, :index, section))
+      {:error, message} -> render_error(conn, message)
+    end
   end
 end

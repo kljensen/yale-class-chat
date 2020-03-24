@@ -748,7 +748,9 @@ defmodule App.Accounts do
 
   """
   def get_registered_students(%App.Courses.Section{} = section) do
-    RegistationAPI.get_registered_students(section.crn)
+    course = App.Courses.get_course!(section.course_id)
+    semester = App.Courses.get_semester!(course.semester_id)
+    RegistrationAPI.get_registered_students(section.crn, semester.term_code)
     "successfully called this function"
   end
 
