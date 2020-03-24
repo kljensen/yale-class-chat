@@ -44,8 +44,6 @@ defmodule AppWeb.Section_RoleController do
         semester = Courses.get_semester!(course.semester_id)
         changeset = Accounts.change_section__role(%Section_Role{})
         render(conn, "api_new.html", changeset: changeset, section: section, role_list: @section_read_roles, course: course)
-        #Connect to API
-        #IO.inspect RegistrationAPI.get_registered_student_user_netids(section.crn, semester.term_code)
 
       false ->
         conn

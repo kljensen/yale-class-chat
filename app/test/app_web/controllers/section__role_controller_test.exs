@@ -70,7 +70,6 @@ defmodule AppWeb.Section_RoleControllerTest do
 
   describe "bulk create section__role" do
     test "redirects to show when data is valid", %{conn: conn, section: section} do
-      current_user = Accounts.get_user_by!("faculty net id")
       attrs = Map.merge(@create_attrs, %{"user_id_list" => "abc123, abc234"})
       conn = conn
         |> init_test_session(uid: "faculty net id")
@@ -85,7 +84,6 @@ defmodule AppWeb.Section_RoleControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn, section: section} do
-      current_user = Accounts.get_user_by!("faculty net id")
       attrs = Map.merge(@invalid_attrs, %{"user_id_list" => "abc123, abc234"})
       conn = conn
         |> init_test_session(uid: "faculty net id")

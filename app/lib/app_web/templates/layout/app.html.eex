@@ -65,8 +65,6 @@
                 </div>
               </li>
             <% end %>
-
-
           </ul>
         </div>
     </nav>

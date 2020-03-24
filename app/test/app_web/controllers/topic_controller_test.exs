@@ -62,7 +62,7 @@ defmodule AppWeb.TopicControllerTest do
       {:ok, section2} = App.Courses.create_section(user_faculty, course, %{crn: "some updated crn", title: "some updated title"})
       section_ids = [Integer.to_string(section.id), Integer.to_string(section2.id)]
       attrs = Map.merge(@create_attrs, %{sections: section_ids})
-      conn = conn
+      conn
         |> init_test_session(uid: "faculty net id")
         |> post(Routes.course_topic_path(conn, :create, course), topic: attrs)
 
