@@ -97,7 +97,7 @@ defmodule AppWeb.TopicController do
                   end
                 end
                 conn
-                |> put_flash(:info, "Topic(s) created successfully.")
+                |> put_flash(:success, "Topic(s) created successfully.")
                 |> redirect(to: Routes.topic_path(conn, :show, topic))
 
               {:error, %Ecto.Changeset{} = changeset} ->
@@ -207,7 +207,7 @@ defmodule AppWeb.TopicController do
     case Topics.update_topic(user, topic, topic_params) do
       {:ok, topic} ->
         conn
-        |> put_flash(:info, "Topic updated successfully.")
+        |> put_flash(:success, "Topic updated successfully.")
         |> redirect(to: Routes.topic_path(conn, :show, topic))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -238,7 +238,7 @@ defmodule AppWeb.TopicController do
         {:ok, _topic} = Topics.delete_topic(user, topic)
 
         conn
-        |> put_flash(:info, "Topic deleted successfully.")
+        |> put_flash(:success, "Topic deleted successfully.")
         |> redirect(to: Routes.section_path(conn, :show, topic.section))
 
       {:error, message} ->

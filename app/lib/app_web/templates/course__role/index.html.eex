@@ -28,5 +28,8 @@
 <% end %>
   </tbody>
 </table>
-
-<span><%= link "Add Course Roles", to: Routes.course_course__role_path(@conn, :bulk_new, @course) %></span>
+<%= if @role == "owner" do %>
+<section class="container uk-padding-small uk-padding-remove-left">
+    <%= link "Add Course Roles", to: Routes.course_course__role_path(@conn, :bulk_new, @course), class: "uk-button uk-button-secondary" %>
+</section>
+<% end %>

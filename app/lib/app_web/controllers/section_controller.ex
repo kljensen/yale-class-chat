@@ -35,7 +35,7 @@ defmodule AppWeb.SectionController do
     case Courses.create_section(user, course, section_params) do
       {:ok, section} ->
         conn
-        |> put_flash(:info, "Section created successfully.")
+        |> put_flash(:success, "Section created successfully.")
         |> redirect(to: Routes.section_path(conn, :show, section))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -134,7 +134,7 @@ defmodule AppWeb.SectionController do
     case Courses.update_section(user, section, section_params) do
       {:ok, section} ->
         conn
-        |> put_flash(:info, "Section updated successfully.")
+        |> put_flash(:success, "Section updated successfully.")
         |> redirect(to: Routes.section_path(conn, :show, section))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -171,7 +171,7 @@ defmodule AppWeb.SectionController do
       true ->
         {:ok, _section} = Courses.delete_section(user, section)
         conn
-        |> put_flash(:info, "Section deleted successfully.")
+        |> put_flash(:success, "Section deleted successfully.")
         |> redirect(to: Routes.course_path(conn, :show, cid))
 
       false ->

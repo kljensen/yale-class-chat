@@ -13,7 +13,8 @@ defmodule AppWeb.Course_RoleController do
     list = Accounts.list_course__role_users(user, course)
     user_list = Map.new(Enum.map(list, fn [key, value] -> {:"#{key}", value} end))
     course_roles = Accounts.list_course_all_course_roles(user, course)
-    render(conn, "index.html", course_roles: course_roles, course: course, user_list: user_list)
+    role = App.Accounts.get_current_course__role(user, course)
+    render(conn, "index.html", course_roles: course_roles, course: course, user_list: user_list, role: role)
   end
 
   def new(conn, %{"course_id" => course_id}) do
@@ -64,7 +65,7 @@ defmodule AppWeb.Course_RoleController do
                 case length(net_id_list) do
                   0 ->
                     conn
-                    |> put_flash(:info, "Course  role created successfully.")
+                    |> put_flash(:success, "Course  role created successfully.")
                     |> redirect(to: Routes.course_path(conn, :show, course))
                   _ ->
 
@@ -87,7 +88,7 @@ defmodule AppWeb.Course_RoleController do
 
                       false ->
                         conn
-                        |> put_flash(:info, result_list)
+                        |> put_flash(:success, result_list)
                         |> redirect(to: Routes.course_course__role_path(conn, :index, course))
                       end
                   end
@@ -121,7 +122,7 @@ defmodule AppWeb.Course_RoleController do
     case Accounts.create_course__role(user_auth, user, course, course__role_params) do
       {:ok, course__role} ->
         conn
-        |> put_flash(:info, "Course  role created successfully.")
+        |> put_flash(:success, "Course  role created successfully.")
         |> redirect(to: Routes.course_course__role_path(conn, :show, course, course__role))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -163,7 +164,7 @@ defmodule AppWeb.Course_RoleController do
       {:ok, course__role} ->
         course = Courses.get_course!(course__role.course_id)
         conn
-        |> put_flash(:info, "Course  role updated successfully.")
+        |> put_flash(:success, "Course  role updated successfully.")
         |> redirect(to: Routes.course_course__role_path(conn, :show, course, course__role))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -183,7 +184,7 @@ defmodule AppWeb.Course_RoleController do
     {:ok, _course__role} = Accounts.delete_course__role(user, course__role)
 
     conn
-    |> put_flash(:info, "Course  role deleted successfully.")
+    |> put_flash(:success, "Course  role deleted successfully.")
     |> redirect(to: Routes.course_course__role_path(conn, :index, course))
   end
 end

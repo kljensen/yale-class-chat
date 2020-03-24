@@ -26,15 +26,15 @@ defmodule AppWeb.AuthController do
 
     conn
     |> clear_flash()
-    |> put_flash(:info, "Successfully authenticated.")
+    |> put_flash(:success, "Successfully authenticated.")
     |> put_session(:uid, uid)
     |> redirect(to: "/")
   end
 
   def delete(conn, _params) do
     conn
-    |> put_flash(:info, "You have been logged out!")
     |> configure_session(drop: true)
+    |> put_flash(:info, "You have been logged out!")
     |> redirect(to: "/")
   end
 

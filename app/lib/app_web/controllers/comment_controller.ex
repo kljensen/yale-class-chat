@@ -25,7 +25,7 @@ defmodule AppWeb.CommentController do
     case Submissions.create_comment(user, submission, comment_params) do
       {:ok, comment} ->
         conn
-        |> put_flash(:info, "Comment created successfully.")
+        |> put_flash(:success, "Comment created successfully.")
         |> redirect(to: Routes.submission_path(conn, :show, submission))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -118,7 +118,7 @@ defmodule AppWeb.CommentController do
             case Submissions.update_comment(user, comment, comment_params) do
               {:ok, comment} ->
                 conn
-                |> put_flash(:info, "Comment updated successfully.")
+                |> put_flash(:success, "Comment updated successfully.")
                 |> redirect(to: Routes.submission_path(conn, :show, submission))
 
               {:error, %Ecto.Changeset{} = changeset} ->
@@ -175,7 +175,7 @@ defmodule AppWeb.CommentController do
       true ->
         {:ok, _comment} = Submissions.delete_comment(user, comment)
         conn
-        |> put_flash(:info, "Comment deleted successfully.")
+        |> put_flash(:success, "Comment deleted successfully.")
         |> redirect(to: Routes.submission_path(conn, :show, submission))
 
       false ->

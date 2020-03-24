@@ -7,6 +7,7 @@ defmodule AppWeb.Router do
     plug :fetch_live_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug AppWeb.Plug.SetCurrentUser
   end
 
   pipeline :api do
@@ -15,7 +16,6 @@ defmodule AppWeb.Router do
 
   pipeline :auth do
     plug AppWeb.Plug.Auth
-    plug AppWeb.Plug.SetCurrentUser
     plug AppWeb.Plug.AuthenticateUser
   end
 
@@ -72,8 +72,6 @@ defmodule AppWeb.Router do
     resources "/submissions", SubmissionController, only: [:edit, :show, :update, :delete]
     resources "/comments", CommentController, only: [:edit, :show, :update, :delete]
     resources "/ratings", RatingController, only: [:edit, :show, :update, :delete]
-
-    get "/mysections", UserSectionController, :index
   end
 
 

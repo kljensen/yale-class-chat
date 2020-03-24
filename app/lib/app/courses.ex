@@ -266,6 +266,7 @@ defmodule App.Courses do
               where: r.valid_from <= from_now(0, "day"),
               where: r.valid_to >= from_now(0, "day"),
               where: c.id == ^course_id,
+              group_by: c.id,
               select: c
     result = Repo.one(query)
 
@@ -281,47 +282,6 @@ defmodule App.Courses do
       {:ok, result}
     end
   end
-
-
-
-  @doc """
-  Gets a single course if user is able to view.
-
-  ## Examples
-
-      iex> get_user_course(user, 123)
-      {:ok, %Course{}}
-
-      iex> get_user_course(invaliduser, 123)
-      {:error, message}
-
-  """
-  def get_user_course(%App.Accounts.User{} = user, course_id) do
-    uid = user.id
-    query = from r in App.Accounts.Course_Role,
-              left_join: c in Course,
-              on: r.course_id == c.id,
-              where: r.user_id == ^uid,
-              where: r.valid_from <= from_now(0, "day"),
-              where: r.valid_to >= from_now(0, "day"),
-              where: c.id == ^course_id,
-              select: c
-    result = Repo.one(query)
-
-    if is_nil(result) do
-      query = from c in Course, where: c.id == ^course_id
-      message = if Repo.exists?(query) do
-                  "forbidden"
-                else
-                  "not found"
-                end
-      {:error, message}
-    else
-      {:ok, result}
-    end
-  end
-
-
 
   @doc """
   Creates a course.

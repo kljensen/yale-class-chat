@@ -19,7 +19,7 @@ defmodule AppWeb.SemesterController do
     case Courses.create_semester(user, semester_params) do
       {:ok, semester} ->
         conn
-        |> put_flash(:info, "Semester created successfully.")
+        |> put_flash(:success, "Semester created successfully.")
         |> redirect(to: Routes.semester_path(conn, :show, semester))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -50,7 +50,7 @@ defmodule AppWeb.SemesterController do
     case Courses.update_semester(semester, semester_params) do
       {:ok, semester} ->
         conn
-        |> put_flash(:info, "Semester updated successfully.")
+        |> put_flash(:success, "Semester updated successfully.")
         |> redirect(to: Routes.semester_path(conn, :show, semester))
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -70,7 +70,7 @@ defmodule AppWeb.SemesterController do
     {:ok, _semester} = Courses.delete_semester(user, semester)
 
     conn
-    |> put_flash(:info, "Semester deleted successfully.")
+    |> put_flash(:success, "Semester deleted successfully.")
     |> redirect(to: Routes.semester_path(conn, :index))
   end
 end

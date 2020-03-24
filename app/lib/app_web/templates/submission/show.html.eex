@@ -149,6 +149,14 @@ end %>
         </div>
     </div>
 
+    <%= if @topic.anonymous do %>
+    <% else %>
+      <div class="uk-alert-warning" uk-alert>
+        <a class="uk-alert-close" uk-close></a>
+        <p>Note: this topic is not anonymous; your name will be visible as the author of this comment.</p>
+      </div>
+    <% end %>
+
     <div class="uk-margin">
         <%= submit "Save", class: "uk-button-secondary uk-button" %>
     </div>

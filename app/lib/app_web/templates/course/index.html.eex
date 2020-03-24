@@ -4,29 +4,25 @@
     <% end %>
     <%= for {course, i} <- Enum.with_index(@courses) do %>
     <div>
-        <div class="uk-card uk-card-small uk-card-default uk-card-hover">
-            <div class="uk-card-header">
-                <div class="uk-width-expand">
-                    <h3 class="uk-card-title uk-margin-remove-bottom">
-                      <%= course.department %><%= to_string(course.number) %>
-                    </h3>
-                    <p class="uk-text-meta uk-margin-remove-top uk-margin-remove-bottom">
-                      <%= course.name %> &mdash;
-                      <%= Map.get(@semesters, :"#{course.semester_id}") %>
-                    </p>
+        <a href="<%= Routes.course_path(@conn, :show, course) %>">
+            <div class="uk-card uk-card-small uk-card-default uk-card-hover color-<%= 1 + rem course.number + 1, 20 %>"">
+                <div class="uk-card-header">
+                    <div class="uk-width-expand">
+                        <h3 class="uk-card-title uk-margin-remove-bottom">
+                        <%= course.department %><%= to_string(course.number) %>
+                        </h3>
+                        <p class="uk-text-meta uk-margin-remove-top uk-margin-remove-bottom">
+                        <%= course.name %> &mdash;
+                        <%= Map.get(@semesters, :"#{course.semester_id}") %>
+                        </p>
+                    </div>
                 </div>
             </div>
-            <%= if course.allow_write do %>
-                <div class="uk-card-body">
-                    <p class="uk-margin-small">
-                        <%= link "View / Edit", to: Routes.course_path(@conn, :show, course), class: "uk-button uk-button-default" %>
-                        <%= link "Delete", to: Routes.course_path(@conn, :delete, course), method: :delete, data: [confirm: "Are you sure?"], class: "uk-button uk-button-default"  %>
-                    </p>
-                </div>
-            <% end%>
-        </div>
+        </a>
     </div>
     <% end %>
 </div>
 
-<span><%= link "New Course", to: Routes.course_path(@conn, :new) %></span>
+<section class="container uk-padding-small uk-padding-remove-left">
+    <%= link "New Course", to: Routes.course_path(@conn, :new), class: "uk-button uk-button-secondary" %>
+</section>

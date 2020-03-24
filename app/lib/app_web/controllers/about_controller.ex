@@ -5,6 +5,7 @@ defmodule AppWeb.AboutController do
   alias App.Courses.Section
 
   def index(conn, _params) do
-    render(conn, "index.html", [current_user: nil, is_faculty: false])
+    current_user = conn.assigns.current_user
+    render(conn, "index.html", [current_user: current_user])
   end
 end
