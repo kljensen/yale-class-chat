@@ -33,11 +33,7 @@ defmodule AppWeb.Course_RoleController do
       true ->
         changeset = Accounts.change_course__role(%Course_Role{})
         render(conn, "bulk_new.html", course: course, changeset: changeset, role_list: @course_admin_roles)
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 
@@ -96,19 +92,11 @@ defmodule AppWeb.Course_RoleController do
               {:error, %Ecto.Changeset{} = changeset} ->
                 render(conn, "bulk_new.html", course: course, changeset: changeset, role_list: @course_admin_roles)
 
-              {:error, message} ->
-                changeset = Accounts.change_course__role(%Course_Role{})
-                conn
-                |> put_flash(:error, message)
-                |> render("bulk_new.html", course: course, changeset: changeset, role_list: @course_admin_roles)
+              {:error, message} -> render_error(conn, message)
               end
             end
 
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 
@@ -130,13 +118,7 @@ defmodule AppWeb.Course_RoleController do
         user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
         render(conn, "new.html", changeset: changeset, course: course, role_list: @course_admin_roles, user_list: user_list)
 
-      {:error, message} ->
-        list = Accounts.list_users_for_course__roles(user_auth, course)
-        user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-        changeset = Accounts.change_course__role(%Course_Role{})
-        conn
-        |> put_flash(:error, message)
-        |> render("new.html", changeset: changeset, course: course, role_list: @course_admin_roles, user_list: user_list)
+      {:error, message} -> render_error(conn, message)
     end
   end
 
@@ -170,10 +152,11 @@ defmodule AppWeb.Course_RoleController do
       {:error, %Ecto.Changeset{} = changeset} ->
         course__role = Accounts.get_course__role!(String.to_integer(id))
         course = Courses.get_course!(course__role.course_id)
-        changeset = Accounts.change_course__role(course__role)
         list = Accounts.list_users_for_course__roles(user, course)
         user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
         render(conn, "edit.html", course__role: course__role, changeset: changeset, course: course, role_list: @course_admin_roles, user_list: user_list)
+
+      {:error, message} -> render_error(conn, message)
     end
   end
 
@@ -181,10 +164,13 @@ defmodule AppWeb.Course_RoleController do
     course__role = Accounts.get_course__role!(id)
     course = Courses.get_course!(course__role.course_id)
     user = conn.assigns.current_user
-    {:ok, _course__role} = Accounts.delete_course__role(user, course__role)
+    case Accounts.delete_course__role(user, course__role) do
+    {:ok, _course__role} ->
+      conn
+      |> put_flash(:success, "Course  role deleted successfully.")
+      |> redirect(to: Routes.course_course__role_path(conn, :index, course))
 
-    conn
-    |> put_flash(:success, "Course  role deleted successfully.")
-    |> redirect(to: Routes.course_course__role_path(conn, :index, course))
+    {:error, message} -> render_error(conn, message)
+    end
   end
 end

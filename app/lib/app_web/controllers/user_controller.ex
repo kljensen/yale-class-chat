@@ -29,7 +29,7 @@ defmodule AppWeb.UserController do
   def show(conn, %{"id" => id}) do
     case id == to_string(conn.assigns.current_user.id) do
       true ->
-        user = unless id == "new", do: user = Accounts.get_user!(id)
+        user = unless id == "new", do: Accounts.get_user!(id)
         render(conn, "show.html", user: user)
       false ->
         conn

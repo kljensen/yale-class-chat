@@ -20,11 +20,7 @@ defmodule AppWeb.SectionController do
       true ->
         changeset = Courses.change_section(%Section{})
         render(conn, "new.html", changeset: changeset, course: course)
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
     end
   end
 
@@ -41,24 +37,7 @@ defmodule AppWeb.SectionController do
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset, course: course)
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          _ ->
-            changeset = Courses.change_section(%Section{})
-            conn
-            |> put_flash(:error, message)
-            |> render("new.html", changeset: changeset, course: course)
-          end
+      {:error, message} -> render_error(conn, message)
       end
   end
 
@@ -70,24 +49,7 @@ defmodule AppWeb.SectionController do
         topics = Topics.list_user_topics(user, section)
         can_edit = App.Accounts.can_edit_section(user, section)
         render(conn, "show.html", course: course, section: section, topics: topics, can_edit: can_edit)
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          _ ->
-            changeset = Courses.change_section(%Section{})
-            conn
-            |> put_flash(:error, message)
-            |> redirect(to: "/")
-        end
+      {:error, message} -> render_error(conn, message)
     end
   end
 
@@ -100,30 +62,9 @@ defmodule AppWeb.SectionController do
             course = section.course
             changeset = Courses.change_section(section)
             render(conn, "edit.html", section: section, changeset: changeset, course: course)
-          false ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+          false -> render_error(conn, "forbidden")
         end
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          _ ->
-            changeset = Courses.change_section(%Section{})
-            conn
-            |> put_flash(:error, message)
-            |> redirect(to: "/")
-        end
+      {:error, message} -> render_error(conn, message)
     end
   end
 
@@ -141,24 +82,7 @@ defmodule AppWeb.SectionController do
         course = section.course
         render(conn, "edit.html", section: section, changeset: changeset, course: course)
 
-      {:error, message} ->
-        case message do
-          "forbidden" ->
-            conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
-          "not found" ->
-            conn
-            |> put_status(:not_found)
-            |> put_view(AppWeb.ErrorView)
-            |> render("404.html")
-          _ ->
-            changeset = Courses.change_section(%Section{})
-            conn
-            |> put_flash(:error, message)
-            |> redirect(to: "/")
-        end
+      {:error, message} -> render_error(conn, message)
     end
   end
 
@@ -174,11 +98,7 @@ defmodule AppWeb.SectionController do
         |> put_flash(:success, "Section deleted successfully.")
         |> redirect(to: Routes.course_path(conn, :show, cid))
 
-      false ->
-        conn
-            |> put_status(:forbidden)
-            |> put_view(AppWeb.ErrorView)
-            |> render("403.html")
+      false -> render_error(conn, "forbidden")
       end
   end
 end

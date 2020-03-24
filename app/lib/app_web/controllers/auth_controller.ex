@@ -22,7 +22,7 @@ defmodule AppWeb.AuthController do
   end
 
   def callback(%{assigns: %{ueberauth_auth: %{uid: uid}}} = conn, _params) do
-    {ok, user} = App.Accounts.create_user_on_login(uid)
+    {:ok, _user} = App.Accounts.create_user_on_login(uid)
 
     conn
     |> clear_flash()
