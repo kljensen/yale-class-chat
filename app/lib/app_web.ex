@@ -55,6 +55,7 @@ defmodule AppWeb do
       import Plug.Conn
       import Phoenix.Controller
       import Phoenix.LiveView.Router
+      import AppWeb.FriendlyRedirect
     end
   end
 

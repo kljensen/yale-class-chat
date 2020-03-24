@@ -38,8 +38,8 @@ defmodule AppWeb.TopicController do
         selected_sections = Map.values(Map.new(sections))
         {:ok, current_time} = DateTime.now("America/New_York")
 
-        topic_params = Map.put(topic_params, "opened_at", convert_NYC_datetime_to_db(topic_params["opened_at"]))
-        topic_params = Map.put(topic_params, "closed_at", convert_NYC_datetime_to_db(closed_at_raw = topic_params["closed_at"]))
+        topic_params = Map.put(topic_params, "opened_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db(topic_params["opened_at"]))
+        topic_params = Map.put(topic_params, "closed_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db(topic_params["closed_at"]))
 
         case section_ids do
           nil ->

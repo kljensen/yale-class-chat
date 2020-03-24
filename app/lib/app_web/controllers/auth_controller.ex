@@ -28,7 +28,7 @@ defmodule AppWeb.AuthController do
     |> clear_flash()
     |> put_flash(:success, "Successfully authenticated.")
     |> put_session(:uid, uid)
-    |> redirect(to: "/")
+    |> redirect(to: AppWeb.FriendlyRedirect.target_path(conn))
   end
 
   def delete(conn, _params) do

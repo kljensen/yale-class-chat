@@ -7,6 +7,7 @@ defmodule AppWeb.Router do
     plug :fetch_live_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :store_path_in_session
     plug AppWeb.Plug.SetCurrentUser
   end
 
