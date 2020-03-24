@@ -37,18 +37,9 @@ defmodule AppWeb.TopicController do
         sections = Enum.map(section_map, fn [value, key] -> {:"#{key}", value} end)
         selected_sections = Map.values(Map.new(sections))
         {:ok, current_time} = DateTime.now("America/New_York")
-        opened_at_raw = topic_params["opened_at"]
-        {:ok, opened_at} = NaiveDateTime.new(String.to_integer(opened_at_raw["year"]), String.to_integer(opened_at_raw["month"]), String.to_integer(opened_at_raw["day"]), String.to_integer(opened_at_raw["hour"]), String.to_integer(opened_at_raw["minute"]), 0)
-        {:ok, opened_at} = DateTime.from_naive(opened_at, "America/New_York")
-        {:ok, opened_at} = DateTime.shift_zone(opened_at, "Etc/UTC")
 
-        closed_at_raw = topic_params["closed_at"]
-        {:ok, closed_at} = NaiveDateTime.new(String.to_integer(closed_at_raw["year"]), String.to_integer(closed_at_raw["month"]), String.to_integer(closed_at_raw["day"]), String.to_integer(closed_at_raw["hour"]), String.to_integer(closed_at_raw["minute"]), 0)
-        {:ok, closed_at} = DateTime.from_naive(closed_at, "America/New_York")
-        {:ok, closed_at} = DateTime.shift_zone(closed_at, "Etc/UTC")
-
-        topic_params = Map.put(topic_params, "opened_at", opened_at)
-        topic_params = Map.put(topic_params, "closed_at", closed_at)
+        topic_params = Map.put(topic_params, "opened_at", convert_NYC_datetime_to_db(topic_params["opened_at"]))
+        topic_params = Map.put(topic_params, "closed_at", convert_NYC_datetime_to_db(closed_at_raw = topic_params["closed_at"]))
 
         case section_ids do
           nil ->
