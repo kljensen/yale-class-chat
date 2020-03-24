@@ -15,23 +15,25 @@ defmodule AppWeb.RatingControllerTest do
     rating
   end
 
-  describe "index" do
-    test "lists all ratings", %{conn: conn, submission: submission} do
-      conn = conn
-        |> init_test_session(uid: "faculty net id")
-        |> get(Routes.submission_rating_path(conn, :index, submission))
-      assert html_response(conn, 200) =~ "Listing Ratings"
-    end
-  end
+  # Disabling - no more new rating form, replaced by JS on dropdown on submission page
+  #describe "index" do
+  #  test "lists all ratings", %{conn: conn, submission: submission} do
+  #    conn = conn
+  #      |> init_test_session(uid: "faculty net id")
+  #      |> get(Routes.submission_rating_path(conn, :index, submission))
+  #    assert html_response(conn, 200) =~ "Listing Ratings"
+  #  end
+  #end
 
-  describe "new rating" do
-    test "renders form", %{conn: conn, submission: submission} do
-      conn = conn
-        |> init_test_session(uid: "faculty net id")
-        |> get(Routes.submission_rating_path(conn, :new, submission))
-      assert html_response(conn, 200) =~ "New Rating"
-    end
-  end
+  # Disabling - no more new rating form, replaced by JS on dropdown on submission page
+  #describe "new rating" do
+  #  test "renders form", %{conn: conn, submission: submission} do
+  #    conn = conn
+  #      |> init_test_session(uid: "faculty net id")
+  #      |> get(Routes.submission_rating_path(conn, :new, submission))
+  #    assert html_response(conn, 200) =~ "New Rating"
+  #  end
+  #end
 
   describe "create rating" do
     test "redirects to show when data is valid", %{conn: conn, submission: submission} do
@@ -95,8 +97,8 @@ defmodule AppWeb.RatingControllerTest do
         |> init_test_session(uid: "faculty net id")
         |> delete(Routes.rating_path(conn, :delete, rating))
       assert redirected_to(conn) == Routes.submission_path(conn, :show, submission)
-      assert_error_sent 404, fn ->
-        get(conn, Routes.submission_rating_path(conn, :show, rating, submission))
+      assert_raise Ecto.NoResultsError, fn ->
+        Submissions.get_rating!(rating.id)
       end
     end
   end
