@@ -73,6 +73,9 @@ defmodule AppWeb.Router do
     resources "/submissions", SubmissionController, only: [:edit, :show, :update, :delete]
     resources "/comments", CommentController, only: [:edit, :update, :delete]
     resources "/ratings", RatingController, only: [:edit, :update, :delete]
+
+    get "/superuser", SuperuserController, :index
+    get "/superuser/switch", SuperuserController, :switch
   end
 
 

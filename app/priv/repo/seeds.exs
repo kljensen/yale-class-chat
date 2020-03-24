@@ -30,6 +30,7 @@ defmodule App.DatabaseSeeder do
     %{display_name: "Student 4", email: "stu4@yale.edu", net_id: "stu4", is_faculty: false},
     %{display_name: "Student 5", email: "stu5@yale.edu", net_id: "stu5", is_faculty: false}
   ]
+  @superuser %{display_name: "SuperUser", email: "super@yale.edu", net_id: "super1", is_faculty: false, is_superuser: true}
   @semester_list [
     %{name: "Fall 2019", term_code: "201903"},
     %{name: "Spring 2020", term_code: "202001"}
@@ -117,6 +118,7 @@ defmodule App.DatabaseSeeder do
   def insert_users do
     Enum.each(@prof_list, &Accounts.create_user/1)
     Enum.each(@student_list, &Accounts.create_user/1)
+    Accounts.create_user(@superuser)
   end
 
   def insert_semesters do

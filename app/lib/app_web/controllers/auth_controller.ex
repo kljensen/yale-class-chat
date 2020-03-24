@@ -22,12 +22,14 @@ defmodule AppWeb.AuthController do
   end
 
   def callback(%{assigns: %{ueberauth_auth: %{uid: uid}}} = conn, _params) do
-    {:ok, _user} = App.Accounts.create_user_on_login(uid)
+    {:ok, user} = App.Accounts.create_user_on_login(uid)
 
     conn
     |> clear_flash()
     |> put_flash(:success, "Successfully authenticated.")
     |> put_session(:uid, uid)
+    |> put_session(:true_uid, uid)
+    |> put_session(:is_superuser, user.is_superuser)
     |> redirect(to: AppWeb.FriendlyRedirect.target_path(conn))
   end
 
@@ -37,6 +39,5 @@ defmodule AppWeb.AuthController do
     |> put_flash(:info, "You have been logged out!")
     |> redirect(to: "/")
   end
-
 
 end
