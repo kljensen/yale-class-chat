@@ -5,7 +5,7 @@ defmodule AppWeb.TopicController do
   alias App.Topics.Topic
   alias App.Courses
   alias App.Submissions
-
+  alias Phoenix.LiveView
 
 
   @sort_list ["date - ascending", "date - descending", "rating - ascending", "rating - descending", "rating - ascending", "random"]
@@ -76,24 +76,13 @@ defmodule AppWeb.TopicController do
 
   def show(conn, %{"id" => id}) do
     user = conn.assigns.current_user
-    case Topics.get_user_topic(user, id) do
+    case Topics.user_can_view_topic(user, id) do
       {:ok, topic} ->
-        can_edit = App.Accounts.can_edit_topic(user, topic)
-        section = topic.section
-        course = topic.section.course
-        submissions = case topic.show_user_submissions do
-          true ->
-            Submissions.list_user_submissions(user, topic)
-          false ->
-            case can_edit do
-              true ->
-                Submissions.list_user_submissions(user, topic)
-              false ->
-                Submissions.list_user_own_submissions(user, topic)
-              end
-          end
-        render(conn, "show.html", topic: topic, submissions: submissions, can_edit: can_edit, uid: user.id, section: section, course: course)
-
+        LiveView.Controller.live_render(
+          conn,
+          AppWeb.TopicLive,
+          session: %{"uid" => user.id, "id" => id}
+        )
       {:error, message} -> render_error(conn, message)
       end
   end
