@@ -12,6 +12,7 @@ defmodule App.Topics do
   alias App.Repo
 
   alias App.Topics.Topic
+  alias App.Submissions
 
   @doc """
   Returns the list of topics.
@@ -90,8 +91,8 @@ defmodule App.Topics do
   end
 
   def get_topic_data_for_user(uid, topic_id) do
-    topic = Topic.get_topic!(topic_id)
-    user = App.Accounts.get_user_by(uid)
+    topic = get_with_couse_and_section(topic_id)
+    user = App.Accounts.get_user!(uid)
     can_edit = App.Accounts.can_edit_topic(user, topic)
     section = topic.section
     course = topic.section.course
@@ -129,21 +130,23 @@ defmodule App.Topics do
     get_user_topic(user, topic_id)
   end
 
-  def get_user_topic(%App.Accounts.User{} = user, topic_id) do
-    allowed_course_roles = @course_admin_roles
-    uid = user.id
+  def get_with_couse_and_section(id) do
     query = from t in Topic,
-              where: t.id == ^topic_id,
+              where: t.id == ^id,
               left_join: s in assoc(t, :section),
               on: t.section_id == s.id,
               left_join: c in assoc(s, :course),
               on: s.course_id == c.id,
               select: t
-    result = if !is_nil(query) do
-      query = query
-        |> preload([t, s, c], [section: {s, course: c}])
-      Repo.one(query)
-    end
+    query
+    |> preload([t, s, c], [section: {s, course: c}])
+    |> Repo.one()
+  end
+
+  def get_user_topic(%App.Accounts.User{} = user, topic_id) do
+    allowed_course_roles = @course_admin_roles
+    uid = user.id
+    result = get_with_couse_and_section(topic_id)
 
     if is_nil(result) do
       query = from t in Topic, where: t.id == ^topic_id
