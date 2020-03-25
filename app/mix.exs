@@ -70,6 +70,8 @@ defmodule App.MixProject do
       {:hackney, "~> 1.15.2"},
       # Use LDAPEx for LDAP queries
       {:ldap_ex, "~> 0.2.2"}
+      # Use poison for JSON parsing
+      {:poison, "~> 3.1"}
     ]
   end
 
