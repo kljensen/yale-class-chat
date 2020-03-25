@@ -5,7 +5,7 @@ defmodule AppWeb.TopicController do
   alias App.Topics.Topic
   alias App.Courses
   alias App.Submissions
-
+  alias Phoenix.LiveView
 
 
   @sort_list ["date - ascending", "date - descending", "rating - ascending", "rating - descending", "rating - ascending", "random"]
@@ -76,7 +76,7 @@ defmodule AppWeb.TopicController do
 
   def show(conn, %{"id" => id}) do
     user = conn.assigns.current_user
-    case Topics.get_user_topic(user, id) do
+    case Topics.user_can_view_topic(user, id) do
       {:ok, topic} ->
         can_edit = App.Accounts.can_edit_topic(user, topic)
         section = topic.section

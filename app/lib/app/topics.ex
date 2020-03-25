@@ -89,6 +89,26 @@ defmodule App.Topics do
     Repo.all(query)
   end
 
+  def get_topic_data_for_user(uid, topic_id) do
+    topic = Topic.get_topic!(topic_id)
+    user = App.Accounts.get_user_by(uid)
+    can_edit = App.Accounts.can_edit_topic(user, topic)
+    section = topic.section
+    course = topic.section.course
+    submissions = case topic.show_user_submissions do
+      true ->
+        Submissions.list_user_submissions(user, topic)
+      false ->
+        case can_edit do
+          true ->
+            Submissions.list_user_submissions(user, topic)
+          false ->
+            Submissions.list_user_own_submissions(user, topic)
+          end
+      end
+    %{topic: topic, submissions: submissions, can_edit: can_edit, uid: user.id, section: section, course: course}
+  end
+
   @doc """
   Gets a single topic.
 
@@ -104,6 +124,10 @@ defmodule App.Topics do
 
   """
   def get_topic!(id), do: Repo.get!(Topic, id)
+
+  def user_can_view_topic(%App.Accounts.User{} = user, topic_id) do
+    get_user_topic(user, topic_id)
+  end
 
   def get_user_topic(%App.Accounts.User{} = user, topic_id) do
     allowed_course_roles = @course_admin_roles

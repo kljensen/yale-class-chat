@@ -3,7 +3,7 @@ defmodule App.Notifications do
   use GenServer
   alias App.Repo
   require Logger
-
+  require Phoenix.PubSub
   @moduledoc """
   # App.Notifications
 
@@ -26,12 +26,14 @@ defmodule App.Notifications do
   def init(_opts) do
     {:ok, pid} = Postgrex.Notifications.start_link(App.Repo.config()) 
     ref = Postgrex.Notifications.listen!(pid, @channel)
-
     {:ok, {pid, ref, @channel}}
   end
 
   @impl true
   def handle_info({:notification, _pid, _ref, @channel, payload}, opts \\ []) do
+
+    Phoenix.PubSub.broadcast!(App.PubSub, "foo", %{})
+
     with {:ok, data} <- Poison.decode(payload, keys: :atoms) do
       data
       |> inspect()
