@@ -1,0 +1,89 @@
+<div class="uk-margin-bottom">
+    <div class="uk-padding-small topic-title">
+    <h1 class="uk-heading-divider"><%= @topic.title %></h1>
+    <%= render AppWeb.HelperView, "multiparagraph_text.html", text: @topic.description %>
+
+    <% topic_status = cond do
+
+    DateTime.compare(@topic.closed_at, current_time(0)) == :lt ->
+    "closed"
+    DateTime.compare(@topic.opened_at, current_time(0)) == :gt ->
+    "closed"
+    true ->
+    "open"
+    end %>
+
+    <%= if @can_edit do %>
+    <hr>
+    <div>
+    <%= link "Edit", to: Routes.topic_path(@conn, :edit, @topic.id) %>
+    |
+    <%= link "Delete", to: Routes.topic_path(@conn, :delete, @topic.id), method: :delete, data: [confirm: "Are you sure?"] %>
+    <p><%= if @topic.anonymous, do: "posted submissions are anonymous / " %>
+    <%= "topic is " <> topic_status <>" / " %>
+    <%= "submissions: "%><%= if @topic.allow_submissions == false, do: "not "%><%= "allowed /"%>
+    <%= "comments: "%><%= if @topic.allow_submission_comments == false, do: "not "%><%= "allowed /"%>
+    <%= "ratings: "%><%= if @topic.allow_submission_voting == false, do: "not "%><%= "allowed /"%>
+    <%= "viewing other user submissions: "%><%= if @topic.show_user_submissions == false, do: "not "%><%= "allowed"%>
+    <%= "submission limit: "%><%= Integer.to_string(@topic.user_submission_limit) %>
+    </p>
+    </div>
+    <% end %>
+
+    </div>
+
+</div>
+
+
+<div class="uk-grid-column-medium uk-grid-row-medium uk-child-width-1-2@s " uk-grid>
+    <%= for {submission, i} <- Enum.with_index(@submissions) do %>
+        <div>
+            <a href="<%= Routes.submission_path(@conn, :show, submission.id) %>">
+                <div class="uk-card uk-card-small uk-card-default uk-card-hover color-<%= 1 + rem submission.id, 20 %>">
+                    <div class="uk-card-header">
+                        <div class="uk-width-expand">
+                            <h5 class="uk-card-title uk-margin-remove-bottom">
+                                <%= submission.title %>
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="uk-card-body">
+                        <div class="uk-width-expand">
+                            <%= render AppWeb.HelperView, "multiparagraph_text.html", text: submission.description, truncate: true %>
+                        </div>
+                    </div>
+                    <div class="uk-card-footer">
+                        <div class="details uk-width-expand">
+                            <%= if @topic.anonymous do %>
+                            <% else %>
+                            <b><%= submission.user_display_name %></b>
+                            /
+                            <% end %>
+                            <%= if submission.rating_count > 0 do %>
+                            <%= stars submission.avg_rating %>
+                            (<%= submission.rating_count |> Integer.to_string %>
+                             <%= if submission.rating_count > 1 do %>ratings<% else %>rating<% end %>)
+                            <% else %>
+                                No ratings yet.
+                            <% end %>
+                            <span class="comment-icon-count">
+                                <span class="comment-icon" uk-icon="icon:  comments; ratio: 0.7"></span>
+                                <%= submission.comment_count |> Integer.to_string %>
+                            </span>
+
+                            |
+                            <span>Posted at: </span><span class="rating"><%= submission.inserted_at %>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    <% end %>
+</div>
+
+<div class="uk-position-fixed uk-position-z-index absolute uk-dark uk-position-bottom-right">
+<a href=<%= Routes.topic_submission_path(@conn, :new, @topic.id) %> class="add uk-box-shadow-small uk-box-shadow-hover-large" uk-marker></a>
+</div>
+
+
+
