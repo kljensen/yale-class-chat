@@ -76,13 +76,12 @@ defmodule AppWeb.TopicController do
 
   def show(conn, %{"id" => id}) do
     user = conn.assigns.current_user
+    # TODO: notice I'm pulling in data multiple times here. Should
+    # Fix this. Most of these controllers need to be refactored.
     case Topics.user_can_view_topic(user, id) do
       {:ok, topic} ->
-        LiveView.Controller.live_render(
-          conn,
-          AppWeb.TopicLive,
-          session: %{"uid" => user.id, "id" => id}
-        )
+        topic_data = App.Topics.get_topic_data_for_user_id(user.id, id)
+        render(conn, "show.html", topic_data)
       {:error, message} -> render_error(conn, message)
       end
   end

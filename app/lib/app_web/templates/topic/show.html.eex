@@ -34,9 +34,6 @@
 
 </div>
 
-<div style="background-color: white; margin: 2em 1em; padding: 1em; border: 1px solid #999;">
-    <%= live_render(@conn, AppWeb.TopicLive, session: %{"extra_token" => "foo"}) %>
-</div>
 
 <div class="uk-grid-column-medium uk-grid-row-medium uk-child-width-1-2@s " uk-grid>
     <%= for {submission, i} <- Enum.with_index(@submissions) do %>

@@ -3,6 +3,7 @@ defmodule App.Topics do
   @course_admin_roles ["administrator", "owner"]
   @section_write_roles ["student"]
   @section_read_roles ["student", "defunct_student", "guest"]
+  require Logger
 
   @moduledoc """
   The Topics context.
@@ -10,7 +11,7 @@ defmodule App.Topics do
 
   import Ecto.Query, warn: false
   alias App.Repo
-
+  alias App.Accounts.User
   alias App.Topics.Topic
   alias App.Submissions
 
@@ -90,9 +91,21 @@ defmodule App.Topics do
     Repo.all(query)
   end
 
-  def get_topic_data_for_user(uid, topic_id) do
+  # TODO: clean up these methods. Notice that these
+  # are making two database round trips. We should be
+  # able to make a query that takes either net_id or
+  # id and get the same result in a single trip.
+  def get_topic_data_for_user_id(user_id, topic_id) do
+    user = App.Accounts.get_user!(user_id)
+    get_topic_data_for_user(user, topic_id)
+  end
+  def get_topic_data_for_net_id(net_id, topic_id) do
+    user = Repo.get_by!(User, net_id: net_id)
+    get_topic_data_for_user(user, topic_id)
+  end
+
+  def get_topic_data_for_user(user, topic_id) do
     topic = get_with_couse_and_section(topic_id)
-    user = App.Accounts.get_user!(uid)
     can_edit = App.Accounts.can_edit_topic(user, topic)
     section = topic.section
     course = topic.section.course
