@@ -1,5 +1,6 @@
 defmodule AppWeb.Router do
   use AppWeb, :router
+  import Phoenix.LiveView.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -38,6 +39,8 @@ defmodule AppWeb.Router do
 
   scope "/", AppWeb do
     pipe_through [:browser, :auth]
+
+    live "/live/topics/:id", TopicLive
 
     #get "/", PageController, :index
     resources "/courses", CourseController do
