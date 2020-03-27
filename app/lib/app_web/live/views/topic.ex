@@ -10,10 +10,8 @@ defmodule AppWeb.TopicLive do
     Phoenix.View.render(AppWeb.TopicView, "live.html", assigns)
   end
 
-  defp subscribe(model, id) do
-    notification_topic = App.Notifications.topic_for_model_and_id(model, id)
-    # TODO: changeme
-    # notification_topic = App.Notifications.topic_for_all()
+  defp subscribe(id) do
+    notification_topic = App.Notifications.key_for_model_and_id(Topic, id)
     {Phoenix.PubSub.subscribe(App.PubSub, notification_topic), notification_topic}
   end
 
@@ -53,7 +51,7 @@ defmodule AppWeb.TopicLive do
   def mount(%{"id" => id}, %{"uid" => net_id}, socket) do
     Logger.info("....in mount BEGIN\n\n")
     if connected?(socket) do
-      {:ok, topic_name} = subscribe(Topic, id)
+      {:ok, topic_name} = subscribe(id)
     end
 
     socket = socket 
@@ -68,6 +66,14 @@ defmodule AppWeb.TopicLive do
     # I think that's the only way in which I'm depending on the @conn.
     # TODO: refactor. One easy way is to pre-load all the routes we
     # need into assigns. Another, I should look at
+
+    # I need to get updated when any of this information changes.
+    # What is the easiest way to do this? I can
+    # * Listen to id-based updates for topic, submission. But, for
+    #   rating, I would need to listen to fk based update. I could
+    #   either patch the state or entirely refresh.
+    # * Write a function that says "something related to this topic
+    #   changed". Then I would entirely refresh state.
 
     {:ok, socket}
   end

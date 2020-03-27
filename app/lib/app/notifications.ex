@@ -33,6 +33,7 @@ defmodule App.Notifications do
   def init(_opts) do
     {:ok, pid} = Postgrex.Notifications.start_link(App.Repo.config()) 
     ref = Postgrex.Notifications.listen!(pid, @pg_channel)
+    ref = Postgrex.Notifications.listen!(pid, "events:details")
     {:ok, {pid, ref, @pg_channel}}
   end
 
@@ -53,66 +54,88 @@ defmodule App.Notifications do
 
 
   @doc """
-  Topic for when you want to track all changes. You'll
+  Key for when you want to track all changes. You'll
   get any change to any table that has a trigger sending
   `pg_notify` messages to the `@pg_channel`.
   """
-  def topic_for_all() do
+  def key_for_all() do
     "#{@topic_key_prefix}"
   end
 
   @doc """
-  Topic for when you want to track changes to a table,
+  Key for when you want to track changes to a table,
   e.g. "comments", or "topics"
   """
-  def topic_for_table(table) do
+  def key_for_table(table) do
     "#{@topic_key_prefix}:#{table}"
   end
 
   @doc """
-  Topic for when you want to track changes a row of a table
+  Key for when you want to track changes a row of a table
   with a particular id, e.g. "comments" and 53.
   """
-  def topic_for_table_and_id(table, id) do
+  def key_for_table_and_id(table, id) do
     "#{@topic_key_prefix}:#{table}:#{id}"
+  end
+
+  @doc """
+  Key for when you want to track changes a row of a table
+  with a particular fk, e.g. "comments" and "submission_id" = 53.
+  """
+  def key_for_table_and_fk(table, fk, id) do
+    "#{@topic_key_prefix}:#{table}:#{fk}=#{id}"
   end
 
   @doc """
   Topic if you want to know when there is an "UPDATE", "INSERT",
   or "DELETE" operation on a table.
   """
-  def topic_for_table_and_change_type(table, change_type) do
+  def key_for_table_and_change_type(table, change_type) do
     "#{@topic_key_prefix}:#{table}:#{change_type}"
   end
 
   @doc """
-  Topic for when you want to track changes to a model,
+  Key for when you want to track changes to a model,
   e.g. "Comment", or "Topic"
   """
-  def topic_for_model(model) do
+  def key_for_model(model) do
     model
     |> table_name_for_model()
-    |> topic_for_table()
+    |> key_for_table()
   end
 
   @doc """
-  Topic for when you want to track changes a row of a model
+  Key for when you want to track changes a row of a model
   with a particular id, e.g. `Comment` and 53.
   """
-  def topic_for_model_and_id(model, id) do
+  def key_for_model_and_id(model, id) do
     model
     |> table_name_for_model()
-    |> topic_for_table_and_id(id)
+    |> key_for_table_and_id(id)
+  end
+
+  @doc """
+  Key for when you want to track changes a row of a model
+  with a particular fk, e.g. `Comment` and `Submission` with id 53.
+  In that case, we'd like to know whenever an event occurs
+  involving a `Comment` that has a foreign key to a `Submission`
+  with `id=53`. We assume the foreign key is `submission_id`.
+  """
+  def key_for_model_and_fk(model, fk_model, id) do
+    table = table_name_for_model(model)
+    fk_table = table_name_for_model(fk_model)
+    fk = "#{fk_table}_id"
+    key_for_table_and_fk(table, fk, id)
   end
 
   @doc """
   Topic if you want to know when there is an "UPDATE", "INSERT",
   or "DELETE" operation on a model, e.g. `Comment`.
   """
-  def topic_for_model_and_change_type(model, change_type) do
+  def key_for_model_and_change_type(model, change_type) do
     model
     |> table_name_for_model()
-    |> topic_for_table_and_change_type(change_type)
+    |> key_for_table_and_change_type(change_type)
   end
 
 
@@ -126,10 +149,10 @@ defmodule App.Notifications do
   """
   defp keys_for_pg_notification(%{table: table, type: type, data: %{id: id}}) do
     [
-      topic_for_all(),
-      topic_for_table(table),
-      topic_for_table_and_change_type(table, type),
-      topic_for_table_and_id(table, id)
+      key_for_all(),
+      key_for_table(table),
+      key_for_table_and_change_type(table, type),
+      key_for_table_and_id(table, id)
     ]
   end
 
@@ -145,12 +168,29 @@ defmodule App.Notifications do
   end
 
   @impl true
-  def handle_info({:notification, _pid, _ref, @pg_channel, notification_payload}, opts \\ []) do
+  def handle_info({:notification, _pid, _ref, @pg_channel, notification_payload}, _opts \\ []) do
     with {:ok, pg_notification} <- Poison.decode(notification_payload, keys: :atoms) do
       pg_notification
       |> inspect()
       |> Logger.info()
       broadcast_change(pg_notification)
+      {:noreply, :event_handled}
+    else
+      error -> {:stop, error, []}
+    end
+  end
+
+  @impl true
+  def handle_info({:notification, _pid, _ref, "events:details", notification_payload}, _opts) do
+    Logger.info("got notification for events:details")
+    notification_payload
+    |> inspect()
+    |> Logger.info()
+
+    with {:ok, pg_notification} <- Poison.decode(notification_payload, keys: :atoms) do
+      pg_notification
+      |> inspect()
+      |> Logger.info()
       {:noreply, :event_handled}
     else
       error -> {:stop, error, []}
