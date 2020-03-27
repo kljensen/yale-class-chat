@@ -1,0 +1,41 @@
+<div>
+    <a href="<%= Routes.submission_path(@conn, :show, @submission.id) %>">
+        <div class="uk-card uk-card-small uk-card-default uk-card-hover color-<%= 1 + rem @submission.id, 20 %>">
+            <div class="uk-card-header">
+                <div class="uk-width-expand">
+                    <h5 class="uk-card-title uk-margin-remove-bottom">
+                        <%= @submission.title %>
+                    </h5>
+                </div>
+            </div>
+            <div class="uk-card-body">
+                <div class="uk-width-expand">
+                    <%= render AppWeb.HelperView, "multiparagraph_text.html", text: @submission.description, truncate: true %>
+                </div>
+            </div>
+            <div class="uk-card-footer">
+                <div class="details uk-width-expand">
+                    <%= if @topic.anonymous do %>
+                    <% else %>
+                    <b><%= @submission.user_display_name %></b>
+                    /
+                    <% end %>
+                    <%= if @submission.rating_count > 0 do %>
+                    <%= stars @submission.avg_rating %>
+                    (<%= @submission.rating_count |> Integer.to_string %>
+                        <%= if @submission.rating_count > 1 do %>ratings<% else %>rating<% end %>)
+                    <% else %>
+                        No ratings yet.
+                    <% end %>
+                    <span class="comment-icon-count">
+                        <span class="comment-icon" uk-icon="icon:  comments; ratio: 0.7"></span>
+                        <%= @submission.comment_count |> Integer.to_string %>
+                    </span>
+
+                    |
+                    <span>Posted at: <%= @submission.inserted_at %></span>
+                </div>
+            </div>
+        </div>
+    </a>
+</div>
