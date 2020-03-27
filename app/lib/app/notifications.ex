@@ -137,6 +137,7 @@ defmodule App.Notifications do
   Takes a decoded payload and broadcasts it to the appropriate topic.
   """
   defp broadcast_change(pg_change_payload) do
+    Logger.info("Broadcasting change..")
     do_broadcast = fn key -> broadcast!(key, pg_change_payload) end
     pg_change_payload
     |> keys_for_pg_notification()
@@ -146,9 +147,9 @@ defmodule App.Notifications do
   @impl true
   def handle_info({:notification, _pid, _ref, @pg_channel, notification_payload}, opts \\ []) do
     with {:ok, pg_notification} <- Poison.decode(notification_payload, keys: :atoms) do
-      # pg_notification
-      # |> inspect()
-      # |> Logger.info()
+      pg_notification
+      |> inspect()
+      |> Logger.info()
       broadcast_change(pg_notification)
       {:noreply, :event_handled}
     else

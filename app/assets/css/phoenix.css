@@ -85,6 +85,17 @@ nav {
     text-decoration: none;
 }
 
+.card-holder {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -15px;
+}
+
+.card-holder > div {
+    flex: 1 1 47%;
+    margin: 0 15px 30px 15px;
+}
+
 .topic-title, .submission-body {
     background-color: white;
 }
@@ -121,13 +132,30 @@ span.vote span {
     color: #999;
 }
 
-a.add {
+div.mobile-add-button {
+    position: fixed;
+    right: 2em;
+    bottom: 2em;
+    background-color: black;
+    border-radius: 50%;
+    width: 2em;
+    height: 2em; 
+    text-align: center;
+    line-height: 2em;
+    box-shadow: 0 5px 15px rgba(0,0,0,.08);
+}
+div.mobile-add-button > a {
+    color: white;
     margin-right: 1.5em;
     margin-bottom: 1em;
-    border: 1px solid #222;
+    display:block;
+    margin: auto;
 }
-a.add:hover {
-    border: 1px solid #000;
+
+/* TODO: I don't think this is working now */
+div.mobile-add-button:hover {
+    box-shadow: 0 6px 18px rgba(0,0,0,.12);
+    transition: box-shadow box-shadow-duration ease-in-out;
 }
 
 article.uk-comment{

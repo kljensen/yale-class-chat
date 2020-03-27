@@ -11,8 +11,10 @@ defmodule AppWeb.TopicLive do
   end
 
   defp subscribe(model, id) do
-    notification_topic = App.Notifications.topic_for_model(model)
-    Phoenix.PubSub.subscribe(App.PubSub, notification_topic)
+    notification_topic = App.Notifications.topic_for_model_and_id(model, id)
+    # TODO: changeme
+    # notification_topic = App.Notifications.topic_for_all()
+    {Phoenix.PubSub.subscribe(App.PubSub, notification_topic), notification_topic}
   end
 
 
@@ -20,9 +22,10 @@ defmodule AppWeb.TopicLive do
   Load topic data into the assigns. Gets net_id and topic id
   from the socket assigns.
   """
-  defp load_topic_data(%{"uid" => net_id, "id" => id} = socket) do
-    load_topic_data(socket, net_id, id)
+  defp load_topic_data(socket) do
+    load_topic_data(socket, socket.assigns.uid, socket.assigns.id)
   end
+
 
   @doc """
   Load topic data into the assigns for this net_id and topic id.
@@ -30,6 +33,13 @@ defmodule AppWeb.TopicLive do
   defp load_topic_data(socket, net_id, id) do
     topic_data = App.Topics.get_topic_data_for_net_id(net_id, id)
     assign(socket, topic_data)
+  end
+
+  @doc """
+  Adds subscriptions and removes stale subscriptions, returning
+  the socket
+  """
+  defp setup_subscriptions(socket) do
   end
 
   @doc """
@@ -41,13 +51,13 @@ defmodule AppWeb.TopicLive do
   the session variables, and the last is the socket.
   """
   def mount(%{"id" => id}, %{"uid" => net_id}, socket) do
+    Logger.info("....in mount BEGIN\n\n")
     if connected?(socket) do
-      :ok = subscribe(Topic, id)
+      {:ok, topic_name} = subscribe(Topic, id)
     end
-    temperature = 50
+
     socket = socket 
     |> assign(:id, id)
-    |> assign(:temperature, temperature)
     |> assign(:conn, AppWeb.Endpoint)
     |> load_topic_data(net_id, id)
 
@@ -59,31 +69,20 @@ defmodule AppWeb.TopicLive do
     # TODO: refactor. One easy way is to pre-load all the routes we
     # need into assigns. Another, I should look at
 
-    Logger.info("\n\n")
-    socket.assigns
-    |> inspect()
-    |> Logger.info()
-    Logger.info("....in mount DONE\n\n")
-
-    Logger.info(socket.assigns.topic.title)
-
     {:ok, socket}
   end
 
-
-
-  def handle_info(:update, socket) do
-    temperature = socket.assigns.temperature + 1
-    {:noreply, assign(socket, :temperature, temperature)}
-  end
   def handle_info(action, socket) do
     Logger.info("\n\n\n>>>>Received a pg update for topic")
     action
     |> inspect()
     |> Logger.info()
+    Logger.info("socket.assigns is")
+    socket.assigns
+    |> inspect()
+    |> Logger.info()
     Logger.info("<<<<\n\n\n")
-    temperature = socket.assigns.temperature + 1
-    {:noreply, assign(socket, :temperature, temperature)}
+    {:noreply, assign(socket, :topic, action.data)}
   end
 
 end

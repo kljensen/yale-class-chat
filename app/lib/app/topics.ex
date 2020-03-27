@@ -123,6 +123,7 @@ defmodule App.Topics do
     %{topic: topic, submissions: submissions, can_edit: can_edit, uid: user.id, section: section, course: course}
   end
 
+
   @doc """
   Gets a single topic.
 
