@@ -31,64 +31,69 @@ defmodule App.Repo.Migrations.PgNotifyBubbleUp do
   See 
   https://stackoverflow.com/questions/13227142/postgresql-9-2-row-to-json-with-nested-joins
 
-  The function `rating_change_detailed_notification` produces `pg_notify`
-  bodies that look like the following:
+  These functions and triggers produce `pg_notify`
+  bodies that look like the following. Notice that
+  the user, topic, and submission are embedded.
 
   ```json
-  {
-    "id": 4,
-    "description": "He walked into the basement with the horror movie from the night before playing in his head.",
-    "submission_id": 1,
-    "user_id": 7,
-    "inserted_at": "2020-03-25T17:10:57",
-    "updated_at": "2020-03-25T17:10:57",
-    "submission": {
-      "id": 1,
-      "title": "Is there enough &Society in this class?",
-      "description": "I'm heading back to Colorado tomorrow after being down in Santa Barbara over the weekend for the festival there. I will be making October plans once there and will try to arrange so I'm back here for the birthday if possible. I'll let you know as soon asI know the doctor's appointment schedule and my flight plans.",
-      "slug": null,
-      "image_url": "http://i.imgur.com/qZA3mCR.jpg",
-      "allow_ranking": false,
-      "visible": true,
-      "topic_id": 1,
-      "user_id": 7,
-      "inserted_at": "2020-03-25T17:10:57",
-      "updated_at": "2020-03-25T17:10:57",
-      "topic": {
-        "id": 1,
-        "title": "foo",
-        "description": "This is where you should post your problems for Assignment 1. Remember: you are posting PROBLEMS that matter -- and maybe a general approach to solving them. You are NOT posting ideas -- the development of ideas will happen through the next assignments.\n\n    “If I had an hour to solve a problem I'd spend 55 minutes thinking about the problem and five minutes thinking about solutions.” - Albert Einstein",
-        "slug": "1101Idea Board (Assignment 1)",
-        "opened_at": "2010-04-17T14:00:00",
-        "closed_at": "2100-04-17T14:00:00",
-        "allow_submissions": true,
-        "allow_submission_voting": true,
-        "anonymous": true,
-        "allow_submission_comments": true,
-        "allow_ranking": true,
-        "show_submission_comments": true,
-        "show_submission_ratings": true,
-        "show_user_submissions": true,
-        "visible": true,
-        "user_submission_limit": 42,
-        "sort": "some sort",
-        "type": "general",
-        "section_id": 1,
-        "inserted_at": "2020-03-25T17:10:57",
-        "updated_at": "2020-03-25T17:10:57"
+    {
+      "table": "ratings",
+      "type": "INSERT",
+      "data": {
+        "id": 80,
+        "score": 4,
+        "submission_id": 80,
+        "user_id": 5,
+        "inserted_at": "2020-03-27T19:23:13",
+        "updated_at": "2020-03-27T19:23:13",
+        "submission": {
+          "id": 80,
+          "title": "How many woodchucks?",
+          "description": "Dave watched as the forest burned up on the hill, only a few miles from her house. The car had been hastily packed and Marta was inside trying to round up the last of the pets. Dave went through his mental list of the most important papers and documents that they couldn't leave behind. He scolded himself for not having prepared these better in advance and hoped that he had remembered everything that was needed. He continued to wait for Marta to appear with the pets, but she still was nowhere to be seen.",
+          "slug": null,
+          "image_url": "http://i.imgur.com/KONVsYw.jpg",
+          "allow_ranking": false,
+          "visible": true,
+          "topic_id": 16,
+          "user_id": 6,
+          "inserted_at": "2020-03-27T19:23:13",
+          "updated_at": "2020-03-27T19:23:13",
+          "topic": {
+            "id": 16,
+            "title": "Help us design yale.chat!",
+            "description": "The website you're using is an experimental piece of software we hope will be helpful during the COVID crisis (and afterward!). This is being developed by SOMers Nick Peranzi and Kyle Jensen. We'd like your advice! What should an app like thisinclude? Right now we're thinking about polls, live chat, private chat, and emojis. (Emojis are top priority.)\n\n    What do you want to see in a communications platform for class? Please tell us!\n\n    ",
+            "slug": "2402Help us design yale.chat!",
+            "opened_at": "2010-04-17T14:00:00",
+            "closed_at": "2100-04-17T14:00:00",
+            "allow_submissions": true,
+            "allow_submission_voting": true,
+            "anonymous": true,
+            "allow_submission_comments": true,
+            "allow_ranking": true,
+            "show_submission_comments": true,
+            "show_submission_ratings": true,
+            "show_user_submissions": true,
+            "visible": true,
+            "user_submission_limit": 42,
+            "sort": "some sort",
+            "type": "general",
+            "section_id": 8,
+            "inserted_at": "2020-03-27T19:23:12",
+            "updated_at": "2020-03-27T19:23:12"
+          }
+        },
+        "user": {
+          "id": 5,
+          "net_id": "stu2",
+          "display_name": "Student 2",
+          "email": "stu2@yale.edu",
+          "is_faculty": false,
+          "inserted_at": "2020-03-27T19:23:05",
+          "updated_at": "2020-03-27T19:23:05",
+          "is_superuser": false
+        }
       }
-    },
-    "user": {
-      "id": 7,
-      "net_id": "stu4",
-      "display_name": "Student 4",
-      "email": "stu4@yale.edu",
-      "is_faculty": false,
-      "inserted_at": "2020-03-25T17:10:57",
-      "updated_at": "2020-03-25T17:10:57",
-      "is_superuser": false
     }
-  }
   ```
 
   Notice that sometimes this will return nil/null when something
@@ -139,7 +144,7 @@ defmodule App.Repo.Migrations.PgNotifyBubbleUp do
         payload := json_build_object(
           'table', TG_TABLE_NAME,
           'type', TG_OP,
-          'data', to_json(row_with_lineage)
+          'data', row_to_json(row_with_lineage)::json->'row'
         )::text;
 
         perform pg_notify('#{@channel}', payload);
