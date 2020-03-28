@@ -163,6 +163,55 @@ defmodule App.Repo.Migrations.PgNotifyBubbleUp do
         """
     end
 
+    execute """
+      CREATE OR REPLACE FUNCTION submissions_bubble_notification()
+      RETURNS trigger AS $$
+      DECLARE
+        current_row RECORD;
+        row_with_lineage RECORD;
+        payload TEXT;
+      BEGIN
+        IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN
+          current_row := NEW;
+        ELSE
+          current_row := OLD;
+        END IF;
+
+      -- `row_with_lineage` stores the submissions information
+      -- and information about its parent submission, topic,
+      -- and user.
+      select into row_with_lineage row
+      from (
+        select
+          s.*,
+          t as topic,
+          u as user
+        from submissions s
+        inner join users u on s.user_id = u.id
+        inner join topics t on s.topic_id = t.id
+        where s.id=current_row.id
+      ) row;
+
+      payload := json_build_object(
+        'table', TG_TABLE_NAME,
+        'type', TG_OP,
+        'data', row_to_json(row_with_lineage)::json->'row'
+      )::text;
+
+      perform pg_notify('#{@channel}', payload);
+
+      RETURN current_row;
+      END;
+      $$ LANGUAGE plpgsql
+    """
+
+    execute """
+        CREATE TRIGGER submissions_bubble_notification_tg
+        AFTER INSERT OR UPDATE OR DELETE
+        ON submissions
+        FOR EACH ROW
+        EXECUTE PROCEDURE submissions_bubble_notification();
+      """
 
   end
 end
