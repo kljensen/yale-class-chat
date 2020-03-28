@@ -29,7 +29,7 @@
 
 <div class="card-holder">
     <%= for submission <- @submissions do %>
-        <%= live_component @socket, SubmissionLiveComponent, id: submission.id, submission: submission %>
+        <%= live_component @socket, SubmissionLiveComponent, id: submission.id, submission: submission, topic: @topic %>
     <% end %>
 </div>
 

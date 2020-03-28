@@ -1,5 +1,5 @@
 <div>
-    <a href="<%= Routes.submission_path(@conn, :show, @submission.id) %>">
+    <a href="<%= Routes.submission_path(@socket, :show, @submission.id) %>">
         <div class="uk-card uk-card-small uk-card-default uk-card-hover color-<%= 1 + rem @submission.id, 20 %>">
             <div class="uk-card-header">
                 <div class="uk-width-expand">
