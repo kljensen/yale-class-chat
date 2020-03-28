@@ -15,7 +15,8 @@ defmodule App.Application do
       AppWeb.Endpoint,
       # Starts a worker by calling: App.Worker.start_link(arg)
       # {App.Worker, arg},
-      worker(App.Notifications, ["events"], id: :database_events)
+      worker(App.Notifications, ["events"], id: :database_events),
+      worker(App.LiveViewNotifications, [], id: :live_view_notifications)
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

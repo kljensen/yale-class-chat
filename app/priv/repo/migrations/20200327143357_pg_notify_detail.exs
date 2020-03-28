@@ -101,10 +101,10 @@ defmodule App.Repo.Migrations.PgNotifyBubbleUp do
   the comments are deleted by cascade.
   """
 
-  defp comment_or_rating_trigger
+  @tables ["topics", "submissions", "comments", "ratings"]
 
   @channel "events:details"
-  def change do
+  def up do
 
     similar_tables = ["comments", "ratings"]
     for table <- similar_tables do
@@ -213,5 +213,46 @@ defmodule App.Repo.Migrations.PgNotifyBubbleUp do
         EXECUTE PROCEDURE submissions_bubble_notification();
       """
 
+     execute """
+        CREATE OR REPLACE FUNCTION topics_bubble_notification()
+        RETURNS trigger AS $$
+        DECLARE
+          current_row RECORD;
+          payload TEXT;
+        BEGIN
+          IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN
+            current_row := NEW;
+          ELSE
+            current_row := OLD;
+          END IF;
+          payload := json_build_object(
+              'table', TG_TABLE_NAME,
+              'type', TG_OP,
+              'data', row_to_json(current_row)
+          )::text;
+          perform pg_notify(
+            '#{@channel}',
+            payload    
+          );
+          RETURN current_row;
+        END;
+        $$ LANGUAGE plpgsql
+      """
+
+      execute """
+        CREATE TRIGGER topics_bubble_notification_tg
+        AFTER INSERT OR UPDATE OR DELETE
+        ON topics
+        FOR EACH ROW
+        EXECUTE PROCEDURE topics_bubble_notification();
+      """
+  end
+
+  def down do
+    drop_trigger = fn table_name ->
+      execute "DROP TRIGGER IF EXISTS #{table_name}_bubble_notification_tg"
+      execute "DROP FUNCTION IF EXISTS #{table_name}_bubble_notification"
+    end
+    Enum.map(@tables, drop_trigger)
   end
 end

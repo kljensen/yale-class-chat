@@ -2,7 +2,7 @@ defmodule AppWeb.TopicLive do
   use Phoenix.LiveView
   require Logger
   require Phoenix.PubSub
-  require App.Notifications
+  require App.LiveViewNotifications
   alias App.Topics.Topic
 
 
@@ -10,18 +10,12 @@ defmodule AppWeb.TopicLive do
     Phoenix.View.render(AppWeb.TopicView, "live.html", assigns)
   end
 
-  defp subscribe(id) do
-    notification_topic = App.Notifications.key_for_model_and_id(Topic, id)
-    {Phoenix.PubSub.subscribe(App.PubSub, notification_topic), notification_topic}
-  end
-
-
   @doc """
   Load topic data into the assigns. Gets net_id and topic id
   from the socket assigns.
   """
   defp load_topic_data(socket) do
-    load_topic_data(socket, socket.assigns.uid, socket.assigns.id)
+    load_topic_data(socket, socket.assigns.net_id, socket.assigns.id)
   end
 
 
@@ -29,15 +23,12 @@ defmodule AppWeb.TopicLive do
   Load topic data into the assigns for this net_id and topic id.
   """
   defp load_topic_data(socket, net_id, id) do
+    Logger.info("About to load topic data")
+    socket.assigns
+    |> inspect()
+    |> Logger.info()
     topic_data = App.Topics.get_topic_data_for_net_id(net_id, id)
     assign(socket, topic_data)
-  end
-
-  @doc """
-  Adds subscriptions and removes stale subscriptions, returning
-  the socket
-  """
-  defp setup_subscriptions(socket) do
   end
 
   @doc """
@@ -51,11 +42,12 @@ defmodule AppWeb.TopicLive do
   def mount(%{"id" => id}, %{"uid" => net_id}, socket) do
     Logger.info("....in mount BEGIN\n\n")
     if connected?(socket) do
-      {:ok, topic_name} = subscribe(id)
+      App.LiveViewNotifications.subscribe_for_topic(id)
     end
 
     socket = socket 
     |> assign(:id, id)
+    |> assign(:net_id, net_id)
     |> assign(:conn, AppWeb.Endpoint)
     |> load_topic_data(net_id, id)
 
@@ -65,30 +57,17 @@ defmodule AppWeb.TopicLive do
     # `Routes.topic_submission_path(@conn, :new, @topic.id)` to work.
     # I think that's the only way in which I'm depending on the @conn.
     # TODO: refactor. One easy way is to pre-load all the routes we
-    # need into assigns. Another, I should look at
-
-    # I need to get updated when any of this information changes.
-    # What is the easiest way to do this? I can
-    # * Listen to id-based updates for topic, submission. But, for
-    #   rating, I would need to listen to fk based update. I could
-    #   either patch the state or entirely refresh.
-    # * Write a function that says "something related to this topic
-    #   changed". Then I would entirely refresh state.
+    # need into assigns.
 
     {:ok, socket}
   end
 
   def handle_info(action, socket) do
-    Logger.info("\n\n\n>>>>Received a pg update for topic")
+    Logger.info("\n\n\n>>>>Updating liveview")
     action
     |> inspect()
     |> Logger.info()
-    Logger.info("socket.assigns is")
-    socket.assigns
-    |> inspect()
-    |> Logger.info()
-    Logger.info("<<<<\n\n\n")
-    {:noreply, assign(socket, :topic, action.data)}
+    {:noreply, load_topic_data(socket)}
   end
 
 end

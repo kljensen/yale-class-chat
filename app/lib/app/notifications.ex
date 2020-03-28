@@ -17,13 +17,18 @@ defmodule App.Notifications do
   # Server to which we send broadcasts
   @pubsub_server App.PubSub
   # Prefix we append to all broadcasts
-  @topic_key_prefix "repo_changes"
+  @key_prefix "repo_changes"
+  @details_key "#{@key_prefix}:details"
 
-  def child_spec(opts) do
-    %{
-      id: __MODULE__,
-      start: {__MODULE__, :start_link, [opts]}
-    }
+  # def child_spec(opts) do
+  #   %{
+  #     id: __MODULE__,
+  #     start: {__MODULE__, :start_link, [opts]}
+  #   }
+  # end
+
+  def get_pubsub_server() do
+    @pubsub_server
   end
 
   def start_link(opts \\ []),
@@ -46,11 +51,8 @@ defmodule App.Notifications do
     model.__struct__.__meta__.source
   end
 
-  @doc """
-  Broadcasts on the pubsub_socket for this module.
-  """
   defp broadcast!(key, message) do
-      Phoenix.PubSub.broadcast!(@pubsub_server, key, message)
+    Phoenix.PubSub.broadcast!(@pubsub_server, key, message)
   end
 
 
@@ -60,7 +62,7 @@ defmodule App.Notifications do
   `pg_notify` messages to the `@pg_event_channel`.
   """
   def key_for_all() do
-    "#{@topic_key_prefix}"
+    "#{@key_prefix}"
   end
 
   @doc """
@@ -68,7 +70,7 @@ defmodule App.Notifications do
   e.g. "comments", or "topics"
   """
   def key_for_table(table) do
-    "#{@topic_key_prefix}:#{table}"
+    "#{@key_prefix}:#{table}"
   end
 
   @doc """
@@ -76,7 +78,7 @@ defmodule App.Notifications do
   with a particular id, e.g. "comments" and 53.
   """
   def key_for_table_and_id(table, id) do
-    "#{@topic_key_prefix}:#{table}:#{id}"
+    "#{@key_prefix}:#{table}:#{id}"
   end
 
   @doc """
@@ -84,7 +86,7 @@ defmodule App.Notifications do
   with a particular fk, e.g. "comments" and "submission_id" = 53.
   """
   def key_for_table_and_fk(table, fk, id) do
-    "#{@topic_key_prefix}:#{table}:#{fk}=#{id}"
+    "#{@key_prefix}:#{table}:#{fk}=#{id}"
   end
 
   @doc """
@@ -92,7 +94,7 @@ defmodule App.Notifications do
   or "DELETE" operation on a table.
   """
   def key_for_table_and_change_type(table, change_type) do
-    "#{@topic_key_prefix}:#{table}:#{change_type}"
+    "#{@key_prefix}:#{table}:#{change_type}"
   end
 
   @doc """
@@ -161,19 +163,35 @@ defmodule App.Notifications do
   Takes a decoded payload and broadcasts it to the appropriate topic.
   """
   defp broadcast_change(pg_change_payload) do
-    Logger.info("Broadcasting change..")
     do_broadcast = fn key -> broadcast!(key, pg_change_payload) end
     pg_change_payload
     |> keys_for_pg_notification()
     |> Enum.map(do_broadcast)
   end
 
+
+  @doc """
+  Called by another process in order to subscribe to the 
+  details topic.
+  """
+  def subscribe_to_details() do
+    Phoenix.PubSub.subscribe(@pubsub_server, @details_key)  
+  end
+
+  @doc """
+  Called by another process in order to subscribe to the 
+  details topic.
+  """
+  def unsubscribe_to_details() do
+    Phoenix.PubSub.unsubscribe(@pubsub_server, @details_key)  
+  end
+
   @impl true
-  def handle_info({:notification, _pid, _ref, @pg_event_channel, notification_payload}, _opts \\ []) do
+  def handle_info({:notification, _pid, _ref, @pg_event_channel, notification_payload}, _opts) do
     with {:ok, pg_notification} <- Poison.decode(notification_payload, keys: :atoms) do
-      pg_notification
-      |> inspect()
-      |> Logger.info()
+      # pg_notification
+      # |> inspect()
+      # |> Logger.info()
       broadcast_change(pg_notification)
       {:noreply, :event_handled}
     else
@@ -184,9 +202,7 @@ defmodule App.Notifications do
   @impl true
   def handle_info({:notification, _pid, _ref, "events:details", notification_payload}, _opts) do
     with {:ok, pg_notification} <- Poison.decode(notification_payload, keys: :atoms) do
-      pg_notification
-      |> inspect()
-      |> Logger.info()
+      broadcast!(@details_key, pg_notification)
       {:noreply, :event_handled}
     else
       error -> {:stop, error, []}

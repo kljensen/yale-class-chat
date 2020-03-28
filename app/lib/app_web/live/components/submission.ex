@@ -4,11 +4,7 @@ defmodule SubmissionLiveComponent do
   require Logger
 
   def render(assigns) do
-    ~L"""
-    <div id="submission-<%= @id %>">
-        Submission will go here
-    </div>
-    """
+    Phoenix.View.render(AppWeb.TopicView, "submission_card.html", assigns)
   end
 
   @doc """
