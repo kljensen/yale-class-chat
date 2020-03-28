@@ -12,7 +12,8 @@ defmodule App.Notifications do
   """
 
   # The pg_notify channel on which we listen
-  @pg_channel "events"
+  @pg_event_channel "events"
+  @pg_event_detail_channel "events:details"
   # Server to which we send broadcasts
   @pubsub_server App.PubSub
   # Prefix we append to all broadcasts
@@ -32,9 +33,9 @@ defmodule App.Notifications do
   @impl true
   def init(_opts) do
     {:ok, pid} = Postgrex.Notifications.start_link(App.Repo.config()) 
-    ref = Postgrex.Notifications.listen!(pid, @pg_channel)
-    ref = Postgrex.Notifications.listen!(pid, "events:details")
-    {:ok, {pid, ref, @pg_channel}}
+    ref1 = Postgrex.Notifications.listen!(pid, @pg_event_channel)
+    ref2 = Postgrex.Notifications.listen!(pid, @pg_event_detail_channel)
+    {:ok, {pid, [{ref1, @pg_event_channel}, {ref2, @pg_event_detail_channel}]}}
   end
 
 
@@ -56,7 +57,7 @@ defmodule App.Notifications do
   @doc """
   Key for when you want to track all changes. You'll
   get any change to any table that has a trigger sending
-  `pg_notify` messages to the `@pg_channel`.
+  `pg_notify` messages to the `@pg_event_channel`.
   """
   def key_for_all() do
     "#{@topic_key_prefix}"
@@ -168,7 +169,7 @@ defmodule App.Notifications do
   end
 
   @impl true
-  def handle_info({:notification, _pid, _ref, @pg_channel, notification_payload}, _opts \\ []) do
+  def handle_info({:notification, _pid, _ref, @pg_event_channel, notification_payload}, _opts \\ []) do
     with {:ok, pg_notification} <- Poison.decode(notification_payload, keys: :atoms) do
       pg_notification
       |> inspect()
@@ -182,11 +183,6 @@ defmodule App.Notifications do
 
   @impl true
   def handle_info({:notification, _pid, _ref, "events:details", notification_payload}, _opts) do
-    Logger.info("got notification for events:details")
-    notification_payload
-    |> inspect()
-    |> Logger.info()
-
     with {:ok, pg_notification} <- Poison.decode(notification_payload, keys: :atoms) do
       pg_notification
       |> inspect()
