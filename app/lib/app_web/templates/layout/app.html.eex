@@ -75,42 +75,46 @@
     </section>
     </header>
     <%= render_existing @view_module, "breadcrumbs.html", assigns %>
-    <main role="main" class="container">
-      <%= if get_flash(@conn) != Map.new() do %>
-        <%= if !is_nil(get_flash(@conn, :info)) do %>
-          <div class="uk-alert-primary" uk-alert>
-            <a class="uk-alert-close" uk-close></a>
-            <p><%= get_flash(@conn, :info) %></p>
-          </div>
+    <div class="content-flex">
+      <main role="main" class="container">
+        <%= if get_flash(@conn) != Map.new() do %>
+          <%= if !is_nil(get_flash(@conn, :info)) do %>
+            <div class="uk-alert-primary" uk-alert>
+              <a class="uk-alert-close" uk-close></a>
+              <p><%= get_flash(@conn, :info) %></p>
+            </div>
+          <% end %>
+          <%= if !is_nil(get_flash(@conn, :success)) do %>
+            <div class="uk-alert-success" uk-alert>
+              <a class="uk-alert-close" uk-close></a>
+              <p><%= get_flash(@conn, :success) %></p>
+            </div>
+          <% end %>
+          <%= if !is_nil(get_flash(@conn, :error)) do %>
+            <div class="uk-alert-danger" uk-alert>
+              <a class="uk-alert-close" uk-close></a>
+              <p><%= get_flash(@conn, :error) %></p>
+            </div>
+          <% end %>
         <% end %>
-        <%= if !is_nil(get_flash(@conn, :success)) do %>
-          <div class="uk-alert-success" uk-alert>
-            <a class="uk-alert-close" uk-close></a>
-            <p><%= get_flash(@conn, :success) %></p>
+        <div><p></p></div>
+        <div class="main-body">
+        <%= render @view_module, @view_template, assigns %>
+        </div>
+      </main>
+    </div>
+    <div class="footer">
+      <footer>
+      <section class="container uk-section-muted uk-padding-small uk-padding-remove-bottom uk-padding-remove-right ">
+          <div class="uk-container uk-container-small">
+          <div class="uk-text-center uk-text-small uk-text-muted uk-section uk-section-small">
+          This is an open source project under active development by Nick Peranzi and Kyle Jensen.
+          <br/>Have a feature request or bug report? Please <a href="https://github.com/kljensen/yale-class-chat/issues/new">open an issue on GitHub</a> or <a href="mailto:nick.peranzi@yale.edu;kyle.jensen@yale.edu?Subject=Yale.chat%20Feature%20Request" target="_top">contact us</a>.
           </div>
-        <% end %>
-        <%= if !is_nil(get_flash(@conn, :error)) do %>
-          <div class="uk-alert-danger" uk-alert>
-            <a class="uk-alert-close" uk-close></a>
-            <p><%= get_flash(@conn, :error) %></p>
-          </div>
-        <% end %>
-      <% end %>
-      <div><p></p></div>
-      <div class="main-body">
-      <%= render @view_module, @view_template, assigns %>
-      </div>
-    </main>
-    <footer>
-    <section class="container uk-section-muted uk-padding-small uk-padding-remove-bottom uk-padding-remove-right ">
-        <div class="uk-container uk-container-small">
-				<div class="uk-text-center uk-text-small uk-text-muted uk-section uk-section-small">
-				This is an open source project under active development by Nick Peranzi and Kyle Jensen.
-        <br/>Have a feature request or bug report? Please <a href="https://github.com/kljensen/yale-class-chat/issues/new">open an issue on GitHub</a> or <a href="mailto:nick.peranzi@yale.edu;kyle.jensen@yale.edu?Subject=Yale.chat%20Feature%20Request" target="_top">contact us</a>.
-				</div>
-			</div>
-      </section>
-    </footer>
+        </div>
+        </section>
+      </footer>
+    </div>
     <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </body>
 </html>
