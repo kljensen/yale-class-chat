@@ -41,6 +41,7 @@ defmodule AppWeb.Router do
     pipe_through [:browser, :auth]
 
     live "/live/topics/:id", TopicLive
+    live "/live/submissions/:id", SubmissionLive
 
     #get "/", PageController, :index
     resources "/courses", CourseController do
