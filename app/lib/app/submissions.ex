@@ -1,4 +1,9 @@
 defmodule App.Submissions do
+  require Logger
+  alias App.Accounts.User
+  alias App.Topics
+  alias App.Courses
+
   @course_owner_roles ["owner"]
   @course_admin_roles ["administrator", "owner"]
   @section_write_roles ["student"]
@@ -143,6 +148,49 @@ defmodule App.Submissions do
     end
 
     Repo.all(query)
+  end
+
+  def get_submission_data_for_user_id!(user_id, submission_id) do
+    user = App.Accounts.get_user!(user_id)
+    get_submission_data_for_user(user, submission_id)
+  end
+
+  def get_submission_data_for_net_id!(net_id, submission_id) do
+    # Logger.info("net_id = #{net_id}")
+    # IEx.Info.info(net_id)
+    # |> inspect()
+    # |> Logger.info()
+    user = Repo.get_by!(User, net_id: net_id)
+    get_submission_data_for_user(user, submission_id)
+  end
+
+  def get_submission_data_for_user(user, id) do
+    submission = Repo.get_by!(Submission, id: id)
+    my_rating = get_user_submission_rating(user.id, id)
+    submission_check = get_submission!(id)
+    topic = Topics.get_topic!(submission.topic_id)
+    can_edit = App.Accounts.can_edit_submission(user, submission_check)
+    is_admin = App.Accounts.can_edit_topic(user, topic)
+    can_edit_topic = App.Accounts.can_edit_topic(user, topic)
+    comments = list_user_comments(user, submission_check)
+    section = Courses.get_section!(topic.section_id)
+    course = Courses.get_course!(section.course_id)
+    comment_changeset = change_comment(%App.Submissions.Comment{})
+    rating_changeset = change_rating(%App.Submissions.Rating{})
+    %{
+      submission: submission,
+      topic: topic,
+      can_edit: can_edit,
+      uid: user.id,
+      can_edit_topic: can_edit_topic,
+      comments: comments,
+      section: section,
+      course: course,
+      is_admin: is_admin,
+      comment_changeset: comment_changeset,
+      rating_changeset: rating_changeset,
+      my_rating: my_rating
+    }
   end
 
   def order_query(query, "date - descending"),
