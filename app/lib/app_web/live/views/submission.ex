@@ -23,12 +23,13 @@ defmodule AppWeb.SubmissionLive do
   Load submission data into the assigns for this net_id and submission id.
   """
   defp load_submission_data(socket, net_id, id) do
-    Logger.info("About to load submission data")
-    socket.assigns
-    |> inspect()
-    |> Logger.info()
-    submission_data = App.Submissions.get_submission_data_for_net_id!(net_id, id)
-    assign(socket, submission_data)
+    {status, submission_data} = App.Submissions.get_submission_data_for_net_id!(net_id, id)
+    case status do
+      :ok ->
+        assign(socket, submission_data)
+      :error ->
+        raise Errors.NotFound
+    end
   end
 
   @doc """
@@ -40,9 +41,8 @@ defmodule AppWeb.SubmissionLive do
   the session variables, and the last is the socket.
   """
   def mount(%{"id" => id}, %{"uid" => net_id}, socket) do
-    Logger.info("....in mount BEGIN\n\n")
     if connected?(socket) do
-      # App.LiveViewNotifications.subscribe_for_submission(id)
+      App.LiveViewNotifications.subscribe_for_submission(id)
     end
 
     socket = socket 
@@ -50,14 +50,6 @@ defmodule AppWeb.SubmissionLive do
     |> assign(:net_id, net_id)
     |> assign(:conn, AppWeb.Endpoint)
     |> load_submission_data(net_id, id)
-
-    # Here, I fake the conn based on the suggestion in github:
-    # https://github.com/phoenixframework/phoenix_live_view/issues/277
-    # It seems to work but doesn't feel right. Mostly this is to get
-    # `Routes.submission_submission_path(@conn, :new, @submission.id)` to work.
-    # I think that's the only way in which I'm depending on the @conn.
-    # TODO: refactor. One easy way is to pre-load all the routes we
-    # need into assigns.
 
     {:ok, socket}
   end

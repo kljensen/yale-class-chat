@@ -1,0 +1,170 @@
+<div class="uk-margin-bottom">
+    <div class="uk-padding-small submission-body">
+        <h1 class="uk-heading-divider"><%= @submission.title %></h1>
+        <%= if !is_nil(@submission.image_url) do %>
+            <img src="<%= @submission.image_url %>">
+        <% end %>
+        <%= render AppWeb.HelperView, "multiparagraph_text.html", text: @submission.description %>
+        <div class="submission-stats">
+            <%= if @topic.anonymous do %>
+            <% else %>
+            <b><%= @submission.user_display_name %></b>
+            /
+            <% end %>
+            <%= cond do %>
+            <%= @submission.rating_count > 0 -> %>
+            <%= stars @submission.avg_rating %>
+            (<%= @submission.rating_count |> Integer.to_string %>
+             <%= if @submission.rating_count > 1 do %>ratings<% else %>rating<% end %>)
+            <% @topic.allow_submission_voting -> %>
+                No ratings yet.
+            <% true -> %>
+
+            <% end %>
+            |
+            <span>Posted at </span><span class="rating"><%= @submission.inserted_at %>
+        </div>
+        <%= if @can_edit do %>
+        <div>
+        <%= link "Edit", to: Routes.submission_path(@socket, :edit, @submission.id) %>
+        |
+        <%= link "Delete", to: Routes.submission_path(@socket, :delete, @submission.id), method: :delete, data: [confirm: "Are you sure?"] %>
+        </div>
+        <% end %>
+    </div>
+</div>
+
+
+<%= cond do %>
+<% length(@comments) != 0 -> %>
+    <h2>
+    Comments
+    <span class="comment-count">(<%= @submission.comment_count |> Integer.to_string %>)</span>
+    </h2>
+    <ul class="uk-comment-list">
+        <%= for {comment, i} <- Enum.with_index(@comments) do %>
+            <li class="comment">
+                <article class="uk-comment uk-visible-toggle speech-bubble" tabindex="-1">
+                    <div class="uk-comment-body">
+                        <p>
+                            <%= comment.description %>
+                        </p>
+                    </div>
+                </article>
+                <div class="comment-author comment-author-<%= if rem(i+1, 2) == 0 do %>even<% else %>odd<% end %>">
+                    <%= if @topic.anonymous do %>
+                            <% else %>
+                            <b><%= comment.user.display_name %></b>
+                            /
+                     said <br>
+                    at
+                    <% end %>
+                    <%= comment.inserted_at %>
+                    <%= if @is_admin || @uid == comment.user_id do %>
+                        <div>
+                          <%= link "Edit", to: Routes.comment_path(@socket, :edit, comment.id) %>
+                            |
+                          <%= link "Delete", to: Routes.comment_path(@socket, :delete, comment.id), method: :delete, data: [confirm: "Are you sure?"] %>
+                        </div>
+                    <% end %>
+                </div>
+            </li>
+        <% end %>
+    </ul>
+<% @topic.allow_submission_comments == false -> %>
+
+<% true -> %>
+<h2>
+Comments
+</h2>
+
+<p>
+    None yet ;P
+</p>
+<% end %>
+
+<%= if @topic.allow_submission_voting do %>
+<div class="form">
+<a name="newrating"></a>
+<% action = if is_nil(@my_rating) do
+Routes.submission_rating_path(@socket, :create, @submission.id)
+else
+Routes.rating_path(@socket, :update, @my_rating)
+end %>
+<% message = if is_nil(@my_rating) do
+"Add a rating"
+else
+"Change your rating"
+end %>
+<%= form_for @rating_changeset, action, [class: "uk-form-stacked"], fn f -> %>
+  <%= if @rating_changeset.action do %>
+    <div class="alert alert-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
+
+  <%= if !is_nil(@my_rating) do %>
+    <input name="_method" type="hidden" value="put">
+  <% end %>
+
+    <div class="uk-margin">
+      <%= label f, :score, message %>
+      <% default_value = if !is_nil(@my_rating) do
+       @my_rating.score
+       else
+       nil
+       end %>
+        <div class="uk-form-controls">
+          <%= select f, :score, 1..5 , value: default_value, class: "uk-select", onchange: "this.form.submit()" %>
+          <%= error_tag f, :score %>
+        </div>
+    </div>
+
+<% end %>
+</div>
+<% end %>
+
+<%= if @topic.allow_submission_comments do %>
+<div>
+    <a name="newcomment"></a>
+    <%= form_for @comment_changeset, Routes.submission_comment_path(@socket, :create, @submission.id), [class: "uk-form-stacked"], fn f -> %>
+    <%= if @comment_changeset.action do %>
+    <div class="alert alert-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+    <% end %>
+
+    <div class="uk-margin">
+        <div class="uk-form-controls">
+          <%= hidden_input f, :title, value: "Sample", class: "uk-input" %>
+          <%= error_tag f, :title %>
+        </div>
+    </div>
+
+    <div class="uk-margin">
+      <%= label f, :description, "Add a comment" %>
+        <div class="uk-form-controls">
+          <%= textarea f, :description, class: "uk-textarea", rows: "6" %>
+          <%= error_tag f, :description %>
+        </div>
+    </div>
+
+    <%= if @topic.anonymous do %>
+    <% else %>
+      <div class="uk-alert-warning" uk-alert>
+        <a class="uk-alert-close" uk-close></a>
+        <p>Note: this topic is not anonymous; your name will be visible as the author of this comment.</p>
+      </div>
+    <% end %>
+
+    <div class="uk-margin">
+        <%= submit "Save", class: "uk-button-secondary uk-button" %>
+    </div>
+
+<% end %>
+</div>
+<% end %>
+
+<div class="uk-position-fixed uk-position-z-index absolute uk-dark uk-position-bottom-right">
+<a href="#newcomment" class="add uk-box-shadow-small uk-box-shadow-hover-large" uk-marker></a>
+</div>
