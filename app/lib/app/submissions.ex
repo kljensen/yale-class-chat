@@ -794,6 +794,18 @@ defmodule App.Submissions do
   end
 
 
+  def create_comment(user_id, submission_id, attrs \\ %{}) when (is_integer(user_id)) do
+    user = Repo.get_by!(User, id: user_id)
+    submission = Repo.get_by!(Submission, id: submission_id)
+    create_comment(user, submission, attrs)
+  end
+
+  def create_comment(net_id, submission_id, attrs) when (is_binary(net_id)) do
+    user = Repo.get_by!(User, net_id: net_id)
+    submission = Repo.get_by!(Submission, id: submission_id)
+    create_comment(user, submission, attrs)
+  end
+
   @doc """
   Creates a comment.
 
@@ -806,7 +818,7 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_comment(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
+  def create_comment(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs) do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
@@ -1119,6 +1131,18 @@ defmodule App.Submissions do
     return
   end
 
+  def create_rating(user_id, submission_id, attrs \\ %{}) when (is_integer(user_id)) do
+    user = Repo.get_by!(User, id: user_id)
+    submission = Repo.get_by!(Submission, id: submission_id)
+    create_rating(user, submission, attrs)
+  end
+
+  def create_rating(net_id, submission_id, attrs) when (is_binary(net_id)) do
+    user = Repo.get_by!(User, net_id: net_id)
+    submission = Repo.get_by!(Submission, id: submission_id)
+    create_rating(user, submission, attrs)
+  end
+
   @doc """
   Creates a rating.
 
@@ -1131,7 +1155,7 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_rating(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
+  def create_rating(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs) do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
@@ -1160,7 +1184,10 @@ defmodule App.Submissions do
     |> Rating.changeset(attrs)
     |> Ecto.Changeset.put_assoc(:user, user)
     |> Ecto.Changeset.put_assoc(:submission, submission)
-    |> Repo.insert()
+    |> Repo.insert(
+        on_conflict: :replace_all,
+        conflict_target: [:submission_id, :user_id]
+      )
   end
 
   @doc """
