@@ -50,13 +50,13 @@ defmodule AppWeb.TopicController do
           _ ->
             {section_id, section_ids} = List.pop_at(section_ids, 0)
             section = Courses.get_section!(section_id)
-            case Topics.create_topic(user, section, topic_params) do
+            case Topics.create_topic!(user, section, topic_params) do
               {:ok, topic} ->
                 if length(section_ids) > 0 do
                   for section_id <- section_ids do
                     section_id = String.to_integer(section_id)
                     section = Courses.get_section!(section_id)
-                    Topics.create_topic(user, section, topic_params)
+                    Topics.create_topic!(user, section, topic_params)
                   end
                 end
                 conn
@@ -83,11 +83,11 @@ defmodule AppWeb.TopicController do
         course = topic.section.course
         submissions = case topic.show_user_submissions do
           true ->
-            Submissions.list_user_submissions(user, topic)
+            Submissions.list_user_submissions!(user, topic)
           false ->
             case can_edit do
               true ->
-                Submissions.list_user_submissions(user, topic)
+                Submissions.list_user_submissions!(user, topic)
               false ->
                 Submissions.list_user_own_submissions(user, topic)
               end
@@ -123,7 +123,7 @@ defmodule AppWeb.TopicController do
     section = topic.section
     user = conn.assigns.current_user
 
-    case Topics.update_topic(user, topic, topic_params) do
+    case Topics.update_topic!(user, topic, topic_params) do
       {:ok, topic} ->
         conn
         |> put_flash(:success, "Topic updated successfully.")
@@ -142,7 +142,7 @@ defmodule AppWeb.TopicController do
     case Topics.get_user_topic(user, id) do
       {:ok, topic} ->
         user = conn.assigns.current_user
-        {:ok, _topic} = Topics.delete_topic(user, topic)
+        {:ok, _topic} = Topics.delete_topic!(user, topic)
 
         conn
         |> put_flash(:success, "Topic deleted successfully.")

@@ -192,12 +192,12 @@ defmodule App.CoursesTest do
       assert length(course_list) == 0
       #Valid role returns one course
       params = %{role: "administrator", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
-      {:ok, course_role} = Accounts.update_course__role(user_faculty, course_role, params)
+      {:ok, course_role} = Accounts.update_course__role!(user_faculty, course_role, params)
       course_list = Courses.list_user_courses(user_faculty2)
       assert length(course_list) == 1
       #Yet to begin role returns no courses
       params = %{role: "administrator", valid_from: DateTime.add(current_time, 7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
-      Accounts.update_course__role(user_faculty, course_role, params)
+      Accounts.update_course__role!(user_faculty, course_role, params)
       course_list = Courses.list_user_courses(user_faculty2)
       assert length(course_list) == 0
     end
@@ -216,7 +216,7 @@ defmodule App.CoursesTest do
       assert length(course_list) == 0
       #Valid role returns one course
       params = %{role: "administrator", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
-      {:ok, course_role} = Accounts.update_course__role(user_faculty, course_role, params)
+      {:ok, course_role} = Accounts.update_course__role!(user_faculty, course_role, params)
       course_list = Courses.list_user_courses(semester, user_faculty2)
       assert length(course_list) == 1
       #Incorrect semester returns no courses
@@ -224,7 +224,7 @@ defmodule App.CoursesTest do
       assert length(course_list) == 0
       #Yet to begin role returns no courses
       params = %{role: "administrator", valid_from: DateTime.add(current_time, 7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
-      Accounts.update_course__role(user_faculty, course_role, params)
+      Accounts.update_course__role!(user_faculty, course_role, params)
       course_list = Courses.list_user_courses(semester, user_faculty2)
       assert length(course_list) == 0
     end
@@ -383,7 +383,7 @@ defmodule App.CoursesTest do
       user_student2 = ATest.user_fixture(%{is_faculty: false, net_id: "other student net id"})
       {:ok, current_time} = DateTime.now("Etc/UTC")
       params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
-      Accounts.create_section__role(user_faculty, user_student, section, params)
+      Accounts.create_section__role!(user_faculty, user_student, section, params)
       section_list = Courses.list_user_sections(user_student)
       assert length(section_list) == 1
       retrieved_section = List.first(section_list)
@@ -474,12 +474,12 @@ defmodule App.CoursesTest do
       assert length(section_list) == 0
       #Expired role returns no sections
       params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, -7200, :second)}
-      {:ok, section_role} = App.Accounts.create_section__role(user_faculty, user_student, section, params)
+      {:ok, section_role} = App.Accounts.create_section__role!(user_faculty, user_student, section, params)
       section_list = Courses.list_user_sections(course, user_student)
       assert length(section_list) == 0
       #Valid role returns one section
       params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
-      {:ok, section_role} = App.Accounts.update_section__role(user_faculty, section_role, params)
+      {:ok, section_role} = App.Accounts.update_section__role!(user_faculty, section_role, params)
       section_list = Courses.list_user_sections(course, user_student)
       assert length(section_list) == 1
       retrieved_section = List.first(section_list)
@@ -488,12 +488,12 @@ defmodule App.CoursesTest do
       assert retrieved_section.title == section.title
       #Yet to begin role returns no sections
       params = %{role: "student", valid_from: DateTime.add(current_time, 7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
-      {:ok, section_role} = App.Accounts.update_section__role(user_faculty, section_role, params)
+      {:ok, section_role} = App.Accounts.update_section__role!(user_faculty, section_role, params)
       section_list = Courses.list_user_sections(course, user_student)
       assert length(section_list) == 0
       #Invalid role returns no sections
       params = %{role: "invalid role", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
-      App.Accounts.update_section__role(user_faculty, section_role, params)
+      App.Accounts.update_section__role!(user_faculty, section_role, params)
       section_list = Courses.list_user_sections(course, user_student)
       assert length(section_list) == 0
     end
@@ -505,17 +505,17 @@ defmodule App.CoursesTest do
       {:ok, current_time} = DateTime.now("Etc/UTC")
       #Expired role returns no sections
       params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, -7200, :second)}
-      {:ok, section_role} = Accounts.create_section__role(user_faculty, user_student, section, params)
+      {:ok, section_role} = Accounts.create_section__role!(user_faculty, user_student, section, params)
       section_list = Courses.list_user_sections(user_student)
       assert length(section_list) == 0
       #Valid role returns one section
       params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
-      {:ok, section_role} = Accounts.update_section__role(user_faculty, section_role, params)
+      {:ok, section_role} = Accounts.update_section__role!(user_faculty, section_role, params)
       section_list = Courses.list_user_sections(user_student)
       assert length(section_list) == 1
       #Yet to begin role returns no sections
       params = %{role: "student", valid_from: DateTime.add(current_time, 7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
-      Accounts.update_section__role(user_faculty, section_role, params)
+      Accounts.update_section__role!(user_faculty, section_role, params)
       section_list = Courses.list_user_sections(user_student)
       assert length(section_list) == 0
     end
@@ -526,7 +526,7 @@ defmodule App.CoursesTest do
       user_student = ATest.user_fixture(%{is_faculty: false, net_id: "student net id"})
       {:ok, current_time} = DateTime.now("Etc/UTC")
       params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
-      Accounts.create_section__role(user_faculty, user_student, section, params)
+      Accounts.create_section__role!(user_faculty, user_student, section, params)
       course = Courses.get_course!(section.course_id)
       Courses.update_course(user_faculty, course, %{allow_read: false})
       section_list = Courses.list_user_sections(user_student)
@@ -595,7 +595,7 @@ defmodule App.CoursesTest do
       section = section_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
 
-      assert {:ok, %Section{} = section} = Courses.update_section(user_faculty, section, @update_attrs)
+      assert {:ok, %Section{} = section} = Courses.update_section!(user_faculty, section, @update_attrs)
       assert section.crn == "some updated crn"
       assert section.title == "some updated title"
     end
@@ -604,7 +604,7 @@ defmodule App.CoursesTest do
       section = section_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
 
-      assert {:error, %Ecto.Changeset{}} = Courses.update_section(user_faculty, section, @invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Courses.update_section!(user_faculty, section, @invalid_attrs)
       retrieved_section = Courses.get_section!(section.id)
       assert retrieved_section.id == section.id
       assert retrieved_section.crn == section.crn
@@ -615,7 +615,7 @@ defmodule App.CoursesTest do
       section = section_fixture()
       user_noauth = ATest.user_fixture()
 
-      assert {:error, "unauthorized"} = Courses.update_section(user_noauth, section, @invalid_attrs)
+      assert {:error, "unauthorized"} = Courses.update_section!(user_noauth, section, @invalid_attrs)
     end
 
     test "update_section/3 on non-writeable course returns error" do
@@ -624,14 +624,14 @@ defmodule App.CoursesTest do
       course = Courses.get_course!(section.course_id)
       Courses.update_course(user_faculty, course, %{allow_write: false})
 
-      assert {:error, "course write not allowed"} = Courses.update_section(user_faculty, section, @update_attrs)
+      assert {:error, "course write not allowed"} = Courses.update_section!(user_faculty, section, @update_attrs)
     end
 
     test "delete_section/2 deletes the section" do
       section = section_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
 
-      assert {:ok, %Section{}} = Courses.delete_section(user_faculty, section)
+      assert {:ok, %Section{}} = Courses.delete_section!(user_faculty, section)
       assert_raise Ecto.NoResultsError, fn -> Courses.get_section!(section.id) end
     end
 
@@ -639,7 +639,7 @@ defmodule App.CoursesTest do
       section = section_fixture()
       user_noauth = ATest.user_fixture()
 
-      assert {:error, "unauthorized"} = Courses.delete_section(user_noauth, section)
+      assert {:error, "unauthorized"} = Courses.delete_section!(user_noauth, section)
       retrieved_section = Courses.get_section!(section.id)
       assert retrieved_section.id == section.id
       assert retrieved_section.crn == section.crn
@@ -652,7 +652,7 @@ defmodule App.CoursesTest do
       course = Courses.get_course!(section.course_id)
       Courses.update_course(user_faculty, course, %{allow_write: false})
 
-      assert {:error, "course write not allowed"} = Courses.delete_section(user_faculty, section)
+      assert {:error, "course write not allowed"} = Courses.delete_section!(user_faculty, section)
     end
 
     test "change_section/1 returns a section changeset" do

@@ -12,7 +12,7 @@ defmodule AppWeb.TopicControllerTest do
   def fixture(:topic) do
     section = AppWeb.SectionControllerTest.fixture(:section)
     user_faculty = App.Accounts.get_user_by!("faculty net id")
-    {:ok, topic} = Topics.create_topic(user_faculty, section, @create_attrs)
+    {:ok, topic} = Topics.create_topic!(user_faculty, section, @create_attrs)
     topic
   end
 

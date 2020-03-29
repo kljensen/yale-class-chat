@@ -48,11 +48,11 @@ defmodule App.Topics do
 
   ## Examples
 
-      iex> list_user_topics(section)
+      iex> list_user_topics!(section)
       [%Topic{}, ...]
 
   """
-  def list_user_topics(%App.Accounts.User{} = user, %App.Courses.Section{} = section, inherit_course_role \\ true) do
+  def list_user_topics!(%App.Accounts.User{} = user, %App.Courses.Section{} = section, inherit_course_role \\ true) do
     sid = section.id
     uid = user.id
     cid = section.course_id
@@ -139,14 +139,14 @@ defmodule App.Topics do
 
   ## Examples
 
-      iex> create_topic(%{field: value})
+      iex> create_topic!(%{field: value})
       {:ok, %Topic{}}
 
-      iex> create_topic(%{field: bad_value})
+      iex> create_topic!(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_topic(%App.Accounts.User{} = user, %App.Courses.Section{} = section, attrs \\ %{}) do
+  def create_topic!(%App.Accounts.User{} = user, %App.Courses.Section{} = section, attrs \\ %{}) do
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_course__role(user, course)
 
@@ -172,14 +172,14 @@ defmodule App.Topics do
 
   ## Examples
 
-      iex> update_topic(topic, %{field: new_value})
+      iex> update_topic!(topic, %{field: new_value})
       {:ok, %Topic{}}
 
-      iex> update_topic(topic, %{field: bad_value})
+      iex> update_topic!(topic, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_topic(%App.Accounts.User{} = user, %Topic{} = topic, attrs \\ %{}) do
+  def update_topic!(%App.Accounts.User{} = user, %Topic{} = topic, attrs \\ %{}) do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_course__role(user, course)
@@ -205,14 +205,14 @@ defmodule App.Topics do
 
   ## Examples
 
-      iex> delete_topic(topic)
+      iex> delete_topic!(topic)
       {:ok, %Topic{}}
 
-      iex> delete_topic(topic)
+      iex> delete_topic!(topic)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_topic(%App.Accounts.User{} = user, %Topic{} = topic) do
+  def delete_topic!(%App.Accounts.User{} = user, %Topic{} = topic) do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_course__role(user, course)

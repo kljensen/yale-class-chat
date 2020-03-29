@@ -11,7 +11,7 @@ defmodule AppWeb.CommentControllerTest do
 
   def fixture(:comment, submission) do
     user_faculty = App.Accounts.get_user_by!("faculty net id")
-    {:ok, comment} = Submissions.create_comment(user_faculty, submission, @create_attrs)
+    {:ok, comment} = Submissions.create_comment!(user_faculty, submission, @create_attrs)
     comment
   end
 

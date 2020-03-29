@@ -12,7 +12,7 @@ defmodule AppWeb.SubmissionControllerTest do
 
   def fixture(:submission, topic) do
     user_faculty = App.Accounts.get_user_by!("faculty net id")
-    {:ok, submission} = Submissions.create_submission(user_faculty, topic, @create_attrs)
+    {:ok, submission} = Submissions.create_submission!(user_faculty, topic, @create_attrs)
     submission
   end
 

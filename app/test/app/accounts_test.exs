@@ -146,10 +146,10 @@ defmodule App.AccountsTest do
       course = Courses.get_course!(course__role.course_id)
       user_faculty = Accounts.get_user_by!("faculty net id")
       {:ok, section} = Courses.create_section(user_faculty, course, %{crn: "some crn", title: "some title"})
-      {:ok, topic} = App.Topics.create_topic(user_faculty, section, %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2100-04-17T14:00:00Z", description: "some description", opened_at: "2010-04-17T14:00:00Z", slug: "some slug", sort: "some sort", title: "some title", user_submission_limit: 42, allow_ranking: true, show_user_submissions: true, visible: true, type: "general"})
-      {:ok, submission} = App.Submissions.create_submission(user_faculty, topic, %{description: "some description", image_url: "http://i.imgur.com/u3vyMCW.jpg", title: "some title", allow_ranking: true, visible: true})
-      {:ok, comment} = App.Submissions.create_comment(user_faculty, submission, %{description: "some description"})
-      {:ok, rating} = App.Submissions.create_rating(user_faculty, submission, %{score: 5})
+      {:ok, topic} = App.Topics.create_topic!(user_faculty, section, %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2100-04-17T14:00:00Z", description: "some description", opened_at: "2010-04-17T14:00:00Z", slug: "some slug", sort: "some sort", title: "some title", user_submission_limit: 42, allow_ranking: true, show_user_submissions: true, visible: true, type: "general"})
+      {:ok, submission} = App.Submissions.create_submission!(user_faculty, topic, %{description: "some description", image_url: "http://i.imgur.com/u3vyMCW.jpg", title: "some title", allow_ranking: true, visible: true})
+      {:ok, comment} = App.Submissions.create_comment!(user_faculty, submission, %{description: "some description"})
+      {:ok, rating} = App.Submissions.create_rating!(user_faculty, submission, %{score: 5})
       user = Accounts.get_user_by!("some net_id")
       assert Accounts.get_current_course__role(user, course) == "some role"
       assert Accounts.get_current_course__role(user, section) == "some role"
@@ -198,7 +198,7 @@ defmodule App.AccountsTest do
       course__role = course__role_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
 
-      assert {:ok, %Course_Role{} = course__role} = Accounts.update_course__role(user_faculty, course__role, @update_attrs)
+      assert {:ok, %Course_Role{} = course__role} = Accounts.update_course__role!(user_faculty, course__role, @update_attrs)
       assert course__role.role == "some updated role"
       assert course__role.valid_from == DateTime.from_naive!(~N[2011-05-18T15:01:01Z], "Etc/UTC")
       assert course__role.valid_to == DateTime.from_naive!(~N[2011-05-18T15:01:01Z], "Etc/UTC")
@@ -208,7 +208,7 @@ defmodule App.AccountsTest do
       course__role = course__role_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
 
-      assert {:error, %Ecto.Changeset{}} = Accounts.update_course__role(user_faculty, course__role, @invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Accounts.update_course__role!(user_faculty, course__role, @invalid_attrs)
       retrieved_course_role = Accounts.get_course__role!(course__role.id)
       assert course__role.id == retrieved_course_role.id
       assert course__role.valid_from == retrieved_course_role.valid_from
@@ -219,7 +219,7 @@ defmodule App.AccountsTest do
       course__role = course__role_fixture()
       user_faculty = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
 
-      assert {:error, "unauthorized"} = Accounts.update_course__role(user_faculty, course__role, @invalid_attrs)
+      assert {:error, "unauthorized"} = Accounts.update_course__role!(user_faculty, course__role, @invalid_attrs)
       retrieved_course_role = Accounts.get_course__role!(course__role.id)
       assert course__role.id == retrieved_course_role.id
       assert course__role.valid_from == retrieved_course_role.valid_from
@@ -231,7 +231,7 @@ defmodule App.AccountsTest do
       user_faculty = Accounts.get_user_by!("faculty net id")
       course = Courses.get_course!(course__role.course_id)
       Courses.update_course(user_faculty, course, %{allow_write: false})
-      assert {:error, "course write not allowed"} = Accounts.update_course__role(user_faculty, course__role, @invalid_attrs)
+      assert {:error, "course write not allowed"} = Accounts.update_course__role!(user_faculty, course__role, @invalid_attrs)
       retrieved_course_role = Accounts.get_course__role!(course__role.id)
       assert course__role.id == retrieved_course_role.id
       assert course__role.valid_from == retrieved_course_role.valid_from
@@ -242,7 +242,7 @@ defmodule App.AccountsTest do
       course__role = course__role_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
 
-      assert {:ok, %Course_Role{}} = Accounts.delete_course__role(user_faculty, course__role)
+      assert {:ok, %Course_Role{}} = Accounts.delete_course__role!(user_faculty, course__role)
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_course__role!(course__role.id) end
     end
 
@@ -250,7 +250,7 @@ defmodule App.AccountsTest do
       course__role = course__role_fixture()
       user_faculty = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
 
-      assert {:error, "unauthorized"} = Accounts.delete_course__role(user_faculty, course__role)
+      assert {:error, "unauthorized"} = Accounts.delete_course__role!(user_faculty, course__role)
       retrieved_course_role = Accounts.get_course__role!(course__role.id)
       assert course__role.id == retrieved_course_role.id
       assert course__role.valid_from == retrieved_course_role.valid_from
@@ -263,7 +263,7 @@ defmodule App.AccountsTest do
       course = Courses.get_course!(course__role.course_id)
       Courses.update_course(user_faculty, course, %{allow_write: false})
 
-      assert {:error, "course write not allowed"} = Accounts.delete_course__role(user_faculty, course__role)
+      assert {:error, "course write not allowed"} = Accounts.delete_course__role!(user_faculty, course__role)
       retrieved_course_role = Accounts.get_course__role!(course__role.id)
       assert course__role.id == retrieved_course_role.id
       assert course__role.valid_from == retrieved_course_role.valid_from
@@ -293,7 +293,7 @@ defmodule App.AccountsTest do
       user_faculty = Accounts.get_user_by!("faculty net id")
 
       {:ok, section__role} =
-        Accounts.create_section__role(user_faculty, user, section, params)
+        Accounts.create_section__role!(user_faculty, user, section, params)
 
       section__role
     end
@@ -315,7 +315,7 @@ defmodule App.AccountsTest do
       user = user_fixture()
       section = CTest.section_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
-      assert {:ok, %Section_Role{} = section__role} = Accounts.create_section__role(user_faculty, user, section, @valid_attrs)
+      assert {:ok, %Section_Role{} = section__role} = Accounts.create_section__role!(user_faculty, user, section, @valid_attrs)
       assert section__role.role == "some role"
       assert section__role.valid_from == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
       assert section__role.valid_to == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
@@ -328,7 +328,7 @@ defmodule App.AccountsTest do
       section = CTest.section_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
 
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_section__role(user_faculty, user, section, @invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_section__role!(user_faculty, user, section, @invalid_attrs)
     end
 
     test "create_section__role/4 by unauthorized user returns error" do
@@ -336,7 +336,7 @@ defmodule App.AccountsTest do
       section = CTest.section_fixture()
       user_noauth = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
 
-      assert {:error, "unauthorized"} = Accounts.create_section__role(user_noauth, user, section, @valid_attrs)
+      assert {:error, "unauthorized"} = Accounts.create_section__role!(user_noauth, user, section, @valid_attrs)
     end
 
     test "create_section__role/4 with non-writeable course returns error" do
@@ -346,13 +346,13 @@ defmodule App.AccountsTest do
       course = Courses.get_course!(section.course_id)
       Courses.update_course(user_faculty, course, %{allow_write: false})
 
-      assert {:error, "course write not allowed"} = Accounts.create_section__role(user_faculty, user, section, @valid_attrs)
+      assert {:error, "course write not allowed"} = Accounts.create_section__role!(user_faculty, user, section, @valid_attrs)
     end
 
     test "update_section__role/3 with valid data updates the section__role" do
       section__role = section__role_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
-      assert {:ok, %Section_Role{} = section__role} = Accounts.update_section__role(user_faculty, section__role, @update_attrs)
+      assert {:ok, %Section_Role{} = section__role} = Accounts.update_section__role!(user_faculty, section__role, @update_attrs)
       assert section__role.role == "some updated role"
       assert section__role.valid_from == DateTime.from_naive!(~N[2011-05-18T15:01:01Z], "Etc/UTC")
       assert section__role.valid_to == DateTime.from_naive!(~N[2011-05-18T15:01:01Z], "Etc/UTC")
@@ -361,7 +361,7 @@ defmodule App.AccountsTest do
     test "update_section__role/3 with invalid data returns error changeset" do
       section__role = section__role_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
-      assert {:error, %Ecto.Changeset{}} = Accounts.update_section__role(user_faculty, section__role, @invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Accounts.update_section__role!(user_faculty, section__role, @invalid_attrs)
       retrieved_section_role = Accounts.get_section__role!(section__role.id)
       assert section__role.id == retrieved_section_role.id
       assert section__role.valid_from == retrieved_section_role.valid_from
@@ -375,7 +375,7 @@ defmodule App.AccountsTest do
       course = Courses.get_course!(section.course_id)
       Courses.update_course(user_faculty, course, %{allow_write: false})
 
-      assert {:error, "course write not allowed"} = Accounts.update_section__role(user_faculty, section__role, @valid_attrs)
+      assert {:error, "course write not allowed"} = Accounts.update_section__role!(user_faculty, section__role, @valid_attrs)
       retrieved_section_role = Accounts.get_section__role!(section__role.id)
       assert section__role.id == retrieved_section_role.id
       assert section__role.valid_from == retrieved_section_role.valid_from
@@ -386,7 +386,7 @@ defmodule App.AccountsTest do
       section__role = section__role_fixture()
       user_noauth = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
 
-      assert {:error, "unauthorized"} = Accounts.update_section__role(user_noauth, section__role, @invalid_attrs)
+      assert {:error, "unauthorized"} = Accounts.update_section__role!(user_noauth, section__role, @invalid_attrs)
       retrieved_section_role = Accounts.get_section__role!(section__role.id)
       assert section__role.id == retrieved_section_role.id
       assert section__role.valid_from == retrieved_section_role.valid_from
@@ -396,21 +396,21 @@ defmodule App.AccountsTest do
     test "delete_section__role/2 deletes the section__role" do
       section__role = section__role_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
-      assert {:ok, %Section_Role{}} = Accounts.delete_section__role(user_faculty, section__role)
+      assert {:ok, %Section_Role{}} = Accounts.delete_section__role!(user_faculty, section__role)
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_section__role!(section__role.id) end
     end
 
     test "delete_section__role/2 by student holding role deletes the section__role" do
       section__role = section__role_fixture()
       user_student = Accounts.get_user_by!("some net_id")
-      assert {:ok, %Section_Role{}} = Accounts.delete_section__role(user_student, section__role)
+      assert {:ok, %Section_Role{}} = Accounts.delete_section__role!(user_student, section__role)
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_section__role!(section__role.id) end
     end
 
     test "delete_section__role/2 by unauthorized user returns error" do
       section__role = section__role_fixture()
       user_noauth = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
-      assert {:error, "unauthorized"} = Accounts.delete_section__role(user_noauth, section__role)
+      assert {:error, "unauthorized"} = Accounts.delete_section__role!(user_noauth, section__role)
       retrieved_section_role = Accounts.get_section__role!(section__role.id)
       assert section__role.id == retrieved_section_role.id
       assert section__role.valid_from == retrieved_section_role.valid_from
@@ -424,7 +424,7 @@ defmodule App.AccountsTest do
       course = Courses.get_course!(section.course_id)
       Courses.update_course(user_faculty, course, %{allow_write: false})
 
-      assert {:error, "course write not allowed"} = Accounts.delete_section__role(user_faculty, section__role)
+      assert {:error, "course write not allowed"} = Accounts.delete_section__role!(user_faculty, section__role)
       retrieved_section_role = Accounts.get_section__role!(section__role.id)
       assert section__role.id == retrieved_section_role.id
       assert section__role.valid_from == retrieved_section_role.valid_from
@@ -435,11 +435,11 @@ defmodule App.AccountsTest do
       section__role = section__role_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
       section = Courses.get_section!(section__role.section_id)
-      {:ok, section__role2} = Accounts.create_section__role(user_faculty, user_faculty, section, %{role: "some role", valid_from: "2010-04-17T14:00:00Z", valid_to: "2010-04-17T14:00:00Z"})
-      assert {2, nil} = Accounts.delete_all_section__roles(user_faculty, section)
+      {:ok, section__role2} = Accounts.create_section__role!(user_faculty, user_faculty, section, %{role: "some role", valid_from: "2010-04-17T14:00:00Z", valid_to: "2010-04-17T14:00:00Z"})
+      assert {2, nil} = Accounts.delete_all_section__roles!(user_faculty, section)
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_section__role!(section__role.id) end
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_section__role!(section__role2.id) end
-      assert length(Accounts.list_section_all_section_roles(user_faculty, section)) == 0
+      assert length(Accounts.list_section_all_section_roles!(user_faculty, section)) == 0
     end
 
     test "delete_all_section__roles/2 by unauthorized user returns error" do
@@ -447,21 +447,21 @@ defmodule App.AccountsTest do
       user_noauth = user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
       user_faculty = Accounts.get_user_by!("faculty net id")
       section = Courses.get_section!(section__role.section_id)
-      {:ok, _section__role2} = Accounts.create_section__role(user_faculty, user_faculty, section, %{role: "some role", valid_from: "2010-04-17T14:00:00Z", valid_to: "2010-04-17T14:00:00Z"})
-      assert {:error, "unauthorized"} = Accounts.delete_all_section__roles(user_noauth, section)
-      assert length(Accounts.list_section_all_section_roles(user_faculty, section)) == 2
+      {:ok, _section__role2} = Accounts.create_section__role!(user_faculty, user_faculty, section, %{role: "some role", valid_from: "2010-04-17T14:00:00Z", valid_to: "2010-04-17T14:00:00Z"})
+      assert {:error, "unauthorized"} = Accounts.delete_all_section__roles!(user_noauth, section)
+      assert length(Accounts.list_section_all_section_roles!(user_faculty, section)) == 2
     end
 
     test "delete_all_section__roles/2 on non-writeable course returns error" do
       section__role = section__role_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
       section = Courses.get_section!(section__role.section_id)
-      {:ok, _section__role2} = Accounts.create_section__role(user_faculty, user_faculty, section, %{role: "some role", valid_from: "2010-04-17T14:00:00Z", valid_to: "2010-04-17T14:00:00Z"})
+      {:ok, _section__role2} = Accounts.create_section__role!(user_faculty, user_faculty, section, %{role: "some role", valid_from: "2010-04-17T14:00:00Z", valid_to: "2010-04-17T14:00:00Z"})
       course = Courses.get_course!(section.course_id)
       Courses.update_course(user_faculty, course, %{allow_write: false})
 
-      assert {:error, "course write not allowed"} = Accounts.delete_all_section__roles(user_faculty, section)
-      assert length(Accounts.list_section_all_section_roles(user_faculty, section)) == 2
+      assert {:error, "course write not allowed"} = Accounts.delete_all_section__roles!(user_faculty, section)
+      assert length(Accounts.list_section_all_section_roles!(user_faculty, section)) == 2
     end
 
     test "change_section__role/1 returns a section__role changeset" do
