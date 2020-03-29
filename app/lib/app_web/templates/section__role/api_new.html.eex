@@ -32,17 +32,6 @@
 </div>
 
 <div class="uk-margin">
-  <%= label f, :update_existing, class: "uk-form-label" do %>
-    Update student display names and emails for existing students
-  <% end %>
-
-  <div class="uk-form-controls">
-  <%= checkbox f, :update_existing, class: "uk-checkbox" %>
-  <%= error_tag f, :update_existing %>
-  </div>
-</div>
-
-<div class="uk-margin">
   <%= label f, :overwrite_roles, class: "uk-form-label" do %>
     Overwrite all existing students in section with API results
   <% end %>
