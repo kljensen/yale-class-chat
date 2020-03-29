@@ -164,10 +164,16 @@ defmodule App.Accounts do
     {stat, user} = case Repo.get_by(User, net_id: net_id) do
       nil ->
         # Get required fields
-        display_name = net_id
-        email = net_id <> "@connect.yale.edu"
-        is_faculty = false
-        attrs = %{display_name: display_name, email: email, net_id: net_id, is_faculty: is_faculty}
+        attrs = case YaleLDAP.get_attrs_by_netid(net_id) do
+          {:ok, ldapattrs} ->
+            Map.put(ldapattrs, :net_id, net_id)
+
+          _ ->
+            display_name = net_id
+            email = net_id <> "@connect.yale.edu"
+            is_faculty = false
+            %{display_name: display_name, email: email, net_id: net_id, is_faculty: is_faculty}
+          end
         %User{}
         |> User.changeset(attrs)
         |> Repo.insert()
@@ -177,6 +183,33 @@ defmodule App.Accounts do
       {stat, user}
   end
 
+  @doc """
+  Updates a user's attributes using an LDAP query.
+
+  ## Examples
+
+      iex> update_user_ldap("netid")
+      {:ok, %User{}}
+
+      iex> update_user_ldap("invalid netid")
+      {:error, "USer not found in [database | LDAP]"}
+
+  """
+  def update_user_ldap(net_id) do
+    case Repo.get_by(User, net_id: net_id) do
+      nil ->
+        {:error, "User not found in database"}
+      user ->
+        case YaleLDAP.get_attrs_by_netid(net_id) do
+          {:ok, attrs} ->
+            user
+            |> User.changeset(attrs)
+            |> Repo.update()
+          _ ->
+            {:error, "User not found in LDAP"}
+          end
+      end
+  end
 
   @doc """
   Updates a user.

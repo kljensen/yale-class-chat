@@ -45,6 +45,17 @@ defmodule AppWeb.UserController do
       end
   end
 
+  def refresh(conn, _params) do
+    case Accounts.update_user_ldap(conn.assigns.current_user.net_id) do
+      {:ok, user} ->
+        conn
+        |> put_flash(:success, "Successfully refreshed user data")
+        |> redirect(to: Routes.user_path(conn, :show, user))
+
+      {:error, message} -> render_error(conn, "forbidden")
+      end
+  end
+
   def update(conn, %{"id" => id, "user" => user_params}) do
     case id == to_string(conn.assigns.current_user.id) do
       true ->

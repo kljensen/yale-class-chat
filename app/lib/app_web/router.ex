@@ -68,7 +68,9 @@ defmodule AppWeb.Router do
     end
 
 
-    resources "/users", UserController, only: [:edit, :show, :update]
+    resources "/users", UserController, only: [:edit, :show, :update] do
+      get "/refresh", UserController, :refresh
+    end
     resources "/topics", TopicController, only: [:edit, :show, :update, :delete]
     resources "/submissions", SubmissionController, only: [:edit, :show, :update, :delete]
     resources "/comments", CommentController, only: [:edit, :update, :delete]

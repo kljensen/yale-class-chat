@@ -47,6 +47,38 @@ defmodule App.AccountsTest do
       assert %{email: ["can't be blank"]} = errors_on(changeset)
     end
 
+    test "create_user_on_login/1 creates previously nonexistent user" do
+      assert {:ok, %User{} = user} = Accounts.create_user_on_login("fake-netid")
+      assert user.net_id == "fake-netid"
+      assert user.display_name == "fake-netid"
+      assert user.email == "fake-netid@connect.yale.edu"
+    end
+
+    test "create_user_on_login/1 returns existing user" do
+      {:ok, %User{} = initialuser} = Accounts.create_user(@valid_attrs)
+      assert {:ok, %User{} = user} = Accounts.create_user_on_login(initialuser.net_id)
+      assert user == initialuser
+    end
+
+    test "update_user_ldap/1 updates user if found on server" do
+      attrs = Map.put(@valid_attrs, :net_id, "klj39")
+      {:ok, %User{}} = Accounts.create_user(attrs)
+      assert {:ok, %User{} = user} = Accounts.update_user_ldap("klj39")
+      assert user.display_name == "Kyle Jensen"
+      assert user.email == "kyle.jensen@yale.edu"
+      assert user.is_faculty == true
+    end
+
+    test "update_user_ldap/1 returns error if user does not exist in db" do
+      assert {:error, "User not found in database"} = Accounts.update_user_ldap("klj39")
+    end
+
+    test "update_user_ldap/1 returns error if user does not exist in LDAP" do
+      attrs = Map.put(@valid_attrs, :net_id, "fake-netid")
+      {:ok, %User{}} = Accounts.create_user(attrs)
+      assert {:error, "User not found in LDAP"} = Accounts.update_user_ldap("fake-netid")
+    end
+
     test "update_user/2 with valid data updates the user" do
       user = user_fixture()
       assert {:ok, %User{} = user} = Accounts.update_user(user, @update_attrs)

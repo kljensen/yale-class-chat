@@ -67,7 +67,9 @@ defmodule App.MixProject do
       {:ecto_fields, "~> 1.2.0"},
       # Use tesla and hackney for external REST API requests
       {:tesla, "~> 1.3.0"},
-      {:hackney, "~> 1.15.2"}
+      {:hackney, "~> 1.15.2"},
+      # Use LDAPEx for LDAP queries
+      {:ldap_ex, "~> 0.2.2"}
     ]
   end
 

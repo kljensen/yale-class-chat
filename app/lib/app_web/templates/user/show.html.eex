@@ -20,4 +20,7 @@
 </ul>
 
 <span><%= link "Edit", to: Routes.user_path(@conn, :edit, @user) %></span>
+|
+<span><%= link "Resync with Yale Directory", to: Routes.user_user_path(@conn, :refresh, @user) %></span>
+|
 <span><%= link "Log Out", to: Routes.auth_path(@conn, :delete, @user) %></span>
