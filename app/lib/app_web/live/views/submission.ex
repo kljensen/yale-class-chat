@@ -4,7 +4,7 @@ defmodule AppWeb.SubmissionLive do
   require Phoenix.PubSub
   require App.LiveViewNotifications
   alias App.Submissions.Submission
-
+  require App.Submissions
 
   def render(assigns) do
     Phoenix.View.render(AppWeb.SubmissionView, "live.html", assigns)
@@ -62,4 +62,38 @@ defmodule AppWeb.SubmissionLive do
     {:noreply, load_submission_data(socket)}
   end
 
+  defp current_user(socket) do
+    Repo.get_by!(User, net_id: socket.assigns.net_id)
+  end
+
+  defp current_user(socket) do
+    Repo.get_by!(User, net_id: socket.assigns.net_id)
+  end
+
+  defp create_comment(comment_data, socket) do
+    App.Submissions.create_comment(socket.assigns.net_id, socket.assigns.id, comment_data)
+  end
+
+  defp create_rating!(comment_data, socket) do
+    App.Submissions.create_rating!(socket.assigns.net_id, socket.assigns.id, comment_data)
+  end
+
+
+  def handle_event("save", %{"comment" => comment_form_data}, socket) do
+    Logger.info("Received the following form data")
+    comment_form_data
+    |> inspect()
+    |> Logger.info()
+    create_comment(comment_form_data, socket)
+    {:noreply, socket}
+  end
+
+  def handle_event("save", %{"rating" => rating_form_data}, socket) do
+    Logger.info("Received the following form data")
+    rating_form_data
+    |> inspect()
+    |> Logger.info()
+    create_rating!(rating_form_data, socket)
+    {:noreply, socket}
+  end
 end
