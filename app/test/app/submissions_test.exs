@@ -326,8 +326,18 @@ defmodule App.SubmissionsTest do
       submitter = context[:submitter]
       topic = context[:topic]
       user_faculty = context[:user_faculty]
-      {:ok, topic} = Topics.update_topic!(user_faculty, topic, %{user_submission_limit: 0})
+      {:ok, topic} = Topics.update_topic!(user_faculty, topic, %{user_submission_limit: 1})
+      assert {:ok, _} = Submissions.create_submission!(submitter, topic, @valid_attrs)
       assert {:error, "user submission limit reached"} = Submissions.create_submission!(submitter, topic, @valid_attrs)
+    end
+
+    test "create_submission/3 allows submissions if user_submission_limit is 0", context do
+      submitter = context[:submitter]
+      topic = context[:topic]
+      user_faculty = context[:user_faculty]
+      {:ok, topic} = Topics.update_topic!(user_faculty, topic, %{user_submission_limit: 0})
+      assert {:ok, _} = Submissions.create_submission!(submitter, topic, @valid_attrs)
+      assert {:ok, _} = Submissions.create_submission!(submitter, topic, @valid_attrs)
     end
 
     test "update_submission/3 with valid data updates the submission", context do

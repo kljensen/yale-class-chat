@@ -4,6 +4,7 @@ defmodule AppWeb.SectionController do
   alias App.Courses
   alias App.Courses.Section
   alias App.Topics
+  import Phoenix.HTML.Link
 
   def index(conn, %{"course_id" => course_id}) do
     course = Courses.get_course!(course_id)
@@ -31,6 +32,7 @@ defmodule AppWeb.SectionController do
     case Courses.create_section(user, course, section_params) do
       {:ok, section} ->
         conn
+        |> put_flash(:info, ["Want to create another section in this course? Click ", link("here", to: Routes.course_section_path(conn, :new, course)), "!"])
         |> put_flash(:success, "Section created successfully.")
         |> redirect(to: Routes.section_path(conn, :show, section))
 

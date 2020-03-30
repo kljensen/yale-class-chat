@@ -94,11 +94,14 @@ defmodule AppWeb.CommentController do
     user = conn.assigns.current_user
     case App.Accounts.can_edit_comment(user, comment) do
       true ->
-        {:ok, _comment} = Submissions.delete_comment!(user, comment)
-        conn
-        |> put_flash(:success, "Comment deleted successfully.")
-        |> redirect(to: Routes.submission_path(conn, :show, submission))
+        case Submissions.delete_comment!(user, comment) do
+          {:ok, _comment} ->
+            conn
+            |> put_flash(:success, "Comment deleted successfully.")
+            |> redirect(to: Routes.submission_path(conn, :show, submission))
 
+          {:error, message} -> render_error(conn, message)
+          end
       false -> render_error(conn, "forbidden")
       end
   end
