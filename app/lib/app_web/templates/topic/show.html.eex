@@ -60,19 +60,22 @@
                             <b><%= submission.user_display_name %></b>
                             /
                             <% end %>
-                            <%= if submission.rating_count > 0 do %>
-                            <%= stars submission.avg_rating %>
-                            (<%= submission.rating_count |> Integer.to_string %>
-                             <%= if submission.rating_count > 1 do %>ratings<% else %>rating<% end %>)
-                            <% else %>
-                                No ratings yet.
+                            <%= if @topic.show_submission_ratings or @can_edit do %>
+                                <%= if submission.rating_count > 0 do %>
+                                <%= stars submission.avg_rating %>
+                                (<%= submission.rating_count |> Integer.to_string %>
+                                <%= if submission.rating_count > 1 do %>ratings<% else %>rating<% end %>)
+                                <% else %>
+                                    No ratings yet.
+                                <% end %>
                             <% end %>
-                            <span class="comment-icon-count">
-                                <span class="comment-icon" uk-icon="icon:  comments; ratio: 0.7"></span>
-                                <%= submission.comment_count |> Integer.to_string %>
-                            </span>
-
-                            |
+                            <%= if @topic.show_submission_comments or @can_edit do %>
+                                <span class="comment-icon-count">
+                                    <span class="comment-icon" uk-icon="icon:  comments; ratio: 0.7"></span>
+                                    <%= submission.comment_count |> Integer.to_string %>
+                                </span>
+                                |
+                            <% end %>
                             <span>Posted at: </span><span class="rating"><%= submission.inserted_at %>
                         </div>
                     </div>

@@ -11,6 +11,7 @@
             <b><%= @submission.user_display_name %></b>
             /
             <% end %>
+            <%= if @topic.show_submission_ratings do %>
             <%= cond do %>
             <%= @submission.rating_count > 0 -> %>
             <%= stars @submission.avg_rating %>
@@ -22,6 +23,7 @@
 
             <% end %>
             |
+            <% end %>
             <span>Posted at </span><span class="rating"><%= @submission.inserted_at %>
         </div>
         <%= if @can_edit do %>
@@ -39,7 +41,7 @@
 <% length(@comments) != 0 -> %>
     <h2>
     Comments
-    <span class="comment-count">(<%= @submission.comment_count |> Integer.to_string %>)</span>
+    <span class="comment-count">(<%= length(@comments) |> Integer.to_string %>)</span>
     </h2>
     <ul class="uk-comment-list">
         <%= for {comment, i} <- Enum.with_index(@comments) do %>
