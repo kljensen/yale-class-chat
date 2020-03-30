@@ -277,10 +277,18 @@ div.comment-author-odd {
 }
 
 
-// Sticky footer
+
 div.footer {
     flex-shrink: 0;
 }
 div.content-flex {
     flex: 1 0 auto;
+}
+
+.uk-form-stacked .with-tooltip {
+    display: inline-block;
+}
+
+.tooltip-icon {
+    display: inline-block;
 }
