@@ -396,7 +396,7 @@ defmodule App.Submissions do
             end
 
     cond do
-      count_user_submissions(user, topic) >= [topic.user_submission_limit] ->
+      count_user_submissions(user, topic) >= [topic.user_submission_limit] && topic.user_submission_limit > 0 ->
         {:error, "user submission limit reached"}
       Date.compare(current_time, topic.opened_at) == :lt ->
         {:error, "topic not yet open"}

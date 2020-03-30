@@ -154,9 +154,9 @@
 <div class="uk-margin">
 
   <%= label f, :user_submission_limit, class: "uk-form-label with-tooltip" do %>
-    Max number of submissions by a single student
+    Max number of submissions by a single student (0 = unlimited)
   <% end %>
-  <span uk-tooltip="title: Limit the number of submissions a single student can make in response to this topic. If left blank, students can submit an unlimited number of submissions." uk-icon="icon: question; ratio: 0.7" class="tooltip-icon"></span>
+  <span uk-tooltip="title: Limit the number of submissions a single student can make in response to this topic. If set to 0, students can submit an unlimited number of submissions." uk-icon="icon: question; ratio: 0.7" class="tooltip-icon"></span>
 
   <div class="uk-form-controls">
   <%= number_input f, :user_submission_limit, min: 0, class: "uk-input" %>
