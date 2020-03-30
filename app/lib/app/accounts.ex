@@ -51,7 +51,7 @@ defmodule App.Accounts do
     end
   end
 
-  def list_users_for_section__roles(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
+  def list_users_for_section__roles!(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
     uid = user.id
     cid = section.course_id
     course = App.Courses.get_course!(cid)
@@ -164,10 +164,16 @@ defmodule App.Accounts do
     {stat, user} = case Repo.get_by(User, net_id: net_id) do
       nil ->
         # Get required fields
-        display_name = net_id
-        email = net_id <> "@connect.yale.edu"
-        is_faculty = false
-        attrs = %{display_name: display_name, email: email, net_id: net_id, is_faculty: is_faculty}
+        attrs = case YaleLDAP.get_attrs_by_netid(net_id) do
+          {:ok, ldapattrs} ->
+            Map.put(ldapattrs, :net_id, net_id)
+
+          _ ->
+            display_name = net_id
+            email = net_id <> "@connect.yale.edu"
+            is_faculty = false
+            %{display_name: display_name, email: email, net_id: net_id, is_faculty: is_faculty}
+          end
         %User{}
         |> User.changeset(attrs)
         |> Repo.insert()
@@ -177,6 +183,33 @@ defmodule App.Accounts do
       {stat, user}
   end
 
+  @doc """
+  Updates a user's attributes using an LDAP query.
+
+  ## Examples
+
+      iex> update_user_ldap("netid")
+      {:ok, %User{}}
+
+      iex> update_user_ldap("invalid netid")
+      {:error, "USer not found in [database | LDAP]"}
+
+  """
+  def update_user_ldap(net_id) do
+    case Repo.get_by(User, net_id: net_id) do
+      nil ->
+        {:error, "User not found in database"}
+      user ->
+        case YaleLDAP.get_attrs_by_netid(net_id) do
+          {:ok, attrs} ->
+            user
+            |> User.changeset(attrs)
+            |> Repo.update()
+          _ ->
+            {:error, "User not found in LDAP"}
+          end
+      end
+  end
 
   @doc """
   Updates a user.
@@ -523,14 +556,14 @@ defmodule App.Accounts do
 
   ## Examples
 
-      iex> update_course__role(course__role, %{field: new_value})
+      iex> update_course__role!(course__role, %{field: new_value})
       {:ok, %Course_Role{}}
 
-      iex> update_course__role(course__role, %{field: bad_value})
+      iex> update_course__role!(course__role, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_course__role(%App.Accounts.User{} = user_auth, %Course_Role{} = course__role, attrs) do
+  def update_course__role!(%App.Accounts.User{} = user_auth, %Course_Role{} = course__role, attrs) do
     course = App.Courses.get_course!(course__role.course_id)
     auth_role = get_current_course__role(user_auth, course)
     cond do
@@ -554,14 +587,14 @@ defmodule App.Accounts do
 
   ## Examples
 
-      iex> delete_course__role(course__role)
+      iex> delete_course__role!(course__role)
       {:ok, %Course_Role{}}
 
-      iex> delete_course__role(course__role)
+      iex> delete_course__role!(course__role)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_course__role(%App.Accounts.User{} = user_auth, %Course_Role{} = course__role) do
+  def delete_course__role!(%App.Accounts.User{} = user_auth, %Course_Role{} = course__role) do
     course = App.Courses.get_course!(course__role.course_id)
     auth_role = get_current_course__role(user_auth, course)
 
@@ -647,14 +680,14 @@ defmodule App.Accounts do
 
   ## Examples
 
-      iex> list_section_all_section_roles(user, section)
+      iex> list_section_all_section_roles!(user, section)
       [%Section_Role{}, ...]
 
   """
-  def list_section_all_section_roles(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
+  def list_section_all_section_roles!(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
     uid = user.id
     cid = section.id
-    auth_role = get_current_section__role(user, section)
+    auth_role = get_current_section__role!(user, section)
     if Enum.member?(@course_admin_roles, auth_role) do
       query = from u_r in Section_Role,
                 where: u_r.section_id == ^cid,
@@ -665,10 +698,10 @@ defmodule App.Accounts do
     end
   end
 
-  def list_section__role_users(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
+  def list_section__role_users!(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
     uid = user.id
     cid = section.id
-    auth_role = get_current_section__role(user, section)
+    auth_role = get_current_section__role!(user, section)
     if Enum.member?(@course_admin_roles, auth_role) do
       query = from u_r in Section_Role,
                 left_join: u in "users",
@@ -711,7 +744,7 @@ defmodule App.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_current_section__role(%App.Accounts.User{} = user, %App.Courses.Section{} = section, inherit_course_role \\ true) do
+  def get_current_section__role!(%App.Accounts.User{} = user, %App.Courses.Section{} = section, inherit_course_role \\ true) do
     {:ok, current_time} = DateTime.now("Etc/UTC")
     uid = user.id
     sid = section.id
@@ -747,7 +780,7 @@ defmodule App.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_registered_students(%App.Courses.Section{} = section) do
+  def get_registered_students!(%App.Courses.Section{} = section) do
     course = App.Courses.get_course!(section.course_id)
     semester = App.Courses.get_semester!(course.semester_id)
     RegistrationAPI.get_registered_students(section.crn, semester.term_code)
@@ -759,14 +792,14 @@ defmodule App.Accounts do
 
   ## Examples
 
-      iex> create_section__role(%{field: value})
+      iex> create_section__role!(%{field: value})
       {:ok, %Section_Role{}}
 
-      iex> create_section__role(%{field: bad_value})
+      iex> create_section__role!(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_section__role(%App.Accounts.User{} = user_auth, %App.Accounts.User{} = user, %App.Courses.Section{} = section, attrs \\ %{}) do
+  def create_section__role!(%App.Accounts.User{} = user_auth, %App.Accounts.User{} = user, %App.Courses.Section{} = section, attrs \\ %{}) do
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_course__role(user_auth, course)
 
@@ -793,14 +826,14 @@ defmodule App.Accounts do
 
   ## Examples
 
-      iex> update_section__role(section__role, %{field: new_value})
+      iex> update_section__role!(section__role, %{field: new_value})
       {:ok, %Section_Role{}}
 
-      iex> update_section__role(section__role, %{field: bad_value})
+      iex> update_section__role!(section__role, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_section__role(%App.Accounts.User{} = user_auth, %Section_Role{} = section__role, attrs) do
+  def update_section__role!(%App.Accounts.User{} = user_auth, %Section_Role{} = section__role, attrs) do
     section = App.Courses.get_section!(section__role.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_course__role(user_auth, course)
@@ -826,14 +859,14 @@ defmodule App.Accounts do
 
   ## Examples
 
-      iex> delete_section__role(section__role)
+      iex> delete_section__role!(section__role)
       {:ok, %Section_Role{}}
 
-      iex> delete_section__role(section__role)
+      iex> delete_section__role!(section__role)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_section__role(%App.Accounts.User{} = user_auth, %Section_Role{} = section__role) do
+  def delete_section__role!(%App.Accounts.User{} = user_auth, %Section_Role{} = section__role) do
     section = App.Courses.get_section!(section__role.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_course__role(user_auth, course)
@@ -857,14 +890,14 @@ defmodule App.Accounts do
 
   ## Examples
 
-      iex> delete_all_section__roles(user, section)
+      iex> delete_all_section__roles!(user, section)
       {:ok, %Section_Role{}}
 
-      iex> delete_section__role(section__role)
+      iex> delete_section__role!(section__role)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_all_section__roles(%App.Accounts.User{} = user_auth, %App.Courses.Section{} = section) do
+  def delete_all_section__roles!(%App.Accounts.User{} = user_auth, %App.Courses.Section{} = section) do
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_course__role(user_auth, course)
 

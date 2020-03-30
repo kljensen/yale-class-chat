@@ -7,7 +7,7 @@ defmodule AppWeb.CommentController do
   def index(conn, %{"submission_id" => submission_id}) do
     submission = Submissions.get_submission!(submission_id)
     user = conn.assigns.current_user
-    comments = Submissions.list_user_comments(user, submission)
+    comments = Submissions.list_user_comments!(user, submission)
     can_edit = App.Accounts.can_edit_submission(user, submission)
     render(conn, "index.html", comments: comments, submission: submission, can_edit: can_edit)
   end
@@ -21,7 +21,7 @@ defmodule AppWeb.CommentController do
   def create(conn, %{"comment" => comment_params, "submission_id" => submission_id}) do
     user = conn.assigns.current_user
     submission = Submissions.get_submission!(submission_id)
-    case Submissions.create_comment(user, submission, comment_params) do
+    case Submissions.create_comment!(user, submission, comment_params) do
       {:ok, _comment} ->
         conn
         |> put_flash(:success, "Comment created successfully.")
@@ -36,7 +36,7 @@ defmodule AppWeb.CommentController do
 
   def show(conn, %{"id" => id}) do
     user = conn.assigns.current_user
-    case App.Submissions.get_user_comment(user, id) do
+    case App.Submissions.get_user_comment!(user, id) do
       {:ok, comment} ->
         submission = Submissions.get_submission!(comment.submission_id)
         can_edit = App.Accounts.can_edit_comment(user, comment)
@@ -48,7 +48,7 @@ defmodule AppWeb.CommentController do
 
   def edit(conn, %{"id" => id}) do
     user = conn.assigns.current_user
-    case App.Submissions.get_user_comment(user, id) do
+    case App.Submissions.get_user_comment!(user, id) do
       {:ok, comment} ->
         case App.Accounts.can_edit_comment(user, comment) do
           true ->
@@ -64,12 +64,12 @@ defmodule AppWeb.CommentController do
 
   def update(conn, %{"id" => id, "comment" => comment_params}) do
     user = conn.assigns.current_user
-    case App.Submissions.get_user_comment(user, id) do
+    case App.Submissions.get_user_comment!(user, id) do
       {:ok, comment} ->
         case App.Accounts.can_edit_comment(user, comment) do
           true ->
             submission = Submissions.get_submission!(comment.submission_id)
-            case Submissions.update_comment(user, comment, comment_params) do
+            case Submissions.update_comment!(user, comment, comment_params) do
               {:ok, _comment} ->
                 conn
                 |> put_flash(:success, "Comment updated successfully.")
@@ -94,7 +94,7 @@ defmodule AppWeb.CommentController do
     user = conn.assigns.current_user
     case App.Accounts.can_edit_comment(user, comment) do
       true ->
-        {:ok, _comment} = Submissions.delete_comment(user, comment)
+        {:ok, _comment} = Submissions.delete_comment!(user, comment)
         conn
         |> put_flash(:success, "Comment deleted successfully.")
         |> redirect(to: Routes.submission_path(conn, :show, submission))

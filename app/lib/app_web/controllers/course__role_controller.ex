@@ -142,7 +142,7 @@ defmodule AppWeb.Course_RoleController do
     course__role = Accounts.get_course__role!(id)
     user = conn.assigns.current_user
 
-    case Accounts.update_course__role(user, course__role, course__role_params) do
+    case Accounts.update_course__role!(user, course__role, course__role_params) do
       {:ok, course__role} ->
         course = Courses.get_course!(course__role.course_id)
         conn
@@ -164,7 +164,7 @@ defmodule AppWeb.Course_RoleController do
     course__role = Accounts.get_course__role!(id)
     course = Courses.get_course!(course__role.course_id)
     user = conn.assigns.current_user
-    case Accounts.delete_course__role(user, course__role) do
+    case Accounts.delete_course__role!(user, course__role) do
     {:ok, _course__role} ->
       conn
       |> put_flash(:success, "Course  role deleted successfully.")

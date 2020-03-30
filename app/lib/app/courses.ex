@@ -613,14 +613,14 @@ defmodule App.Courses do
 
   ## Examples
 
-      iex> update_section(section, %{field: new_value})
+      iex> update_section!(section, %{field: new_value})
       {:ok, %Section{}}
 
-      iex> update_section(section, %{field: bad_value})
+      iex> update_section!(section, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_section(%App.Accounts.User{} = user, %Section{} = section, attrs) do
+  def update_section!(%App.Accounts.User{} = user, %Section{} = section, attrs) do
     #If user role is Administrator or Owner, then allow update of a section
     course = get_course!(section.course_id)
     course_role = App.Accounts.get_current_course__role(user, course)
@@ -646,14 +646,14 @@ defmodule App.Courses do
 
   ## Examples
 
-      iex> delete_section(section)
+      iex> delete_section!(section)
       {:ok, %Section{}}
 
-      iex> delete_section(section)
+      iex> delete_section!(section)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_section(%App.Accounts.User{} = user, %Section{} = section) do
+  def delete_section!(%App.Accounts.User{} = user, %Section{} = section) do
     course = get_course!(section.course_id)
     course_role = App.Accounts.get_current_course__role(user, course)
 

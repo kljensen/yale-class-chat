@@ -12,7 +12,7 @@ defmodule AppWeb.Section_RoleControllerTest do
 
   def fixture(:section__role, section, student) do
     user_faculty = App.Accounts.get_user_by!("faculty net id")
-    {:ok, section__role} = Accounts.create_section__role(user_faculty, student, section, @create_attrs)
+    {:ok, section__role} = Accounts.create_section__role!(user_faculty, student, section, @create_attrs)
     section__role
   end
 
@@ -106,7 +106,7 @@ defmodule AppWeb.Section_RoleControllerTest do
     test "redirects to show when data is valid", %{conn: conn, section: section} do
       current_user = Accounts.get_user_by!("faculty net id")
       #Update semester termcode and section CRN to return valid data
-      App.Courses.update_section(current_user, section, %{crn: "12801"})
+      App.Courses.update_section!(current_user, section, %{crn: "12801"})
       course = App.Courses.get_course!(section.course_id)
       semester = App.Courses.get_semester!(course.semester_id)
       App.Courses.update_semester(current_user, semester, %{term_code: "201903"})
@@ -125,7 +125,7 @@ defmodule AppWeb.Section_RoleControllerTest do
     test "renders errors when data is invalid", %{conn: conn, section: section} do
       current_user = Accounts.get_user_by!("faculty net id")
       attrs = Map.merge(@invalid_attrs, %{"update existing" => "false", "overwrite" => "false"})
-      App.Courses.update_section(current_user, section, %{crn: "111111"})
+      App.Courses.update_section!(current_user, section, %{crn: "111111"})
       conn = conn
         |> init_test_session(uid: "faculty net id")
         |> post(Routes.section_section__role_path(conn, :api_create, section), section__role: attrs)

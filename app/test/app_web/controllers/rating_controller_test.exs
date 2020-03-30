@@ -11,7 +11,7 @@ defmodule AppWeb.RatingControllerTest do
 
   def fixture(:rating, submission) do
     user_faculty = App.Accounts.get_user_by!("faculty net id")
-    {:ok, rating} = Submissions.create_rating(user_faculty, submission, @create_attrs)
+    {:ok, rating} = Submissions.create_rating!(user_faculty, submission, @create_attrs)
     rating
   end
 

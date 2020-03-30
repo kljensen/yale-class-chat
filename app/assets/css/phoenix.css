@@ -32,6 +32,7 @@
 html, body{
   padding: 0;
   margin: 0;
+  height: 100%;
 }
 
 html{
@@ -51,6 +52,8 @@ body {
     font-smooth: auto;
     -webkit-font-smoothing: subpixel-antialiased;
     -moz-osx-font-smoothing:grayscale;
+    display: flex  !important;
+    flex-direction: column;
 }
 
 nav {
@@ -274,3 +277,11 @@ div.comment-author-odd {
     }
 }
 
+
+// Sticky footer
+div.footer {
+    flex-shrink: 0;
+}
+div.content-flex {
+    flex: 1 0 auto;
+}

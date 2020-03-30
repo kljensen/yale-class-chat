@@ -23,7 +23,7 @@ defmodule App.TopicsTest do
       user_faculty = Accounts.get_user_by!("faculty net id")
 
       {:ok, topic} =
-        Topics.create_topic(user_faculty, section, params)
+        Topics.create_topic!(user_faculty, section, params)
 
       topic
     end
@@ -38,7 +38,7 @@ defmodule App.TopicsTest do
       params =
         %{slug: "some other slug"}
         |> Enum.into(@valid_attrs)
-      {:ok, topic2} = Topics.create_topic(user_faculty, section2, params)
+      {:ok, topic2} = Topics.create_topic!(user_faculty, section2, params)
 
       [topic: topic, section: section, course: course, user_faculty: user_faculty, section2: section2, topic2: topic2]
     end
@@ -55,8 +55,8 @@ defmodule App.TopicsTest do
       Accounts.create_course__role(user_faculty, user_faculty2, setupvars[:course], params)
 
       params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
-      {:ok, student_section_role} = App.Accounts.create_section__role(user_faculty, student, setupvars[:section], params)
-      {:ok, student_section2_role} = App.Accounts.create_section__role(user_faculty, student, setupvars[:section2], params)
+      {:ok, student_section_role} = App.Accounts.create_section__role!(user_faculty, student, setupvars[:section], params)
+      {:ok, student_section2_role} = App.Accounts.create_section__role!(user_faculty, student, setupvars[:section2], params)
 
       Enum.concat(setupvars, [user_faculty2: user_faculty2, student: student, student_notreg: student_notreg, student_section_role: student_section_role, student_section2_role: student_section2_role])
     end
@@ -96,19 +96,19 @@ defmodule App.TopicsTest do
       user_faculty = setupvars[:user_faculty]
       user_faculty2 = setupvars[:user_faculty2]
 
-      retrieved_topics = Topics.list_user_topics(user_faculty, section)
+      retrieved_topics = Topics.list_user_topics!(user_faculty, section)
       assert length(retrieved_topics) == 1
       retrieved_topic = List.first(retrieved_topics)
       assert retrieved_topic.id == topic.id
-      retrieved_topics = Topics.list_user_topics(user_faculty, section2)
+      retrieved_topics = Topics.list_user_topics!(user_faculty, section2)
       assert length(retrieved_topics) == 1
       retrieved_topic = List.first(retrieved_topics)
       assert retrieved_topic.id == topic2.id
-      retrieved_topics = Topics.list_user_topics(user_faculty2, section)
+      retrieved_topics = Topics.list_user_topics!(user_faculty2, section)
       assert length(retrieved_topics) == 1
       retrieved_topic = List.first(retrieved_topics)
       assert retrieved_topic.id == topic.id
-      retrieved_topics = Topics.list_user_topics(user_faculty2, section2)
+      retrieved_topics = Topics.list_user_topics!(user_faculty2, section2)
       assert length(retrieved_topics) == 1
       retrieved_topic = List.first(retrieved_topics)
       assert retrieved_topic.id == topic2.id
@@ -122,11 +122,11 @@ defmodule App.TopicsTest do
       section2 = setupvars[:section2]
       student = setupvars[:student]
 
-      retrieved_topics = Topics.list_user_topics(student, section)
+      retrieved_topics = Topics.list_user_topics!(student, section)
       assert length(retrieved_topics) == 1
       retrieved_topic = List.first(retrieved_topics)
       assert retrieved_topic.id == topic.id
-      retrieved_topics = Topics.list_user_topics(student, section2)
+      retrieved_topics = Topics.list_user_topics!(student, section2)
       assert length(retrieved_topics) == 1
       retrieved_topic = List.first(retrieved_topics)
       assert retrieved_topic.id == topic2.id
@@ -140,25 +140,25 @@ defmodule App.TopicsTest do
       student_notreg = setupvars[:student_notreg]
       user_faculty = setupvars[:user_faculty]
 
-      retrieved_topics = Topics.list_user_topics(student_notreg, section)
+      retrieved_topics = Topics.list_user_topics!(student_notreg, section)
       assert length(retrieved_topics) == 0
-      retrieved_topics = Topics.list_user_topics(student_notreg, section2)
+      retrieved_topics = Topics.list_user_topics!(student_notreg, section2)
       assert length(retrieved_topics) == 0
 
-      retrieved_topics = Topics.list_user_topics(student, section)
+      retrieved_topics = Topics.list_user_topics!(student, section)
       assert length(retrieved_topics) == 1
-      retrieved_topics = Topics.list_user_topics(student, section2)
+      retrieved_topics = Topics.list_user_topics!(student, section2)
       assert length(retrieved_topics) == 1
 
       {:ok, current_time} = DateTime.now("Etc/UTC")
       params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, -7200, :second)}
-      App.Accounts.update_section__role(user_faculty, setupvars[:student_section_role], params)
+      App.Accounts.update_section__role!(user_faculty, setupvars[:student_section_role], params)
       params = %{role: "student", valid_from: DateTime.add(current_time, 7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
-      App.Accounts.update_section__role(user_faculty, setupvars[:student_section2_role], params)
+      App.Accounts.update_section__role!(user_faculty, setupvars[:student_section2_role], params)
 
-      retrieved_topics = Topics.list_user_topics(student, section)
+      retrieved_topics = Topics.list_user_topics!(student, section)
       assert length(retrieved_topics) == 0
-      retrieved_topics = Topics.list_user_topics(student, section2)
+      retrieved_topics = Topics.list_user_topics!(student, section2)
       assert length(retrieved_topics) == 0
     end
 
@@ -171,22 +171,22 @@ defmodule App.TopicsTest do
       user_faculty = setupvars[:user_faculty]
       user_faculty2 = setupvars[:user_faculty2]
 
-      {:ok, topic} = Topics.update_topic(user_faculty, topic, %{visible: false})
-      {:ok, topic2} = Topics.update_topic(user_faculty, topic2, %{visible: false})
+      {:ok, topic} = Topics.update_topic!(user_faculty, topic, %{visible: false})
+      {:ok, topic2} = Topics.update_topic!(user_faculty, topic2, %{visible: false})
 
-      retrieved_topics = Topics.list_user_topics(user_faculty, section)
+      retrieved_topics = Topics.list_user_topics!(user_faculty, section)
       assert length(retrieved_topics) == 1
       retrieved_topic = List.first(retrieved_topics)
       assert retrieved_topic.id == topic.id
-      retrieved_topics = Topics.list_user_topics(user_faculty, section2)
+      retrieved_topics = Topics.list_user_topics!(user_faculty, section2)
       assert length(retrieved_topics) == 1
       retrieved_topic = List.first(retrieved_topics)
       assert retrieved_topic.id == topic2.id
-      retrieved_topics = Topics.list_user_topics(user_faculty2, section)
+      retrieved_topics = Topics.list_user_topics!(user_faculty2, section)
       assert length(retrieved_topics) == 1
       retrieved_topic = List.first(retrieved_topics)
       assert retrieved_topic.id == topic.id
-      retrieved_topics = Topics.list_user_topics(user_faculty2, section2)
+      retrieved_topics = Topics.list_user_topics!(user_faculty2, section2)
       assert length(retrieved_topics) == 1
       retrieved_topic = List.first(retrieved_topics)
       assert retrieved_topic.id == topic2.id
@@ -201,12 +201,12 @@ defmodule App.TopicsTest do
       student = setupvars[:student]
       user_faculty = setupvars[:user_faculty]
 
-      Topics.update_topic(user_faculty, topic, %{visible: false})
-      Topics.update_topic(user_faculty, topic2, %{visible: false})
+      Topics.update_topic!(user_faculty, topic, %{visible: false})
+      Topics.update_topic!(user_faculty, topic2, %{visible: false})
 
-      retrieved_topics = Topics.list_user_topics(student, section)
+      retrieved_topics = Topics.list_user_topics!(student, section)
       assert length(retrieved_topics) == 0
-      retrieved_topics = Topics.list_user_topics(student, section2)
+      retrieved_topics = Topics.list_user_topics!(student, section2)
       assert length(retrieved_topics) == 0
     end
 
@@ -219,7 +219,7 @@ defmodule App.TopicsTest do
     test "create_topic/3 with valid data creates a topic" do
       section = CTest.section_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
-      assert {:ok, %Topic{} = topic} = Topics.create_topic(user_faculty, section, @valid_attrs)
+      assert {:ok, %Topic{} = topic} = Topics.create_topic!(user_faculty, section, @valid_attrs)
       assert topic.allow_submission_comments == true
       assert topic.allow_submission_voting == true
       assert topic.allow_submissions == true
@@ -236,7 +236,7 @@ defmodule App.TopicsTest do
     test "create_topic/3 with invalid data returns error changeset" do
       section = CTest.section_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
-      assert {:error, changeset = topic} = Topics.create_topic(user_faculty, section, @invalid_attrs)
+      assert {:error, changeset = topic} = Topics.create_topic!(user_faculty, section, @invalid_attrs)
       assert %{allow_submission_comments: ["can't be blank"]} = errors_on(changeset)
       assert %{allow_submission_voting: ["can't be blank"]} = errors_on(changeset)
       assert %{allow_submissions: ["can't be blank"]} = errors_on(changeset)
@@ -256,7 +256,7 @@ defmodule App.TopicsTest do
       section = CTest.section_fixture()
       user_noauth = ATest.user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
 
-      assert {:error, "unauthorized"} = Topics.create_topic(user_noauth, section, @invalid_attrs)
+      assert {:error, "unauthorized"} = Topics.create_topic!(user_noauth, section, @invalid_attrs)
     end
 
     test "create_topic/3 with non-writeable course returns error" do
@@ -265,13 +265,13 @@ defmodule App.TopicsTest do
       course = Courses.get_course!(section.course_id)
       Courses.update_course(user_faculty, course, %{allow_write: false})
 
-      assert {:error, "course write not allowed"} = Topics.create_topic(user_faculty, section, @invalid_attrs)
+      assert {:error, "course write not allowed"} = Topics.create_topic!(user_faculty, section, @invalid_attrs)
     end
 
     test "update_topic/2 with valid data updates the topic" do
       topic = topic_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
-      assert {:ok, %Topic{} = topic} = Topics.update_topic(user_faculty, topic, @update_attrs)
+      assert {:ok, %Topic{} = topic} = Topics.update_topic!(user_faculty, topic, @update_attrs)
       assert topic.allow_submission_comments == false
       assert topic.allow_submission_voting == false
       assert topic.allow_submissions == false
@@ -288,7 +288,7 @@ defmodule App.TopicsTest do
     test "update_topic/2 with invalid data returns error changeset" do
       topic = topic_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
-      assert {:error, %Ecto.Changeset{}} = Topics.update_topic(user_faculty, topic, @invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Topics.update_topic!(user_faculty, topic, @invalid_attrs)
       retrieved_topic = Topics.get_topic!(topic.id)
       assert topic.id == retrieved_topic.id
       assert topic.allow_submission_comments == retrieved_topic.allow_submission_comments
@@ -307,7 +307,7 @@ defmodule App.TopicsTest do
     test "update_topic/2 by unauthorized user returns error" do
       topic = topic_fixture()
       user_noauth = ATest.user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
-      assert {:error, "unauthorized"} = Topics.update_topic(user_noauth, topic, @invalid_attrs)
+      assert {:error, "unauthorized"} = Topics.update_topic!(user_noauth, topic, @invalid_attrs)
       retrieved_topic = Topics.get_topic!(topic.id)
       assert topic.id == retrieved_topic.id
       assert topic.allow_submission_comments == retrieved_topic.allow_submission_comments
@@ -330,20 +330,20 @@ defmodule App.TopicsTest do
       course = Courses.get_course!(section.course_id)
       Courses.update_course(user_faculty, course, %{allow_write: false})
 
-      assert {:error, "course write not allowed"} = Topics.update_topic(user_faculty, topic, @update_attrs)
+      assert {:error, "course write not allowed"} = Topics.update_topic!(user_faculty, topic, @update_attrs)
     end
 
     test "delete_topic/2 deletes the topic" do
       topic = topic_fixture()
       user_faculty = Accounts.get_user_by!("faculty net id")
-      assert {:ok, %Topic{}} = Topics.delete_topic(user_faculty, topic)
+      assert {:ok, %Topic{}} = Topics.delete_topic!(user_faculty, topic)
       assert_raise Ecto.NoResultsError, fn -> Topics.get_topic!(topic.id) end
     end
 
     test "delete_topic/2 by unauthorized user returns error" do
       topic = topic_fixture()
       user_noauth = ATest.user_fixture(%{is_faculty: true, net_id: "new faculty net id"})
-      assert {:error, "unauthorized"} = Topics.delete_topic(user_noauth, topic)
+      assert {:error, "unauthorized"} = Topics.delete_topic!(user_noauth, topic)
       retrieved_topic = Topics.get_topic!(topic.id)
       assert topic.id == retrieved_topic.id
       assert topic.allow_submission_comments == retrieved_topic.allow_submission_comments
@@ -366,7 +366,7 @@ defmodule App.TopicsTest do
       course = Courses.get_course!(section.course_id)
       Courses.update_course(user_faculty, course, %{allow_write: false})
 
-      assert {:error, "course write not allowed"} = Topics.delete_topic(user_faculty, topic)
+      assert {:error, "course write not allowed"} = Topics.delete_topic!(user_faculty, topic)
     end
 
     test "change_topic/1 returns a topic changeset" do

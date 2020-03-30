@@ -47,11 +47,11 @@ defmodule App.Submissions do
 
   ## Examples
 
-      iex> list_user_submissions(user, topic)
+      iex> list_user_submissions!(user, topic)
       [%Submission{}, ...]
 
   """
-  def list_user_submissions(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic, inherit_course_role \\ true) do
+  def list_user_submissions!(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic, inherit_course_role \\ true) do
     tid = topic.id
     uid = user.id
     sid = topic.section_id
@@ -253,7 +253,7 @@ defmodule App.Submissions do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user_submission(%App.Accounts.User{} = user, id) do
+  def get_user_submission!(%App.Accounts.User{} = user, id) do
     submission = Repo.get!(Submission, id)
     result = case App.Accounts.can_edit_submission(user, submission) do
                 true ->
@@ -360,17 +360,17 @@ defmodule App.Submissions do
 
   ## Examples
 
-      iex> create_submission(%{field: value})
+      iex> create_submission!(%{field: value})
       {:ok, %Submission{}}
 
-      iex> create_submission(%{field: bad_value})
+      iex> create_submission!(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_submission(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic, attrs \\ %{}) do
+  def create_submission!(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic, attrs \\ %{}) do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_section__role(user, section)
+    auth_role = App.Accounts.get_current_section__role!(user, section)
     course_role = App.Accounts.get_current_course__role(user, course)
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
@@ -426,14 +426,14 @@ defmodule App.Submissions do
 
   ## Examples
 
-      iex> update_submission(submission, %{field: new_value})
+      iex> update_submission!(submission, %{field: new_value})
       {:ok, %Submission{}}
 
-      iex> update_submission(submission, %{field: bad_value})
+      iex> update_submission!(submission, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_submission(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
+  def update_submission!(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
@@ -486,18 +486,18 @@ defmodule App.Submissions do
 
   ## Examples
 
-      iex> delete_submission(submission)
+      iex> delete_submission!(submission)
       {:ok, %Submission{}}
 
-      iex> delete_submission(submission)
+      iex> delete_submission!(submission)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_submission(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission) do
+  def delete_submission!(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission) do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_section__role(user, section)
+    auth_role = App.Accounts.get_current_section__role!(user, section)
     {:ok, current_time} = DateTime.now("Etc/UTC")
     authorized = Enum.member?(@course_admin_roles, auth_role) or user.id == submission.user_id
 
@@ -568,11 +568,11 @@ defmodule App.Submissions do
 
   ## Examples
 
-      iex> list_user_comments(user, submission)
+      iex> list_user_comments!(user, submission)
       [%Comment{}, ...]
 
   """
-  def list_user_comments(%App.Accounts.User{} = user, %Submission{} = submission, inherit_course_role \\ true) do
+  def list_user_comments!(%App.Accounts.User{} = user, %Submission{} = submission, inherit_course_role \\ true) do
     tid = submission.topic_id
     topic = App.Topics.get_topic!(tid)
     uid = user.id
@@ -692,13 +692,13 @@ defmodule App.Submissions do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user_comment(%App.Accounts.User{} = user, id) do
+  def get_user_comment!(%App.Accounts.User{} = user, id) do
     comment = Repo.get!(Comment, id)
     return = case App.Accounts.can_edit_comment(user, comment) do
                 true ->
                   {:ok, comment}
                 false ->
-                  returntmp = case get_user_submission(user, comment.submission_id) do
+                  returntmp = case get_user_submission!(user, comment.submission_id) do
                                 {:ok, submission} ->
                                   tid = submission.topic_id
                                   uid = user.id
@@ -743,18 +743,18 @@ defmodule App.Submissions do
 
   ## Examples
 
-      iex> create_comment(%{field: value})
+      iex> create_comment!(%{field: value})
       {:ok, %Comment{}}
 
-      iex> create_comment(%{field: bad_value})
+      iex> create_comment!(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_comment(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
+  def create_comment!(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_section__role(user, section)
+    auth_role = App.Accounts.get_current_section__role!(user, section)
     course_role = App.Accounts.get_current_course__role(user, section)
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
@@ -787,14 +787,14 @@ defmodule App.Submissions do
 
   ## Examples
 
-      iex> update_comment(comment, %{field: new_value})
+      iex> update_comment!(comment, %{field: new_value})
       {:ok, %Comment{}}
 
-      iex> update_comment(comment, %{field: bad_value})
+      iex> update_comment!(comment, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_comment(%App.Accounts.User{} = user, %App.Submissions.Comment{} = comment, attrs \\ %{}) do
+  def update_comment!(%App.Accounts.User{} = user, %App.Submissions.Comment{} = comment, attrs \\ %{}) do
     submission = get_submission!(comment.submission_id)
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
@@ -829,14 +829,14 @@ defmodule App.Submissions do
 
   ## Examples
 
-      iex> delete_comment(comment)
+      iex> delete_comment!(comment)
       {:ok, %Comment{}}
 
-      iex> delete_comment(comment)
+      iex> delete_comment!(comment)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_comment(%App.Accounts.User{} = user, %App.Submissions.Comment{} = comment) do
+  def delete_comment!(%App.Accounts.User{} = user, %App.Submissions.Comment{} = comment) do
     submission = get_submission!(comment.submission_id)
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
@@ -911,11 +911,11 @@ defmodule App.Submissions do
 
   ## Examples
 
-      iex> list_user_ratings(user, submission)
+      iex> list_user_ratings!(user, submission)
       [%Rating{}, ...]
 
   """
-  def list_user_ratings(%App.Accounts.User{} = user, %Submission{} = submission, inherit_course_role \\ true) do
+  def list_user_ratings!(%App.Accounts.User{} = user, %Submission{} = submission, inherit_course_role \\ true) do
     tid = submission.topic_id
     topic = App.Topics.get_topic!(tid)
     uid = user.id
@@ -1022,7 +1022,7 @@ defmodule App.Submissions do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user_rating(%App.Accounts.User{} = user, id) do
+  def get_user_rating!(%App.Accounts.User{} = user, id) do
     rating = Repo.get!(Rating, id)
     return = case App.Accounts.can_edit_rating(user, rating) do
                 true ->
@@ -1068,18 +1068,18 @@ defmodule App.Submissions do
 
   ## Examples
 
-      iex> create_rating(%{field: value})
+      iex> create_rating!(%{field: value})
       {:ok, %Rating{}}
 
-      iex> create_rating(%{field: bad_value})
+      iex> create_rating!(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_rating(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
+  def create_rating!(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_section__role(user, section)
+    auth_role = App.Accounts.get_current_section__role!(user, section)
     course_role = App.Accounts.get_current_course__role(user, section)
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
@@ -1112,14 +1112,14 @@ defmodule App.Submissions do
 
   ## Examples
 
-      iex> update_rating(rating, %{field: new_value})
+      iex> update_rating!(rating, %{field: new_value})
       {:ok, %Rating{}}
 
-      iex> update_rating(rating, %{field: bad_value})
+      iex> update_rating!(rating, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_rating(%App.Accounts.User{} = user, %App.Submissions.Rating{} = rating, attrs \\ %{}) do
+  def update_rating!(%App.Accounts.User{} = user, %App.Submissions.Rating{} = rating, attrs \\ %{}) do
     submission = get_submission!(rating.submission_id)
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
@@ -1154,14 +1154,14 @@ defmodule App.Submissions do
 
   ## Examples
 
-      iex> delete_rating(rating)
+      iex> delete_rating!(rating)
       {:ok, %Rating{}}
 
-      iex> delete_rating(rating)
+      iex> delete_rating!(rating)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_rating(%App.Accounts.User{} = user, %App.Submissions.Rating{} = rating) do
+  def delete_rating!(%App.Accounts.User{} = user, %App.Submissions.Rating{} = rating) do
     submission = get_submission!(rating.submission_id)
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)

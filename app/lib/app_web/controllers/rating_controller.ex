@@ -7,7 +7,7 @@ defmodule AppWeb.RatingController do
   def index(conn, %{"submission_id" => submission_id}) do
     submission = Submissions.get_submission!(submission_id)
     user = conn.assigns.current_user
-    ratings = Submissions.list_user_ratings(user, submission)
+    ratings = Submissions.list_user_ratings!(user, submission)
     can_edit = App.Accounts.can_edit_submission(user, submission)
     render(conn, "index.html", ratings: ratings, submission: submission, can_edit: can_edit)
   end
@@ -21,7 +21,7 @@ defmodule AppWeb.RatingController do
   def create(conn, %{"rating" => rating_params, "submission_id" => submission_id}) do
     user = conn.assigns.current_user
     submission = Submissions.get_submission!(submission_id)
-    case Submissions.create_rating(user, submission, rating_params) do
+    case Submissions.create_rating!(user, submission, rating_params) do
       {:ok, _rating} ->
         conn
         |> put_flash(:success, "Rating created successfully.")
@@ -36,7 +36,7 @@ defmodule AppWeb.RatingController do
 
   def show(conn, %{"id" => id}) do
     user = conn.assigns.current_user
-    case App.Submissions.get_user_rating(user, id) do
+    case App.Submissions.get_user_rating!(user, id) do
       nil -> render_error(conn, "not found")
 
       rating ->
@@ -48,7 +48,7 @@ defmodule AppWeb.RatingController do
 
   def edit(conn, %{"id" => id}) do
     user = conn.assigns.current_user
-    case App.Submissions.get_user_rating(user, id) do
+    case App.Submissions.get_user_rating!(user, id) do
       nil -> render_error(conn, "not found")
 
       rating ->
@@ -69,7 +69,7 @@ defmodule AppWeb.RatingController do
     case App.Accounts.can_edit_rating(user, rating) do
       true ->
         submission = Submissions.get_submission!(rating.submission_id)
-        case Submissions.update_rating(user, rating, rating_params) do
+        case Submissions.update_rating!(user, rating, rating_params) do
           {:ok, _rating} ->
             conn
             |> put_flash(:success, "Rating updated successfully.")
@@ -92,7 +92,7 @@ defmodule AppWeb.RatingController do
 
     case App.Accounts.can_edit_rating(user, rating) do
       true ->
-        {:ok, _rating} = Submissions.delete_rating(user, rating)
+        {:ok, _rating} = Submissions.delete_rating!(user, rating)
         conn
         |> put_flash(:success, "Rating deleted successfully.")
         |> redirect(to: Routes.submission_path(conn, :show, submission))

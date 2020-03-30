@@ -48,6 +48,17 @@ config :app, RegistrationAPI,
     password: System.get_env("REGISTRATION_API_PASSWORD")
 
 
+# LDAP Connection for names and faculty status
+# ```elixir
+config :ldap_ex, :defaults, %{
+    server: System.get_env("LDAP_HOST"),
+    port: elem(Integer.parse(System.get_env("LDAP_PORT")), 0),
+    ssl: System.get_env("LDAP_SSL") == "true",
+    username: System.get_env("LDAP_USER"),
+    password: System.get_env("LDAP_PASS"),
+    timeout: 5000
+  }
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"

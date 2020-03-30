@@ -12,7 +12,7 @@ defmodule AppWeb.SubmissionController do
       {:ok, topic} ->
         section = topic.section
         course = topic.section.course
-        submissions = Submissions.list_user_submissions(user, topic)
+        submissions = Submissions.list_user_submissions!(user, topic)
         can_edit = App.Accounts.can_edit_topic(user, topic)
         render(conn, "index.html", submissions: submissions, topic: topic, can_edit: can_edit, uid: user.id, section: section, course: course)
 
@@ -40,7 +40,7 @@ defmodule AppWeb.SubmissionController do
         section = topic.section
         course = topic.section.course
 
-        case Submissions.create_submission(user, topic, submission_params) do
+        case Submissions.create_submission!(user, topic, submission_params) do
           {:ok, _submission} ->
             conn
             |> put_flash(:success, "Submission created successfully.")
@@ -58,7 +58,7 @@ defmodule AppWeb.SubmissionController do
 
   def show(conn, %{"id" => id}) do
     user = conn.assigns.current_user
-    case Submissions.get_user_submission(user, id) do
+    case Submissions.get_user_submission!(user, id) do
       {:ok, submission} ->
         my_rating = Submissions.get_user_submission_rating(user.id, id)
         submission_check = Submissions.get_submission!(id)
@@ -66,7 +66,7 @@ defmodule AppWeb.SubmissionController do
         can_edit = App.Accounts.can_edit_submission(user, submission_check)
         is_admin = App.Accounts.can_edit_topic(user, topic)
         can_edit_topic = App.Accounts.can_edit_topic(user, topic)
-        comments = Submissions.list_user_comments(user, submission_check)
+        comments = Submissions.list_user_comments!(user, submission_check)
         section = Courses.get_section!(topic.section_id)
         course = Courses.get_course!(section.course_id)
         comment_changeset = Submissions.change_comment(%App.Submissions.Comment{})
@@ -107,7 +107,7 @@ defmodule AppWeb.SubmissionController do
     submission = Submissions.get_submission!(id)
     user = conn.assigns.current_user
 
-    case Submissions.update_submission(user, submission, submission_params) do
+    case Submissions.update_submission!(user, submission, submission_params) do
       {:ok, submission} ->
         conn
         |> put_flash(:success, "Submission updated successfully.")
@@ -129,7 +129,7 @@ defmodule AppWeb.SubmissionController do
     case App.Accounts.can_edit_submission(user, submission) do
       true ->
         topic = Topics.get_topic!(submission.topic_id)
-        {:ok, _submission} = Submissions.delete_submission(user, submission)
+        {:ok, _submission} = Submissions.delete_submission!(user, submission)
         conn
         |> put_flash(:success, "Submission deleted successfully.")
         |> redirect(to: Routes.topic_path(conn, :show, topic))

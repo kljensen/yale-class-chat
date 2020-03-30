@@ -34,7 +34,10 @@ SIGNING_SALT=8ebd49dc616e9d895fff338536e44d5625bd5dc53f8f5c347fb60be75ddfb707
 REGISTRATION_API_URL=http://example.com
 REGISTRATION_API_USERNAME=user_for_reg_api
 REGISTRATION_API_PASSWORD=random-string-of-words-or-characters
-LDAP_HOST=ldaps://example.com
+#LDAP (NOTE: do not include ldaps:// in LDAP_HOST)
+LDAP_HOST=ldap.example.com
+LDAP_PORT=636
+LDAP_SSL=true
 LDAP_USER=ldap_user
 LDAP_PASS=ldap_pass
 YALE_BASE_URL=https://example.com

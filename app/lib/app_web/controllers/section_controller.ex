@@ -46,7 +46,7 @@ defmodule AppWeb.SectionController do
     case Courses.get_user_section(user, id) do
       {:ok, section} ->
         course = section.course
-        topics = Topics.list_user_topics(user, section)
+        topics = Topics.list_user_topics!(user, section)
         can_edit = App.Accounts.can_edit_section(user, section)
         render(conn, "show.html", course: course, section: section, topics: topics, can_edit: can_edit)
       {:error, message} -> render_error(conn, message)
@@ -72,7 +72,7 @@ defmodule AppWeb.SectionController do
     user = conn.assigns.current_user
     {:ok, section} = Courses.get_user_section(user, id)
 
-    case Courses.update_section(user, section, section_params) do
+    case Courses.update_section!(user, section, section_params) do
       {:ok, section} ->
         conn
         |> put_flash(:success, "Section updated successfully.")
@@ -93,7 +93,7 @@ defmodule AppWeb.SectionController do
 
     case App.Accounts.can_edit_section(user, section) do
       true ->
-        {:ok, _section} = Courses.delete_section(user, section)
+        {:ok, _section} = Courses.delete_section!(user, section)
         conn
         |> put_flash(:success, "Section deleted successfully.")
         |> redirect(to: Routes.course_path(conn, :show, cid))
