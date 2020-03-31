@@ -40,7 +40,6 @@ defmodule AppWeb.Router do
   scope "/", AppWeb do
     pipe_through [:browser, :auth]
 
-    live "/live/topics/:id", TopicLive
     live "/live/submissions/:id", SubmissionLive
 
     #get "/", PageController, :index
@@ -62,7 +61,8 @@ defmodule AppWeb.Router do
       delete "/leave_section", Section_RoleController, :self_delete
     end
 
-    resources "/topics", TopicController, only: [:show] do
+    resources "/topics", TopicController, only: [] do
+      live "/", TopicLive
       resources "/submissions", SubmissionController, except: [:show, :index]
     end
 
