@@ -40,8 +40,6 @@ defmodule AppWeb.Router do
   scope "/", AppWeb do
     pipe_through [:browser, :auth]
 
-    live "/live/submissions/:id", SubmissionLive
-
     #get "/", PageController, :index
     resources "/courses", CourseController do
       resources "/sections", SectionController, only: [:new]
@@ -66,7 +64,8 @@ defmodule AppWeb.Router do
       resources "/submissions", SubmissionController, except: [:show, :index]
     end
 
-    resources "/submissions", SubmissionController, only: [:show] do
+    resources "/submissions", SubmissionController, only: [] do
+      live "/", SubmissionLive
       resources "/comments", CommentController, except: [:index, :show, :new]
       resources "/ratings", RatingController, except: [:index, :show, :new, :edit]
     end
