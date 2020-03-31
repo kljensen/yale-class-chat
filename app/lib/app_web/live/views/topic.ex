@@ -39,8 +39,7 @@ defmodule AppWeb.TopicLive do
   The first argument is the URL params. The second are
   the session variables, and the last is the socket.
   """
-  def mount(%{"id" => id}, %{"uid" => net_id}, socket) do
-    Logger.info("....in mount BEGIN\n\n")
+  def mount(%{"topic_id" => id}, %{"uid" => net_id}, socket) do
     if connected?(socket) do
       App.LiveViewNotifications.subscribe_for_topic(id)
     end

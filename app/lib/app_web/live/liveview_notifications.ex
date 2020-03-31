@@ -113,11 +113,13 @@ defmodule App.LiveViewNotifications do
       "submissions" -> [:data, :topic, :id]
       "comments" -> [:data, :submission, :topic, :id]
       "ratings" -> [:data, :submission, :topic, :id]
+      _ -> nil
     end
-    topic_id = get_in(payload, topic_id_path_keys)
-
-    if !is_nil(topic_id) do
-      mark_topic_updated!(topic_id)
+    if !is_nil(topic_id_path_keys) do
+      topic_id = get_in(payload, topic_id_path_keys)
+      if !is_nil(topic_id) do
+        mark_topic_updated!(topic_id)
+      end
     end
   end
 
@@ -126,11 +128,13 @@ defmodule App.LiveViewNotifications do
       "submissions" -> [:data, :id]
       "comments" -> [:data, :submission, :id]
       "ratings" -> [:data, :submission, :id]
+      _ -> nil
     end
-    submission_id = get_in(payload, submission_id_path_keys)
-
-    if !is_nil(submission_id) do
-      mark_submission_updated!(submission_id)
+    if !is_nil(submission_id_path_keys) do
+      submission_id = get_in(payload, submission_id_path_keys)
+      if !is_nil(submission_id) do
+        mark_submission_updated!(submission_id)
+      end
     end
   end
 

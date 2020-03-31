@@ -69,7 +69,7 @@ defmodule App.MixProject do
       {:tesla, "~> 1.3.0"},
       {:hackney, "~> 1.15.2"},
       # Use LDAPEx for LDAP queries
-      {:ldap_ex, "~> 0.2.2"}
+      {:ldap_ex, "~> 0.2.2"},
       # Use poison for JSON parsing
       {:poison, "~> 3.1"}
     ]

@@ -105,17 +105,22 @@ defmodule App.Topics do
   end
 
   def get_topic_data_for_user(user, topic_id) do
+    Logger.info("about to call get_with_couse_and_section(#{topic_id})")
     topic = get_with_couse_and_section(topic_id)
+    Logger.info("got topic")
+    topic
+    |> inspect()
+    |> Logger.info()
     can_edit = App.Accounts.can_edit_topic(user, topic)
     section = topic.section
     course = topic.section.course
     submissions = case topic.show_user_submissions do
       true ->
-        Submissions.list_user_submissions(user, topic)
+        Submissions.list_user_submissions!(user, topic)
       false ->
         case can_edit do
           true ->
-            Submissions.list_user_submissions(user, topic)
+            Submissions.list_user_submissions!(user, topic)
           false ->
             Submissions.list_user_own_submissions(user, topic)
           end

@@ -5,6 +5,7 @@ defmodule AppWeb.SubmissionLive do
   require App.LiveViewNotifications
   alias App.Submissions.Submission
   require App.Submissions
+  require AppWeb.Errors
 
   def render(assigns) do
     Phoenix.View.render(AppWeb.SubmissionView, "live.html", assigns)
@@ -28,7 +29,7 @@ defmodule AppWeb.SubmissionLive do
       :ok ->
         assign(socket, submission_data)
       :error ->
-        raise Errors.NotFound
+        raise AppWeb.Errors.NotFound
     end
   end
 
@@ -70,8 +71,8 @@ defmodule AppWeb.SubmissionLive do
     Repo.get_by!(User, net_id: socket.assigns.net_id)
   end
 
-  defp create_comment(comment_data, socket) do
-    App.Submissions.create_comment(socket.assigns.net_id, socket.assigns.id, comment_data)
+  defp create_comment!(comment_data, socket) do
+    App.Submissions.create_comment!(socket.assigns.net_id, socket.assigns.id, comment_data)
   end
 
   defp create_rating!(comment_data, socket) do
@@ -84,7 +85,7 @@ defmodule AppWeb.SubmissionLive do
     comment_form_data
     |> inspect()
     |> Logger.info()
-    create_comment(comment_form_data, socket)
+    create_comment!(comment_form_data, socket)
     {:noreply, socket}
   end
 
