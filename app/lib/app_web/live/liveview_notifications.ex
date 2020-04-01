@@ -52,29 +52,35 @@ defmodule App.LiveViewNotifications do
     Phoenix.PubSub.broadcast!(server, key, :true)
   end
 
-  def subscribe_for_topic(id) do
+  defp sub_unsub(:subscribe, key) do
     server = get_pubsub_server()
+    Phoenix.PubSub.subscribe(server, key)
+  end
+
+  defp sub_unsub(:unsubscribe, key) do
+    server = get_pubsub_server()
+    Phoenix.PubSub.unsubscribe(server, key)
+  end
+
+  def subscribe_for_topic(id) do
     key = key_for_topic(id)
-    Phoenix.PubSub.subscribe(server, key)  
+    sub_unsub(:subscribe, key)
   end
 
   def unsubscribe_for_topic(id) do
-    server = get_pubsub_server()
     key = key_for_topic(id)
-    Phoenix.PubSub.unsubscribe(server, key)  
+    sub_unsub(:unsubscribe, key)
   end
 
   def subscribe_for_submission(id) do
-    server = get_pubsub_server()
     key = key_for_submission(id)
+    sub_unsub(:subscribe, key)
     Logger.info("Subscribed to #{key}")
-    Phoenix.PubSub.subscribe(server, key)  
   end
 
   def unsubscribe_for_submission(id) do
-    server = get_pubsub_server()
     key = key_for_submission(id)
-    Phoenix.PubSub.unsubscribe(server, key)  
+    sub_unsub(:unsubscribe, key)
   end
 
   def key_for_topic(id) do
@@ -144,6 +150,10 @@ defmodule App.LiveViewNotifications do
   end
 
   def handle_info(%{table: table} = payload, socket) do
+    Logger.info("Got notification")
+    payload
+    |> inspect()
+    |> Logger.info()
     check_for_updates(table, payload)
     {:noreply, :event_handled}
   end
