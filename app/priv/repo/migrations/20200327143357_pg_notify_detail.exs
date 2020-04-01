@@ -98,7 +98,31 @@ defmodule App.Repo.Migrations.PgNotifyBubbleUp do
 
   Notice that sometimes this will return nil/null when something
   is deleted via a cascade, e.g. if we delete a submission and
-  the comments are deleted by cascade.
+  the comments are deleted by cascade. E.g. this is the notification
+  we will receive for comment id=4 deletion when it is deleted 
+  via cascade of submission id=1's deletion. Notice that `submission_id`
+  is populated but submission is not because that submission no longer
+  exists in the table.
+
+   %{data: %{description: "I currently have 4 windows open up… and I don’t know why.",
+    id: 4,
+    inserted_at: "2020-04-01T20:06:44",
+    submission: nil,
+    submission_id: 1,
+    updated_at: "2020-04-01T20:06:44",
+    user: %{display_name: "Student 1",
+    email: "stu1@yale.edu",
+    id: 4,
+    inserted_at: "2020-04-01T20:06:43",
+    is_faculty: false,
+    is_superuser: false,
+    net_id: "stu1",
+    updated_at: "2020-04-01T20:06:43"},
+    user_id: 4},
+    table: "comments",
+    type: "DELETE"}
+
+
   """
 
   @tables ["topics", "submissions", "comments", "ratings"]
@@ -131,9 +155,9 @@ defmodule App.Repo.Migrations.PgNotifyBubbleUp do
             c.*,
             st as submission,
             u as user
-          from #{table} c
-          inner join users u on c.user_id = u.id
-          inner join(
+          from (select current_row.*) c
+          LEFT OUTER join users u on c.user_id = u.id
+          LEFT OUTER join(
             select s.*, t as topic
             from submissions s
             inner join topics t on t.id = s.topic_id
@@ -186,9 +210,9 @@ defmodule App.Repo.Migrations.PgNotifyBubbleUp do
           s.*,
           t as topic,
           u as user
-        from submissions s
-        inner join users u on s.user_id = u.id
-        inner join topics t on s.topic_id = t.id
+        from (select current_row.*) s
+        LEFT OUTER join users u on s.user_id = u.id
+        LEFT OUTER join topics t on s.topic_id = t.id
         where s.id=current_row.id
       ) row;
 
