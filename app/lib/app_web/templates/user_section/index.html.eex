@@ -2,21 +2,6 @@
   <span>Looks like you don't have any courses yet! Reach out to your professor or TA to get access.</span>
 <% else %>
     <div class="card-holder">
-        <%= for section <- @sections do %>
-        <div class="card color-<%= 1 + rem section.course_num + 1, 16 %>">
-            <a href="<%= Routes.section_path(@conn, :show, section.id) %>">
-                    <h3>
-                    <%= section.course_dept %><%=  Integer.to_string(section.course_num)  %>: <%= section.title %>
-                    </h3>
-                    <p class="class-details">
-                    <%= section.course_name %> &mdash;
-                    <%= section.semester_name %>
-                    </p>
-                <div class="section-admin">
-                    <%= link "Leave Section", to: Routes.section_section__role_path(@conn, :self_delete, section.id), method: :delete, data: [confirm: "Are you sure? This cannot be undone; please only leave sections if you have been accidentally assigned."] %>
-                </div>
-            </a>
-        </div>
-        <% end %>
+        <%= render_many @sections, AppWeb.UserSectionView, "section-card.html", as: :section, conn: @conn %>
     </div>
 <% end %>
