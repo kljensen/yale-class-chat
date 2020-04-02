@@ -19,102 +19,72 @@
   </head>
   <body>
     <header>
-      <section class="container top-matter uk-padding-small uk-padding-remove-vertical uk-padding-remove-right ">
-        <!--<a href="/">
-        <div class="row">
-            <div class="column">
-                Yale Chat
-            </div>
-        </div>
-        </a>
-        <nav class="navigation">
-            <span uk-icon="icon: table; ratio: 1" class="icon"></span>
-            <div uk-dropdown>
-                <ul class="uk-nav uk-dropdown-nav">
-                    <li class=""><a href="/">Home</a></li>
-                    <li class=""><a href="/about">About</a></li>
-                    <li class="uk-nav-divider"></li>
-                    <%= if is_nil((@conn.assigns[:current_user])) do %>
-                      <li><a href="/auth/cas">Log In</a></span>
-                    <% else %>
-                      <li class="uk-nav-header"><%= @conn.private.plug_session["uid"] %></li>
-                      <li><%= link "Profile", to: Routes.user_path(@conn, :show, @conn.assigns.current_user) %></li>
-                      <li><%= link "Log Out", to: Routes.auth_path(@conn, :delete, @conn.assigns.current_user) %></li>
-                    <% end %>
-                </ul>
-            </div>
-        </nav>-->
-      <nav class="uk-navbar-container uk-navbar-transparent uk-margin-remove-top" uk-navbar>
-        <div class="uk-navbar-left">
-          <a class="uk-navbar-item uk-logo top-matter" href="/">Yale Chat</a>
+       <nav>
+        <div>
+          <a class="top-matter" href="/">Yale&nbsp;Chat</a>
         </div>
 
-        <div class="uk-navbar-right">
-          <ul class="uk-navbar-nav">
-            <li><a href="/about">About</a></li>
+        <div class="top-links">
+          <ul>
             <%= if is_nil((@conn.assigns[:current_user])) do %>
-              <li><a href="/auth/cas">Log In<span uk-icon="icon: user; ratio: 0.6" class="icon"></span></a></li>
+              <li>
+              <a href="/auth/cas">Log In
+                <svg width="12" height="12" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" data-svg="user"><circle fill="none" stroke="#000" stroke-width="1.1" cx="9.9" cy="6.4" r="4.4"></circle><path fill="none" stroke="#000" stroke-width="1.1" d="M1.5,19 C2.3,14.5 5.8,11.2 10,11.2 C14.2,11.2 17.7,14.6 18.5,19.2"></path></svg>
+              </a></li>
             <% else %>
               <li>
-                <a href="#"><%= @conn.private.plug_session["uid"] %><span uk-icon="icon: user; ratio: 0.6" class="icon"></span></a>
-                <div class="uk-navbar-dropdown">
-                  <ul class="uk-nav uk-navbar-dropdown-nav">
+                <a href="#"><%= @conn.private.plug_session["uid"] %>
+                  <svg width="12" height="12" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" data-svg="user"><circle fill="none" stroke="#000" stroke-width="1.1" cx="9.9" cy="6.4" r="4.4"></circle><path fill="none" stroke="#000" stroke-width="1.1" d="M1.5,19 C2.3,14.5 5.8,11.2 10,11.2 C14.2,11.2 17.7,14.6 18.5,19.2"></path></svg>
+                </a>
+                <div>
+                  <ul>
                     <li><%= link "Profile", to: Routes.user_path(@conn, :show, @conn.assigns.current_user) %></li>
                     <li><%= link "Log Out", to: Routes.auth_path(@conn, :delete, @conn.assigns.current_user) %></li>
                     <%= if @conn.private.plug_session["is_superuser"] do %>
-                    <li class="uk-nav-divider"></li>
+                    <li></li>
                     <li><a href="<%= Routes.superuser_path(@conn, :index) %>">Switch User</a></li>
                     <% end %>
                   </ul>
                 </div>
               </li>
             <% end %>
+            <li><a href="/about">About</a></li>
           </ul>
         </div>
     </nav>
-    </section>
     </header>
     <%= render_existing @view_module, "breadcrumbs.html", assigns %>
-    <div class="content-flex">
-      <main role="main" class="container">
-        <%= if get_flash(@conn) != Map.new() do %>
-          <%= if !is_nil(get_flash(@conn, :info)) do %>
-            <div class="uk-alert-primary" uk-alert>
-              <a class="uk-alert-close" uk-close></a>
-              <p><%= get_flash(@conn, :info) %></p>
-            </div>
-          <% end %>
-          <%= if !is_nil(get_flash(@conn, :success)) do %>
-            <div class="uk-alert-success" uk-alert>
-              <a class="uk-alert-close" uk-close></a>
-              <p><%= get_flash(@conn, :success) %></p>
-            </div>
-          <% end %>
-          <%= if !is_nil(get_flash(@conn, :error)) do %>
-            <div class="uk-alert-danger" uk-alert>
-              <a class="uk-alert-close" uk-close></a>
-              <p><%= get_flash(@conn, :error) %></p>
-            </div>
-          <% end %>
+    <main role="main" class="container">
+      <%= if get_flash(@conn) != Map.new() do %>
+        <%= if !is_nil(get_flash(@conn, :info)) do %>
+          <div>
+            <a></a>
+            <p><%= get_flash(@conn, :info) %></p>
+          </div>
         <% end %>
-        <div><p></p></div>
-        <div class="main-body">
-        <%= render @view_module, @view_template, assigns %>
-        </div>
-      </main>
-    </div>
-    <div class="footer">
+        <%= if !is_nil(get_flash(@conn, :success)) do %>
+          <div>
+            <a></a>
+            <p><%= get_flash(@conn, :success) %></p>
+          </div>
+        <% end %>
+        <%= if !is_nil(get_flash(@conn, :error)) do %>
+          <div>
+            <a></a>
+            <p><%= get_flash(@conn, :error) %></p>
+          </div>
+        <% end %>
+      <% end %>
+      <div class="main-body">
+      <%= render @view_module, @view_template, assigns %>
+      </div>
+    </main>
       <footer>
-      <section class="container uk-section-muted uk-padding-small uk-padding-remove-bottom uk-padding-remove-right ">
-          <div class="uk-container uk-container-small">
-          <div class="uk-text-center uk-text-small uk-text-muted uk-section uk-section-small">
+      <p>
           This is an open source project under active development by Nick Peranzi and Kyle Jensen.
           <br/>Have a feature request or bug report? Please <a href="https://github.com/kljensen/yale-class-chat/issues/new">open an issue on GitHub</a> or <a href="mailto:nick.peranzi@yale.edu;kyle.jensen@yale.edu?Subject=Yale.chat%20Feature%20Request" target="_top">contact us</a>.
-          </div>
-        </div>
-        </section>
+      </p>
       </footer>
-    </div>
     <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </body>
 </html>
