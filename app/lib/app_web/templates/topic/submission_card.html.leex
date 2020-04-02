@@ -1,29 +1,29 @@
 <div>
     <a href="<%= Routes.submission_path(@socket, :show, @submission.id) %>">
-        <div class="uk-card uk-card-small uk-card-default uk-card-hover color-<%= 1 + rem @submission.id, 20 %>">
-            <div class="uk-card-header">
-                <div class="uk-width-expand">
-                    <h5 class="uk-card-title uk-margin-remove-bottom">
+        <div class="color-<%= 1 + rem @submission.id, 20 %>">
+            <div>
+                <div>
+                    <h5>
                         <%= @submission.title %>
                     </h5>
                 </div>
             </div>
-            <div class="uk-card-body">
-                <div class="uk-width-expand">
+            <div>
+                <div>
                     <%= render AppWeb.HelperView, "multiparagraph_text.html", text: @submission.description, truncate: true %>
                 </div>
             </div>
-            <div class="uk-card-footer">
-                <div class="details uk-width-expand">
+            <div>
+                <div class="details">
                     <%= if @topic.anonymous do %>
                     <% else %>
                     <b><%= @submission.user_display_name %></b>
                     /
                     <% end %>
-                    <%= if @submission.rating_count > 0 do %>
+                    <%= if @submission.rating_count> 0 do %>
                     <%= stars @submission.avg_rating %>
                     (<%= @submission.rating_count |> Integer.to_string %>
-                        <%= if @submission.rating_count > 1 do %>ratings<% else %>rating<% end %>)
+                        <%= if @submission.rating_count> 1 do %>ratings<% else %>rating<% end %>)
                     <% else %>
                         No ratings yet.
                     <% end %>

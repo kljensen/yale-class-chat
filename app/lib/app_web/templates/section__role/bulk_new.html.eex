@@ -1,49 +1,49 @@
 <h1>Add Section Roles</h1>
 
-<%= form_for @changeset, Routes.section_section__role_path(@conn, :bulk_create, @section.id), [class: "uk-form-stacked"], fn f -> %>
+<%= form_for @changeset, Routes.section_section__role_path(@conn, :bulk_create, @section.id), [class: ""], fn f -> %>
   <%= if @changeset.action do %>
     <div class="alert alert-danger">
       <p>Oops, something went wrong! Please check the errors below.</p>
     </div>
   <% end %>
 
-<div class="uk-margin">
-  <%= label f, :role, class: "uk-form-label" %>
-  <div class="uk-form-controls">
-  <%= select f, :role, @role_list, class: "uk-select" %>
+<div>
+  <%= label f, :role, class: "" %>
+  <div>
+  <%= select f, :role, @role_list, class: "" %>
   <%= error_tag f, :role %>
   </div>
 </div>
 
-<div class="uk-margin">
-  <%= label f, :valid_from, class: "uk-form-label" %>
-  <div class="uk-form-controls">
+<div>
+  <%= label f, :valid_from, class: "" %>
+  <div>
   <%= datetime_select f, :valid_from %>
   <%= error_tag f, :valid_from %>
   </div>
 </div>
 
-<div class="uk-margin">
-  <%= label f, :valid_to, class: "uk-form-label" %>
-  <div class="uk-form-controls">
+<div>
+  <%= label f, :valid_to, class: "" %>
+  <div>
   <%= datetime_select f, :valid_to %>
   <%= error_tag f, :valid_to %>
   </div>
 </div>
 
-<div class="uk-margin">
-  <%= label f, :user_id_list, class: "uk-form-label" do %>
+<div>
+  <%= label f, :user_id_list, class: "" do %>
     List of net ids (separated by comma, space, and/or semicolon)
   <% end %>
-  <div class="uk-form-controls">
-  <%= text_input f, :user_id_list, class: "uk-input" %>
+  <div>
+  <%= text_input f, :user_id_list, class: "" %>
   <%= error_tag f, :user_id_list %>
   </div>
 </div>
 
-<div class="uk-margin">
+<div>
   <div>
-    <%= submit "Save", class: "uk-button-secondary uk-button" %>
+    <%= submit "Save", class: "" %>
   </div>
 
   <% end %>

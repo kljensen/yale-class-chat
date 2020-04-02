@@ -1,12 +1,12 @@
 <%= if @can_edit do %>
 
-<div class="uk-grid-medium uk-child-width-1-2@s" uk-grid>
+<div>
     <div>
-        <div class="uk-card uk-card-small uk-card-default uk-card-hover">
-            <div class="uk-card-header">
-            <h3 class="uk-card-title uk-margin-remove-bottom">Section Details</h3>
+        <div>
+            <div>
+            <h3>Section Details</h3>
             </div>
-            <div class="uk-card-body">
+            <div>
                 <ul>
                     <li>
                     <strong>Title:</strong>
@@ -25,8 +25,8 @@
 
                 </ul>
             </div>
-            <div class="uk-card-footer">
-                <div class="details uk-width-expand">
+            <div>
+                <div class="details">
                     <%= link "Edit Section Details", to: Routes.section_path(@conn, :edit, @section) %>
                 </div>
             </div>
@@ -34,17 +34,17 @@
     </div>
 
     <div>
-        <div class="uk-card uk-card-small uk-card-default uk-card-hover">
-            <div class="uk-card-header">
-            <h3 class="uk-card-title uk-margin-remove-bottom">Administration</h3>
+        <div>
+            <div>
+            <h3>Administration</h3>
             </div>
-            <div class="uk-card-body">
+            <div>
             Topics
             <ul>
                 <li><%= link "Create Topic", to: Routes.course_topic_path(@conn, :new, @course) %></li>
             </ul>
             Section Roles (Students/Guests)
-            <ul class="uk-margin-remove-top">
+            <ul>
                 <li><%= link "View Existing Section Roles", to: Routes.section_section__role_path(@conn, :index, @section) %></li>
                 <li><%= link "Manually Add Students to Section", to: Routes.section_section__role_path(@conn, :bulk_new, @section) %></li>
                 <li><%= link "Automatically Add Registered Students to Section", to: Routes.section_section__role_path(@conn, :api_new, @section) %> <br/>(uses course registration API to add students automatically)</li>
@@ -58,22 +58,22 @@
 <%= end %>
 
 <h2>Topics in Section</h2>
-<div class="uk-grid-column-medium uk-grid-row-medium uk-child-width-1-2@s uk-grid-match" uk-grid>
+<div>
     <%= for topic <- @topics do %>
         <div>
             <a href="<%= Routes.topic_path(@conn, :show, topic) %>">
-                <div class="uk-card uk-card-small uk-card-default uk-card-hover color-<%= 1 + rem topic.id, 20 %>">
-                    <div class="uk-card-header">
-                        <div class="uk-width-expand">
-                            <h3 class="uk-card-title uk-margin-remove-bottom">
+                <div class="color-<%= 1 + rem topic.id, 20 %>">
+                    <div>
+                        <div>
+                            <h3>
                                 <%= topic.title %>
                             </h3>
-                            <%= render AppWeb.HelperView, "multiparagraph_text.html", text: topic.description, truncate: true, pclass: "uk-text-meta uk-margin-remove-bottom" %>
+                            <%= render AppWeb.HelperView, "multiparagraph_text.html", text: topic.description, truncate: true, pclass: "" %>
                         </div>
                     </div>
                     <%= if @can_edit do %>
-                    <div class="uk-card-footer">
-                        <div class="details uk-width-expand">
+                    <div>
+                        <div class="details">
                             <%= link "Edit", to: Routes.topic_path(@conn, :edit, topic) %>
                             |
                             <%= link "Delete", to: Routes.topic_path(@conn, :delete, topic), method: :delete, data: [confirm: "Are you sure?"] %>

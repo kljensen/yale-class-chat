@@ -1,6 +1,6 @@
-<div class="uk-margin-bottom">
-    <div class="uk-padding-small topic-title">
-    <h1 class="uk-heading-divider"><%= @topic.title %></h1>
+<div>
+    <div class="topic-title">
+    <h1><%= @topic.title %></h1>
     <%= render AppWeb.HelperView, "multiparagraph_text.html", text: @topic.description %>
 
     <% topic_status = cond do
@@ -35,42 +35,42 @@
 </div>
 
 
-<div class="uk-grid-column-medium uk-grid-row-medium uk-child-width-1-2@s " uk-grid>
+<div>
     <%= for {submission, i} <- Enum.with_index(@submissions) do %>
         <div>
             <a href="<%= Routes.submission_path(@conn, :show, submission.id) %>">
-                <div class="uk-card uk-card-small uk-card-default uk-card-hover color-<%= 1 + rem submission.id, 20 %>">
-                    <div class="uk-card-header">
-                        <div class="uk-width-expand">
-                            <h5 class="uk-card-title uk-margin-remove-bottom">
+                <div class="color-<%= 1 + rem submission.id, 20 %>">
+                    <div>
+                        <div>
+                            <h5>
                                 <%= submission.title %>
                             </h5>
                         </div>
                     </div>
-                    <div class="uk-card-body">
-                        <div class="uk-width-expand">
+                    <div>
+                        <div>
                             <%= render AppWeb.HelperView, "multiparagraph_text.html", text: submission.description, truncate: true %>
                         </div>
                     </div>
-                    <div class="uk-card-footer">
-                        <div class="details uk-width-expand">
+                    <div>
+                        <div class="details">
                             <%= if @topic.anonymous do %>
                             <% else %>
                             <b><%= submission.user_display_name %></b>
                             /
                             <% end %>
                             <%= if @topic.show_submission_ratings or @can_edit do %>
-                                <%= if submission.rating_count > 0 do %>
+                                <%= if submission.rating_count> 0 do %>
                                 <%= stars submission.avg_rating %>
                                 (<%= submission.rating_count |> Integer.to_string %>
-                                <%= if submission.rating_count > 1 do %>ratings<% else %>rating<% end %>)
+                                <%= if submission.rating_count> 1 do %>ratings<% else %>rating<% end %>)
                                 <% else %>
                                     No ratings yet.
                                 <% end %>
                             <% end %>
                             <%= if @topic.show_submission_comments or @can_edit do %>
                                 <span class="comment-icon-count">
-                                    <span class="comment-icon" uk-icon="icon:  comments; ratio: 0.7"></span>
+                                    <span class="comment-icon"="icon:  comments; ratio: 0.7"></span>
                                     <%= submission.comment_count |> Integer.to_string %>
                                 </span>
                                 |
@@ -84,8 +84,8 @@
     <% end %>
 </div>
 
-<div class="uk-position-fixed uk-position-z-index absolute uk-dark uk-position-bottom-right">
-<a href=<%= Routes.topic_submission_path(@conn, :new, @topic.id) %> class="add uk-box-shadow-small uk-box-shadow-hover-large" uk-marker></a>
+<div class="absolute">
+<a href=<%= Routes.topic_submission_path(@conn, :new, @topic.id) %> class="add"></a>
 </div>
 
 

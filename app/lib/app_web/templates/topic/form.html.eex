@@ -1,195 +1,195 @@
-<%= form_for @changeset, @action, [class: "uk-form-stacked"], fn f -> %>
+<%= form_for @changeset, @action, [class: ""], fn f -> %>
   <%= if @changeset.action do %>
     <div class="alert alert-danger">
       <p>Oops, something went wrong! Please check the errors below.</p>
     </div>
   <% end %>
 
-<div class="uk-margin">
-  <%= label f, :title, class: "uk-form-label" %>
-  <div class="uk-form-controls">
-  <%= text_input f, :title, class: "uk-input" %>
+<div>
+  <%= label f, :title, class: "" %>
+  <div>
+  <%= text_input f, :title, class: "" %>
   <%= error_tag f, :title %>
   </div>
 </div>
 
-<div class="uk-margin">
-  <%= label f, :description, class: "uk-form-label" %>
-  <div class="uk-form-controls">
-  <%= textarea f, :description, class: "uk-textarea" %>
+<div>
+  <%= label f, :description, class: "" %>
+  <div>
+  <%= textarea f, :description, class: "" %>
   <%= error_tag f, :description %>
   </div>
 </div>
 
-<div class="uk-margin">
-  <%= label f, :slug, class: "uk-form-label with-tooltip" %>
-  <span uk-tooltip="title: Unique string that you'd like to appear in the URL for this topic (e.g., 'yale.chat/t/your-slug-here'); the actual URL scheme is planned for a future release" uk-icon="icon: question; ratio: 0.7" class="tooltip-icon"></span>
-  <div class="uk-form-controls">
-  <%= text_input f, :slug, class: "uk-input" %>
+<div>
+  <%= label f, :slug, class: "with-tooltip" %>
+  <span="title: Unique string that you'd like to appear in the URL for this topic (e.g., 'yale.chat/t/your-slug-here'); the actual URL scheme is planned for a future release"="icon: question; ratio: 0.7" class="tooltip-icon"></span>
+  <div>
+  <%= text_input f, :slug, class: "" %>
   <%= error_tag f, :slug %>
   </div>
 </div>
 
-<div class="uk-margin">
-  <%= label f, :opened_at, class: "uk-form-label with-tooltip" %>
-  <span uk-tooltip="title: The date and time at which the topic should open for students to post" uk-icon="icon: question; ratio: 0.7" class="tooltip-icon"></span>
-  <div class="uk-form-controls">
+<div>
+  <%= label f, :opened_at, class: "with-tooltip" %>
+  <span="title: The date and time at which the topic should open for students to post"="icon: question; ratio: 0.7" class="tooltip-icon"></span>
+  <div>
   <%= datetime_select f, :opened_at, default: {{@current_time.year, @current_time.month, @current_time.day},
-{@current_time.hour, @current_time.minute, @current_time.second}}, class: "uk-select" %>
+{@current_time.hour, @current_time.minute, @current_time.second}}, class: "" %>
   <%= error_tag f, :opened_at %>
   </div>
 </div>
 
-<div class="uk-margin">
-  <%= label f, :closed_at, class: "uk-form-label with-tooltip" %>
-  <span uk-tooltip="title: The date and time at which the topic will close, preventing students from posting" uk-icon="icon: question; ratio: 0.7" class="tooltip-icon"></span>
-  <div class="uk-form-controls">
+<div>
+  <%= label f, :closed_at, class: "with-tooltip" %>
+  <span="title: The date and time at which the topic will close, preventing students from posting"="icon: question; ratio: 0.7" class="tooltip-icon"></span>
+  <div>
   <%= datetime_select f, :closed_at, default: {{@current_time.year, @current_time.month + 1, @current_time.day},
-{@current_time.hour, @current_time.minute, @current_time.second}}, class: "uk-select" %>
+{@current_time.hour, @current_time.minute, @current_time.second}}, class: "" %>
   <%= error_tag f, :closed_at %>
   </div>
 </div>
 
-<div class="uk-margin">
+<div>
 
-  <%= label f, :visible, class: "uk-form-label with-tooltip" do %>
+  <%= label f, :visible, class: "with-tooltip" do %>
     Topic is visible to students
   <% end %>
-  <span uk-tooltip="title: If unchecked, only professors and TAs will be able to view the topic" uk-icon="icon: question; ratio: 0.7" class="tooltip-icon"></span>
+  <span="title: If unchecked, only professors and TAs will be able to view the topic"="icon: question; ratio: 0.7" class="tooltip-icon"></span>
 
-  <div class="uk-form-controls">
-  <%= checkbox f, :visible, class: "uk-checkbox" %>
+  <div>
+  <%= checkbox f, :visible, class: "" %>
   <%= error_tag f, :visible %>
   </div>
 </div>
 
-<div class="uk-margin">
+<div>
 
-  <%= label f, :allow_submissions, class: "uk-form-label with-tooltip" do %>
+  <%= label f, :allow_submissions, class: "with-tooltip" do %>
     Allow student submissions to topic
   <% end %>
-  <span uk-tooltip="title: If unchecked, students are not able to submit responses to the topic. They can still rate and comment on other submissions unless those options are disabled below." uk-icon="icon: question; ratio: 0.7" class="tooltip-icon"></span>
+  <span="title: If unchecked, students are not able to submit responses to the topic. They can still rate and comment on other submissions unless those options are disabled below."="icon: question; ratio: 0.7" class="tooltip-icon"></span>
 
-  <div class="uk-form-controls">
-  <%= checkbox f, :allow_submissions, class: "uk-checkbox" %>
+  <div>
+  <%= checkbox f, :allow_submissions, class: "" %>
   <%= error_tag f, :allow_submissions %>
   </div>
 </div>
 
-<div class="uk-margin">
+<div>
 
-  <%= label f, :allow_submission_voting, class: "uk-form-label with-tooltip" do %>
+  <%= label f, :allow_submission_voting, class: "with-tooltip" do %>
     Allow student voting/rating on others' submissions
   <% end %>
-  <span uk-tooltip="title: If unchecked, students are not able to rate other submissions. They can still post submissions or comments unless those options are disabled." uk-icon="icon: question; ratio: 0.7" class="tooltip-icon"></span>
+  <span="title: If unchecked, students are not able to rate other submissions. They can still post submissions or comments unless those options are disabled."="icon: question; ratio: 0.7" class="tooltip-icon"></span>
 
-  <div class="uk-form-controls">
-  <%= checkbox f, :allow_submission_voting, class: "uk-checkbox" %>
+  <div>
+  <%= checkbox f, :allow_submission_voting, class: "" %>
   <%= error_tag f, :allow_submission_voting %>
   </div>
 </div>
 
-<div class="uk-margin">
+<div>
 
-  <%= label f, :anonymous, class: "uk-form-label with-tooltip" do %>
+  <%= label f, :anonymous, class: "with-tooltip" do %>
     Hide submitter names from submissions and comments on this topic
   <% end %>
-  <span uk-tooltip="title: If checked, all submissions and comments will be anonymous. If unchecked, the author's names for submissions and comments will be shown." uk-icon="icon: question; ratio: 0.7" class="tooltip-icon"></span>
+  <span="title: If checked, all submissions and comments will be anonymous. If unchecked, the author's names for submissions and comments will be shown."="icon: question; ratio: 0.7" class="tooltip-icon"></span>
 
-  <div class="uk-form-controls">
-  <%= checkbox f, :anonymous, class: "uk-checkbox" %>
+  <div>
+  <%= checkbox f, :anonymous, class: "" %>
   <%= error_tag f, :anonymous %>
   </div>
 </div>
 
-<div class="uk-margin">
+<div>
 
-  <%= label f, :allow_submission_comments, class: "uk-form-label with-tooltip" do %>
+  <%= label f, :allow_submission_comments, class: "with-tooltip" do %>
       Allow student to comment on others' submissions
   <% end %>
-  <span uk-tooltip="title: If unchecked, students are not able to comment on other submissions. They can still post submissions and rate submissions unless those options are disabled above." uk-icon="icon: question; ratio: 0.7" class="tooltip-icon"></span>
+  <span="title: If unchecked, students are not able to comment on other submissions. They can still post submissions and rate submissions unless those options are disabled above."="icon: question; ratio: 0.7" class="tooltip-icon"></span>
 
 
-  <div class="uk-form-controls">
-  <%= checkbox f, :allow_submission_comments, class: "uk-checkbox" %>
+  <div>
+  <%= checkbox f, :allow_submission_comments, class: "" %>
   <%= error_tag f, :allow_submission_comments %>
   </div>
 </div>
 
-<div class="uk-margin">
+<div>
 
-  <%= label f, :show_submission_comments, class: "uk-form-label with-tooltip" do %>
+  <%= label f, :show_submission_comments, class: "with-tooltip" do %>
     Allow students to see each others' comments
   <% end %>
-  <span uk-tooltip="title: If unchecked, students will only be able to see their own comments on submissions. Professors and TAs will still see all comments." uk-icon="icon: question; ratio: 0.7" class="tooltip-icon"></span>
-  <div class="uk-form-controls">
-  <%= checkbox f, :show_submission_comments, class: "uk-checkbox" %>
+  <span="title: If unchecked, students will only be able to see their own comments on submissions. Professors and TAs will still see all comments."="icon: question; ratio: 0.7" class="tooltip-icon"></span>
+  <div>
+  <%= checkbox f, :show_submission_comments, class: "" %>
   <%= error_tag f, :show_submission_comments %>
   </div>
 </div>
 
-<div class="uk-margin">
-  <%= label f, :show_submission_ratings, class: "uk-form-label with-tooltip" do %>
+<div>
+  <%= label f, :show_submission_ratings, class: "with-tooltip" do %>
     Allow students to see the average rating for each submission
   <% end %>
-  <span uk-tooltip="title: If unchecked, students will only see their own rating for a submission. Professors and TAs will still see the count and average of all ratings." uk-icon="icon: question; ratio: 0.7" class="tooltip-icon"></span>
-  <div class="uk-form-controls">
-  <%= checkbox f, :show_submission_ratings, class: "uk-checkbox" %>
+  <span="title: If unchecked, students will only see their own rating for a submission. Professors and TAs will still see the count and average of all ratings."="icon: question; ratio: 0.7" class="tooltip-icon"></span>
+  <div>
+  <%= checkbox f, :show_submission_ratings, class: "" %>
   <%= error_tag f, :show_submission_ratings %>
   </div>
 </div>
 
-<div class="uk-margin">
+<div>
 
-  <%= label f, :show_user_submissions, class: "uk-form-label with-tooltip" do %>
+  <%= label f, :show_user_submissions, class: "with-tooltip" do %>
     Allow students to see each others' submissions
   <% end %>
-  <span uk-tooltip="title: If unchecked, students will only see their own submissions. Professors and TAs will still see all submissions." uk-icon="icon: question; ratio: 0.7" class="tooltip-icon"></span>
-  <div class="uk-form-controls">
-  <%= checkbox f, :show_user_submissions, class: "uk-checkbox" %>
+  <span="title: If unchecked, students will only see their own submissions. Professors and TAs will still see all submissions."="icon: question; ratio: 0.7" class="tooltip-icon"></span>
+  <div>
+  <%= checkbox f, :show_user_submissions, class: "" %>
   <%= error_tag f, :show_user_submissions %>
   </div>
 </div>
 
-<div class="uk-margin">
+<div>
 
-  <%= label f, :user_submission_limit, class: "uk-form-label with-tooltip" do %>
+  <%= label f, :user_submission_limit, class: "with-tooltip" do %>
     Max number of submissions by a single student (0 = unlimited)
   <% end %>
-  <span uk-tooltip="title: Limit the number of submissions a single student can make in response to this topic. If set to 0, students can submit an unlimited number of submissions." uk-icon="icon: question; ratio: 0.7" class="tooltip-icon"></span>
+  <span="title: Limit the number of submissions a single student can make in response to this topic. If set to 0, students can submit an unlimited number of submissions."="icon: question; ratio: 0.7" class="tooltip-icon"></span>
 
-  <div class="uk-form-controls">
-  <%= number_input f, :user_submission_limit, min: 0, class: "uk-input" %>
+  <div>
+  <%= number_input f, :user_submission_limit, min: 0, class: "" %>
   <%= error_tag f, :user_submission_limit %>
   </div>
 </div>
 
-<div class="uk-margin">
+<div>
 
-  <%= label f, :sort, class: "uk-form-label" do %>
+  <%= label f, :sort, class: "" do %>
       Sort order for student submissions in this topic
   <% end %>
 
 
-  <div class="uk-form-controls">
-  <%= select f, :sort, @sort_list, class: "uk-select" %>
+  <div>
+  <%= select f, :sort, @sort_list, class: "" %>
   <%= error_tag f, :sort %>
   </div>
 </div>
 
   <%= if String.starts_with?(@action, "/courses") do %>
 
-  <div class="uk-margin">
-    <%= label f, "Post topic to sections", class: "uk-form-label with-tooltip" %>
-    <span uk-tooltip="title: Select the sections to which you'd like to post this topic. You can select multiple sections by holding Ctrl or Shift when clicking." uk-icon="icon: question; ratio: 0.7" class="tooltip-icon"></span>
-  <div class="uk-form-controls">
-    <%= multiple_select f, :sections, @sections, selected: @selected_sections, class: "uk-select" %>
+  <div>
+    <%= label f, "Post topic to sections", class: "with-tooltip" %>
+    <span="title: Select the sections to which you'd like to post this topic. You can select multiple sections by holding Ctrl or Shift when clicking."="icon: question; ratio: 0.7" class="tooltip-icon"></span>
+  <div>
+    <%= multiple_select f, :sections, @sections, selected: @selected_sections, class: "" %>
     <%= error_tag f, :sections %>
   </div>
   </div>
   <% end %>
 
-  <div class="uk-margin">
-    <%= submit "Save", class: "uk-button-secondary uk-button" %>
+  <div>
+    <%= submit "Save", class: "" %>
   </div>
 <% end %>

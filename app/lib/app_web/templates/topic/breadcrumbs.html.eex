@@ -1,5 +1,5 @@
-<div class="uk-light uk-background-secondary breadcrumb-holder">
-    <ul class="breadcrumb uk-breadcrumb">
+<div class="breadcrumb-holder">
+    <ul class="breadcrumb">
         <li>
             <span>
                 Courses

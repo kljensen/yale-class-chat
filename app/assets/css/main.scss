@@ -1,6 +1,11 @@
 $default-margin: 0.5rem;
 $default-background-color: #ecf0f1;
+$muted-background-color: #f8f8f8;
+$muted-text-color: #999;
+$muted-line-color: #e5e5e5;
+$smaller-font-size: 0.875em;
 
+@import "./normalize.css";
 
 @font-face {
     font-family: "YaleNew";
@@ -38,40 +43,53 @@ html, body{
 }
 
 html{
-  height: 100%;
-  scroll-behavior: smooth;
-
+    height: 100%;
+    scroll-behavior: smooth;
 }
 
 body {
-    min-height: 100%;
     color: #222222;
-    margin:0;
-    font-family: "Mallory";
+    font-family: "Mallory",Verdana,Arial,Helvetica,sans-serif;
     padding-bottom:0rem;
     background-color:$default-background-color;
     text-rendering: optimizeLegibility;
-    font-smooth: auto;
     -webkit-font-smoothing: subpixel-antialiased;
     -moz-osx-font-smoothing:grayscale;
     display: flex;
+    justify-content:center;
     flex-direction: column;
 }
 
 a {
     transition: .1s ease-in-out;
     transition-property: color,background-color;
+    text-decoration: none;
 }
+
+h1, h2, h3, h4, h5 {
+    color: #333;
+    font-size: 1.5rem;
+    line-height: 1.5;
+    margin:0;
+    padding:0;
+    font-weight: 400;
+    font-family: "YaleNew",Georgia,"Times New Roman",serif;
+}
+
 header {
     display: block;
     background-color: #003366;
     color: #fff;
+    display: flex;
+    justify-content: center;
     padding: $default-margin 2*$default-margin;
     nav {
+        width: 100%;
+        max-width: 1000px;
         font-family: "Mallory";
         vertical-align:baseline;
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 50% 50%;
 
         a {
             color: white;
@@ -86,11 +104,12 @@ header {
             li {
                 list-style: none;
                 padding: $default-margin;
-                font-size: 0.875rem;
+                padding-right: 0;
+                font-size: $smaller-font-size;
                 a {
                     text-transform: uppercase;
                     font-variant-caps: small-caps;
-                    color: #999;
+                    color: $muted-text-color;
                 }
                 a:hover{
                     color: #666;
@@ -101,12 +120,17 @@ header {
 }
 
 main {
-    padding: 2*$default-margin $default-margin;
+    padding: $default-margin 2*$default-margin;
+    div.main-body {
+        max-width: 1000px;
+        margin: auto;
+    }
 }
+
 
 .top-matter{
     font-size: 2rem;
-    font-family: "YaleNew";
+    font-family: "YaleNew",Georgia,"Times New Roman",serif;
 }
 .top-matter a{
     color: white;
@@ -117,15 +141,43 @@ main {
 }
 
 .card-holder {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
     margin: 0 -$default-margin;
+    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-column-gap: 2*$default-margin;
+    grid-row-gap: 3*$default-margin;
+    padding: 3*$default-margin 0;
+
+    a:hover {
+        text-decoration: none;
+    }
+
+    > div.card {
+        padding: 1em;
+        background-color: white;
+        padding: $default-margin $default-margin $default-margin 0;
+        box-shadow: 0 5px 15px rgba(0,0,0,.08);
+        padding-left: $default-margin;
+        color: $muted-text-color;
+        .class-details {
+            color: $muted-text-color;
+            font-weight: 400;
+            margin: 0;
+            font-size: $smaller-font-size;
+        }
+        .section-admin{
+            margin-top: $default-margin;
+            padding-top: $default-margin;
+            border-top: 1px solid $muted-line-color;
+            font-size: $smaller-font-size;
+        }
+    }
+    > div.card:hover {
+        box-shadow: 0 6px 18px rgba(0,0,0,.1);
+    }
 }
 
-.card-holder > div {
-    flex: 1 1 47%;
-    margin: 0 $default-margin 30px $default-margin;
-}
 
 .topic-title, .submission-body {
     background-color: white;
@@ -258,6 +310,7 @@ div.comment-author-odd {
     color: #999;
 }
 
+
 // https://flatuicolors.com/palette/defo
 .color-1{ border-left: 10px solid #1abc9c;}
 .color-2{ border-left: 10px solid #16a085;}
@@ -346,6 +399,14 @@ div.content-flex {
 
 .tooltip-icon {
     display: inline-block;
+}
+
+footer {
+    background-color: $muted-background-color;
+    padding: 4*$default-margin $default-margin;
+    font-size: $smaller-font-size;
+    color: $muted-text-color;
+    text-align: center;
 }
 
 /* Import style for default CSS classes (Phoenix LiveView) */

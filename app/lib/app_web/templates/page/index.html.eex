@@ -1,19 +1,19 @@
-<section class="uk-section uk-section-small">
-    <div class="uk-height-large uk-cover-container uk-border-rounded">
-      <img src="/images/som-class-of-2020.jpg" alt="Class of 2020" data-uk-cover="" class="uk-cover" style="height: 450px; width: 1170px;">
-      <div class="uk-overlay uk-overlay-primary uk-position-cover uk-flex uk-flex-center uk-flex-middle uk-light uk-text-center">
+<section>
+    <div>
+      <img src="/images/som-class-of-2020.jpg" alt="Class of 2020" data-=""  style="height: 450px; width: 1170px;">
+      <div>
         <div>
           <span style="letter-spacing: 0.2em; font-size: 0.725rem">WELCOME</span>
-          <h1 class="uk-margin-top uk-margin-small-bottom uk-margin-remove-adjacent">Yale Chat</h1>
+          <h1>Yale Chat</h1>
           <p>The website you're using is an experimental piece of software we hope will be helpful during the COVID-19 crisis (and afterward!).</p>
-          <a href="/auth/cas" class="uk-button uk-button-default uk-button-large ">Log In</a>
+          <a href="/auth/cas">Log In</a>
         </div>
       </div>
     </div>
 </section>
-<section class="uk-section uk-section-muted uk-padding-remove-bottom uk-padding-remove-top">
-  <div class="uk-container uk-container-small">
-    <div class="uk-text-center uk-text-small uk-text-muted uk-section uk-section-small">
+<section>
+  <div>
+    <div>
     <br/>We'd like your advice! What should an app like this include? Right now we're thinking about polls, live chat, private chat, and emojis. (Emojis are top priority, of course.)
     <br/>
     <br/>What do you want to see in a communications platform for class? <a href="mailto:nick.peranzi@yale.edu;kyle.jensen@yale.edu?Subject=Yale.chat%20Feature%20Request" target="_top">Please tell us!</a>

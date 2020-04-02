@@ -1,6 +1,6 @@
 <h1>Listing Section roles</h1>
 
-<table class="uk-table">
+<table>
   <thead>
     <tr>
       <th>User</th>

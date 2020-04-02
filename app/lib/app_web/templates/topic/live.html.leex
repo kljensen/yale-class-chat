@@ -1,6 +1,6 @@
-<div class="uk-margin-bottom">
-    <div class="uk-padding-small topic-title">
-    <h1 class="uk-heading-divider"><%= @topic.title %></h1>
+<div>
+    <div class="topic-title">
+    <h1><%= @topic.title %></h1>
     <%= render AppWeb.HelperView, "multiparagraph_text.html", text: @topic.description %>
 
     <% topic_status = "TODO-FIXME"  %>
