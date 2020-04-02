@@ -58,32 +58,6 @@
 <%= end %>
 
 <h2>Topics in Section</h2>
-<div>
-    <%= for topic <- @topics do %>
-        <div>
-            <a href="<%= Routes.topic_path(@conn, :show, topic) %>">
-                <div class="color-<%= 1 + rem topic.id, 20 %>">
-                    <div>
-                        <div>
-                            <h3>
-                                <%= topic.title %>
-                            </h3>
-                            <%= render AppWeb.HelperView, "multiparagraph_text.html", text: topic.description, truncate: true, pclass: "" %>
-                        </div>
-                    </div>
-                    <%= if @can_edit do %>
-                    <div>
-                        <div class="details">
-                            <%= link "Edit", to: Routes.topic_path(@conn, :edit, topic) %>
-                            |
-                            <%= link "Delete", to: Routes.topic_path(@conn, :delete, topic), method: :delete, data: [confirm: "Are you sure?"] %>
-                        </div>
-                    </div>
-                    <% end %>
-                </div>
-            </a>
-        </div>
-    <% end %>
+<div class="card-holder">
+    <%= render_many @topics, AppWeb.TopicView, "topic_card.html", as: :topic, conn: @conn, can_edit: @can_edit %>
 </div>
-
-<%= link "Back", to: Routes.course_path(@conn, :show, @section.course_id) %>
