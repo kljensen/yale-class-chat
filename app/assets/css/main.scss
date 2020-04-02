@@ -4,6 +4,8 @@ $muted-background-color: #f8f8f8;
 $muted-text-color: #999;
 $muted-line-color: #e5e5e5;
 $smaller-font-size: 0.875em;
+$max-width: 1000px;
+$dark-background: #222;
 
 @import "./normalize.css";
 
@@ -85,7 +87,7 @@ header {
     padding: $default-margin 2*$default-margin;
     nav {
         width: 100%;
-        max-width: 1000px;
+        max-width: $max-width;
         font-family: "Mallory";
         vertical-align:baseline;
         display: grid;
@@ -122,7 +124,7 @@ header {
 main {
     padding: $default-margin 2*$default-margin;
     div.main-body {
-        max-width: 1000px;
+        max-width: $max-width;
         margin: auto;
     }
 }
@@ -291,19 +293,36 @@ div.comment-author-odd {
     margin-left: 45px;
 }
 
-.breadcrumb-holder {
-    margin: 0;
-    padding: 0.5em 0 0.5em $default-margin;
+.breadcrumbs {
+    background-color: $dark-background;
+    color: $muted-text-color;
+    font-size: $smaller-font-size;
+    ul {
+        margin: auto;
+        display: block;
+        max-width: $max-width;
+        margin-bottom: 0;
+        padding: $default-margin 0;
+        li {
+            display: inline-block;
+            margin-right: $default-margin;
+            span, a, a:hover {
+                color: $muted-text-color;
+                text-transform: lower;
+                font-variant-caps: small-caps;
+            }
+        }
+        li:first-child {
+            list-style: none;
+        }
+        li:not(:first-child)::before {
+            content: ">";
+            margin: 0 1rem;
+        }
+    }
 }
 
-.breadcrumb-holder ul {
-    margin-bottom: 0;
-}
 
-.uk-breadcrumb span, .uk-breadcrumb a {
-    text-transform: lower;
-    font-variant-caps: small-caps;
-}
 .read-more {
     text-transform: lower;
     font-variant-caps: small-caps;
