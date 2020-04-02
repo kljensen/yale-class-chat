@@ -1,9 +1,17 @@
 <div>
-    <div class="topic-title">
-    <h1><%= @topic.title %></h1>
-    <%= render AppWeb.HelperView, "multiparagraph_text.html", text: @topic.description %>
+    <div class="topic-details">
+        <h1><%= @topic.title %></h1>
 
-    <% topic_status = "TODO-FIXME"  %>
+        <%= render AppWeb.HelperView, "multiparagraph_text.html", text: @topic.description %>
+
+    <% topic_status = cond do
+        DateTime.compare(@topic.closed_at, current_time(0)) == :lt ->
+        "closed"
+        DateTime.compare(@topic.opened_at, current_time(0)) == :gt ->
+        "closed"
+        true ->
+        "open"
+    end %>
 
     <%= if @can_edit do %>
     <hr>

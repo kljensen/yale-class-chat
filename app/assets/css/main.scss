@@ -8,6 +8,14 @@ $max-width: 1000px;
 $dark-background: #222;
 $main-font-color: #222;
 
+@mixin dropshadow() {
+    box-shadow: 0 5px 15px rgba(0,0,0,.08);
+}
+@mixin bigdropshadow() {
+    box-shadow: 0 6px 18px rgba(0,0,0,.10);
+}
+
+
 @import "./normalize.css";
 
 @font-face {
@@ -162,9 +170,9 @@ main {
     }
 
     > .card {
+        @include dropshadow();
         padding: $default-margin 2*$default-margin $default-margin $default-margin;
         background-color: white;
-        box-shadow: 0 5px 15px rgba(0,0,0,.08);
         padding-left: $default-margin;
         color: $muted-text-color;
         .class-details {
@@ -186,13 +194,15 @@ main {
         }
     }
     > .card:hover {
-        box-shadow: 0 6px 18px rgba(0,0,0,.1);
+        @include bigdropshadow();
     }
 }
 
 
-.topic-title, .submission-body {
+.topic-details, .submission-body {
     background-color: white;
+    padding: $default-margin;
+    @include dropshadow();
 }
 
 .submission-stats {
@@ -233,7 +243,7 @@ div.mobile-add-button {
     height: 2em; 
     text-align: center;
     line-height: 2em;
-    box-shadow: 0 5px $default-margin rgba(0,0,0,.08);
+    @include dropshadow();
 }
 div.mobile-add-button > a {
     color: white;
@@ -245,7 +255,7 @@ div.mobile-add-button > a {
 
 /* TODO: I don't think this is working now */
 div.mobile-add-button:hover {
-    box-shadow: 0 6px 18px rgba(0,0,0,.12);
+    @include dropshadow();
     transition: box-shadow box-shadow-duration ease-in-out;
 }
 
