@@ -1,0 +1,11 @@
+<div class="card color-<%= 1 + rem @course.number + 1, 16 %>">
+    <a href="<%= Routes.course_path(@conn, :show, @course.id) %>">
+        <h3>
+            <%= @course.department %><%=  Integer.to_string(@course.number)  %>
+        </h3>
+        <p class="class-details">
+            <%= @course.name %> &mdash;
+            <%= Map.get(@semesters, :"#{@course.semester_id}") %>
+        </p>
+    </a>
+</div>

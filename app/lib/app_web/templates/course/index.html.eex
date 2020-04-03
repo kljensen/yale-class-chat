@@ -1,27 +1,10 @@
-<div>
-    <%= if length(@courses) == 0 do %>
-        <span>Looks like you don't have any courses yet! Create one to get started.</span>
-    <% end %>
-    <%= for {course, i} <- Enum.with_index(@courses) do %>
-    <div>
-        <a href="<%= Routes.course_path(@conn, :show, course) %>">
-            <div class="color-<%= 1 + rem course.number + 1, 20 %>"">
-                <div>
-                    <div>
-                        <h3>
-                        <%= course.department %><%= to_string(course.number) %>
-                        </h3>
-                        <p>
-                        <%= course.name %> &mdash;
-                        <%= Map.get(@semesters, :"#{course.semester_id}") %>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </a>
+<%= if length(@courses) == 0 do %>
+    <span>Looks like you don't have any courses yet! Create one to get started.</span>
+<% else %>
+    <div class="card-holder">
+        <%= render_many @courses, AppWeb.CourseView, "course-card.html", as: :course, conn: @conn, semesters: @semesters %>
     </div>
-    <% end %>
-</div>
+<% end %>
 
 <section class="container">
     <%= link "New Course", to: Routes.course_path(@conn, :new), class: "" %>
