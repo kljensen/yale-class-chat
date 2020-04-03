@@ -50,7 +50,7 @@ defmodule AppWeb.TopicControllerTest do
         |> init_test_session(uid: "faculty net id")
         |> post(Routes.course_topic_path(conn, :create, course), topic: attrs)
 
-      assert %{id: id} = redirected_params(conn)
+      assert %{topic_id: id} = redirected_params(conn)
       topic = Topics.get_topic!(id)
       attrstest = Map.put(@create_attrs, :opened_at, convert_NYC_datetime_to_db(@create_attrs.opened_at))
       attrstest = Map.put(attrstest, :closed_at, convert_NYC_datetime_to_db(@create_attrs.closed_at))
@@ -68,7 +68,7 @@ defmodule AppWeb.TopicControllerTest do
         |> init_test_session(uid: "faculty net id")
         |> post(Routes.course_topic_path(conn, :create, course), topic: attrs)
 
-      assert %{id: id} = redirected_params(conn)
+      assert %{topic_id: id} = redirected_params(conn)
       assert redirected_to(conn) == Routes.topic_path(conn, :show, id)
 
       conn = get(conn, Routes.topic_path(conn, :show, id))
@@ -142,8 +142,9 @@ defmodule AppWeb.TopicControllerTest do
         |> delete(Routes.topic_path(conn, :delete, topic))
 
       assert redirected_to(conn) == Routes.section_path(conn, :show, section)
-      conn = get(conn, Routes.topic_path(conn, :show, topic))
-      assert html_response(conn, 404) =~ "Not Found"
+      assert_raise Ecto.NoResultsError, fn ->
+        Topics.get_topic!(topic.id)
+      end
     end
   end
 

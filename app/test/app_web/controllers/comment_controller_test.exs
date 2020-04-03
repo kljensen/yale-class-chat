@@ -40,7 +40,7 @@ defmodule AppWeb.CommentControllerTest do
         |> init_test_session(uid: "faculty net id")
         |> post(Routes.submission_comment_path(conn, :create, submission), comment: @create_attrs)
 
-      assert %{id: id} = redirected_params(conn)
+      assert %{submission_id: id} = redirected_params(conn)
       assert redirected_to(conn) == Routes.submission_path(conn, :show, id)
 
       conn = get(conn, Routes.submission_path(conn, :show, id))

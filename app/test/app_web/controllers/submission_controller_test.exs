@@ -40,7 +40,7 @@ defmodule AppWeb.SubmissionControllerTest do
         |> init_test_session(uid: "faculty net id")
         |> post(Routes.topic_submission_path(conn, :create, topic), submission: @create_attrs)
 
-      assert %{id: id} = redirected_params(conn)
+      assert %{topic_id: id} = redirected_params(conn)
       assert redirected_to(conn) == Routes.topic_path(conn, :show, topic.id)
 
       conn = get(conn, Routes.topic_path(conn, :show, topic.id))
