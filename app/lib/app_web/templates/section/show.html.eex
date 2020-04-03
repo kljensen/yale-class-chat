@@ -1,60 +1,41 @@
 <%= if @can_edit do %>
+  <div class="card-holder">
+    <div class="card">
+      <h3>Section Details</h3>
+      <ul>
+        <li>
+        <strong>Title:</strong>
+        <%= @section.title %>
+        </li>
 
-<div>
-    <div>
-        <div>
-            <div>
-            <h3>Section Details</h3>
-            </div>
-            <div>
-                <ul>
-                    <li>
-                    <strong>Title:</strong>
-                    <%= @section.title %>
-                    </li>
+        <li>
+        <strong>CRN:</strong>
+        <%= @section.crn %>
+        </li>
 
-                    <li>
-                    <strong>CRN:</strong>
-                    <%= @section.crn %>
-                    </li>
-
-                    <li>
-                    <strong>Course:</strong>
-                    <%= @course.department <> Integer.to_string(@course.number) <> ": " <> @course.name %>
-                    </li>
-
-                </ul>
-            </div>
-            <div>
-                <div class="details">
-                    <%= link "Edit Section Details", to: Routes.section_path(@conn, :edit, @section) %>
-                </div>
-            </div>
-        </div>
+        <li>
+        <strong>Course:</strong>
+        <%= @course.department <> Integer.to_string(@course.number) <> ": " <> @course.name %>
+      </li>
+      </ul>
+      <div class="section-admin">
+        <%= link "Edit Section Details", to: Routes.section_path(@conn, :edit, @section) %>
+      </div>
     </div>
-
-    <div>
-        <div>
-            <div>
-            <h3>Administration</h3>
-            </div>
-            <div>
-            Topics
-            <ul>
-                <li><%= link "Create Topic", to: Routes.course_topic_path(@conn, :new, @course) %></li>
-            </ul>
-            Section Roles (Students/Guests)
-            <ul>
-                <li><%= link "View Existing Section Roles", to: Routes.section_section__role_path(@conn, :index, @section) %></li>
-                <li><%= link "Manually Add Students to Section", to: Routes.section_section__role_path(@conn, :bulk_new, @section) %></li>
-                <li><%= link "Automatically Add Registered Students to Section", to: Routes.section_section__role_path(@conn, :api_new, @section) %> <br/>(uses course registration API to add students automatically)</li>
-            </ul>
-            </div>
-        </div>
+    <div class="card">
+      <h3>Administration</h3>
+      Topics
+      <ul>
+          <li><%= link "Create Topic", to: Routes.course_topic_path(@conn, :new, @course) %></li>
+      </ul>
+      Section Roles (Students/Guests)
+      <ul>
+          <li><%= link "View Existing Section Roles", to: Routes.section_section__role_path(@conn, :index, @section) %></li>
+          <li><%= link "Manually Add Students to Section", to: Routes.section_section__role_path(@conn, :bulk_new, @section) %></li>
+          <li><%= link "Automatically Add Registered Students to Section", to: Routes.section_section__role_path(@conn, :api_new, @section) %> <br/>(uses course registration API to add students automatically)</li>
+      </ul>
     </div>
-
-</div>
-
+  </div>
 <%= end %>
 
 <h2>Topics in Section</h2>
