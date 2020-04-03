@@ -48,6 +48,7 @@ defmodule AppWeb.TopicLive do
     |> assign(:id, id)
     |> assign(:net_id, net_id)
     |> assign(:conn, AppWeb.Endpoint)
+    |> assign(:breadcrumb_module, AppWeb.TopicView)
     |> load_topic_data(net_id, id)
 
     # Here, I fake the conn based on the suggestion in github:

@@ -164,6 +164,7 @@ main {
     grid-column-gap: 2*$default-margin;
     grid-row-gap: 3*$default-margin;
     padding: 2*$default-margin 0 4*$default-margin 0;
+    align-items: center;
 
     a:hover {
         text-decoration: none;
@@ -175,11 +176,19 @@ main {
         background-color: white;
         padding-left: $default-margin;
         color: $muted-text-color;
-        .class-details {
+
+        h5 {
+            line-height: 1.3em;
+        }
+        .class-details, .details {
             color: $muted-text-color;
             font-weight: 400;
             margin: 0;
             font-size: $smaller-font-size;
+        }
+        .details {
+            border-top: 1px solid $muted-line-color;
+            padding-top: $default-margin;
         }
         .section-admin{
             margin-top: $default-margin;
@@ -201,8 +210,9 @@ main {
 
 .topic-details, .submission-body {
     background-color: white;
-    padding: $default-margin;
+    padding: $default-margin 2*$default-margin;
     @include dropshadow();
+    margin-bottom: 2*$default-margin;
 }
 
 .submission-stats {
@@ -213,6 +223,9 @@ main {
 .comment-icon-count {
     margin-left: 0.5em;
     margin-right: 0.5em;
+    svg {
+        margin-bottom: -4px;
+    }
 }
 
 a {

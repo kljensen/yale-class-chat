@@ -45,7 +45,10 @@
         </div>
     </nav>
     </header>
-    <%= render_existing @view_module, "breadcrumbs.html", assigns %>
+
+    <% breadcrumb_module = Map.get(assigns, :breadcrumb_module) || @view_module %>
+    <%= render_existing breadcrumb_module, "breadcrumbs.html", assigns %>
+
     <main role="main" class="container">
       <%= if get_flash(@conn) != Map.new() do %>
         <%= if !is_nil(get_flash(@conn, :info)) do %>
