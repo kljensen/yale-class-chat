@@ -7,6 +7,7 @@ $smaller-font-size: 0.875em;
 $max-width: 1000px;
 $dark-background: #222;
 $main-font-color: #222;
+$line-height: 1.3;
 
 @mixin dropshadow() {
     box-shadow: 0 5px 15px rgba(0,0,0,.08);
@@ -51,7 +52,7 @@ $main-font-color: #222;
 html, body{
   padding: 0;
   margin: 0;
-  line-height: 1.3rem;
+  line-height: $line-height;
 }
 
 html{
@@ -120,7 +121,6 @@ header {
             flex-direction: row-reverse;
             li {
                 list-style: none;
-                padding: 0 $default-margin 0 0;
                 font-size: $smaller-font-size;
                 a {
                     text-transform: uppercase;
@@ -212,7 +212,7 @@ main {
     background-color: white;
     padding: $default-margin 2*$default-margin;
     @include dropshadow();
-    margin-bottom: 2*$default-margin;
+    margin-bottom: 3*$default-margin;
     img {
         max-width: 100%;
     }
@@ -275,11 +275,6 @@ div.mobile-add-button:hover {
     transition: box-shadow box-shadow-duration ease-in-out;
 }
 
-article.uk-comment{
-    background-color: white;
-    padding: $default-margin;
-}
-
 ul.comment-bubbles{
     margin: 0;
     padding: 0;
@@ -294,7 +289,7 @@ ul.comment-bubbles{
         }
         > div:first-child {
             background-color: white;
-            @import dropshadow();
+            @include bigdropshadow();
         }
         > div:first-child::after {
             content: '';
@@ -338,6 +333,7 @@ ul.comment-bubbles{
     background-color: $dark-background;
     color: $muted-text-color;
     font-size: $smaller-font-size;
+    padding: 0 2*$default-margin;
     ul {
         margin: auto;
         display: block;
@@ -358,7 +354,7 @@ ul.comment-bubbles{
         }
         li:not(:first-child)::before {
             content: ">";
-            margin: 0 1rem;
+            margin: 0 0.5rem;
         }
     }
 }
@@ -446,22 +442,12 @@ ul.comment-bubbles{
 
 
 
-div.footer {
-    flex-shrink: 0;
-}
 div.content-flex {
     flex: 1 0 auto;
 }
 
-.uk-form-stacked .with-tooltip {
-    display: inline-block;
-}
-
-.tooltip-icon {
-    display: inline-block;
-}
-
 footer {
+    margin-top: 2*$default-margin;
     background-color: $muted-background-color;
     padding: 4*$default-margin $default-margin;
     font-size: $smaller-font-size;
@@ -469,5 +455,80 @@ footer {
     text-align: center;
 }
 
+input, select, textarea {
+	max-width: 100%;
+	width: 100%;
+	border: 0 none;
+	padding: 0 $default-margin;
+	background: #fff;
+	color: #666;
+	border: 1px solid $muted-line-color;
+	transition: .2s ease-in-out;
+	transition-property: color,background-color,border;
+}
+
+checkbox, input, radio, select, textarea {
+	box-sizing: border-box;
+	margin: 0;
+	border-radius: 0;
+	font: inherit;
+}
+
+
+// FOrm stuff
+.bottom-form {
+    margin-top: 4*$default-margin;
+}
+fieldset {
+    border: 0;
+    margin: $default-margin 0;
+    padding: 0;
+}
+select:not([multiple]):not([size]) {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	padding-right: 20px;
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2224%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23666%22%20points%3D%2212%201%209%206%2015%206%22%20%2F%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23666%22%20points%3D%2212%2013%209%208%2015%208%22%20%2F%3E%0A%3C%2Fsvg%3E%0A");
+	background-repeat: no-repeat;
+	background-position: 100% 50%;
+}
+input, select:not([multiple]):not([size]) {
+	height: 2.6em;
+	vertical-align: middle;
+	display: inline-block;
+}
+
+button {
+	margin: 0;
+	border: none;
+	overflow: visible;
+	font: inherit;
+	color: inherit;
+	text-transform: none;
+	-webkit-appearance: none;
+	border-radius: 0;
+	display: inline-block;
+	box-sizing: border-box;
+	padding: 0 2*$default-margin;
+	vertical-align: middle;
+	font-size: $smaller-font-size;
+	line-height: 2*$line-height;
+	text-align: center;
+	text-decoration: none;
+	text-transform: uppercase;
+	transition: .1s ease-in-out;
+	transition-property: color,background-color,border-color;
+	background-color: #222;
+	color: #fff;
+	border: 1px solid transparent;
+}
+button:not(:disabled) {
+	cursor: pointer;
+}
+button:focus,
+button:hover {
+ background-color:#151515;
+ color:#fff
+}
 /* Import style for default CSS classes (Phoenix LiveView) */
 @import "../../deps/phoenix_live_view/assets/css/live_view.css";

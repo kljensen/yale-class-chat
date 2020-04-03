@@ -59,7 +59,7 @@
 <% end %>
 
 <%= if @topic.allow_submission_voting do %>
-<div class="form">
+<div class="bottom-form">
 <a name="newrating"></a>
 <% message = if is_nil(@my_rating) do
 "Add a rating"
@@ -104,32 +104,25 @@ end %>
     </div>
     <% end %>
 
-    <div>
-        <div>
-          <%= hidden_input f, :title, value: "Sample", class: "" %>
-          <%= error_tag f, :title %>
-        </div>
-    </div>
+    <fieldset>
+      <%= hidden_input f, :title, value: "Sample", class: "" %>
+      <%= error_tag f, :title %>
+    </fieldset>
 
-    <div>
+    <fieldset>
       <%= label f, :description, "Add a comment" %>
-        <div>
-          <%= textarea f, :description, class: "", rows: "6" %>
-          <%= error_tag f, :description %>
-        </div>
-    </div>
+      <%= textarea f, :description, class: "", rows: "6" %>
+      <%= error_tag f, :description %>
+    </fieldset>
 
     <%= if @topic.anonymous do %>
     <% else %>
       <div>
-        <a></a>
         <p>Note: this topic is not anonymous; your name will be visible as the author of this comment.</p>
       </div>
     <% end %>
 
-    <div>
-        <%= submit "Save", class: "" %>
-    </div>
+    <%= submit "Save", class: "" %>
 
 <% end %>
 </div>
