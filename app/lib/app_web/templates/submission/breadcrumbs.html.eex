@@ -1,9 +1,7 @@
 <div class="breadcrumbs">
     <ul >
         <li>
-            <span>
-                Courses
-            </span>
+            <a href="/">Courses</a>
         </li>
         <li>
              <%= if App.Accounts.can_edit_course(@current_user, @course) do %>

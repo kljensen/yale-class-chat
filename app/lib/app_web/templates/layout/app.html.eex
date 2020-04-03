@@ -1,85 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+
   <head>
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Yale Class Chat</title>
-
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
     <%= csrf_meta_tag() %>
   </head>
+
   <body>
     <header>
-       <nav>
+      <nav>
         <div>
-          <a class="top-matter" href="/">Yale&nbsp;Chat</a>
+          <a class="home-link" href="/">Yale&nbsp;Chat</a>
         </div>
-
         <div class="top-links">
-          <ul>
-            <%= if is_nil((@conn.assigns[:current_user])) do %>
-              <li>
-              <a href="/auth/cas">Log In
-                <svg width="12" height="12" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" data-svg="user"><circle fill="none" stroke="#000" stroke-width="1.1" cx="9.9" cy="6.4" r="4.4"></circle><path fill="none" stroke="#000" stroke-width="1.1" d="M1.5,19 C2.3,14.5 5.8,11.2 10,11.2 C14.2,11.2 17.7,14.6 18.5,19.2"></path></svg>
-              </a></li>
-            <% else %>
-              <li>
-                <a href="#"><%= @conn.private.plug_session["uid"] %>
-                  <svg width="12" height="12" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" data-svg="user"><circle fill="none" stroke="#000" stroke-width="1.1" cx="9.9" cy="6.4" r="4.4"></circle><path fill="none" stroke="#000" stroke-width="1.1" d="M1.5,19 C2.3,14.5 5.8,11.2 10,11.2 C14.2,11.2 17.7,14.6 18.5,19.2"></path></svg>
-                </a>
-                <div>
-                  <ul>
-                    <li><%= link "Profile", to: Routes.user_path(@conn, :show, @conn.assigns.current_user) %></li>
-                    <li><%= link "Log Out", to: Routes.auth_path(@conn, :delete, @conn.assigns.current_user) %></li>
-                    <%= if @conn.private.plug_session["is_superuser"] do %>
-                    <li></li>
-                    <li><a href="<%= Routes.superuser_path(@conn, :index) %>">Switch User</a></li>
-                    <% end %>
-                  </ul>
-                </div>
-              </li>
-            <% end %>
-            <li><a href="/about">About</a></li>
-          </ul>
+          <%= render AppWeb.LayoutView, "user-menu.html", assigns %>
         </div>
-    </nav>
+      </nav>
     </header>
 
+    <%# Our breadcrumb module can be overloaded, which is helpful for liveview. %>
+    <%# To overload it, just specify `:breadcrumb_module` in the `assigns`.  %>
     <% breadcrumb_module = Map.get(assigns, :breadcrumb_module) || @view_module %>
     <%= render_existing breadcrumb_module, "breadcrumbs.html", assigns %>
 
     <main role="main" class="container">
-      <%= if get_flash(@conn) != Map.new() do %>
-        <%= if !is_nil(get_flash(@conn, :info)) do %>
-          <div>
-            <a></a>
-            <p><%= get_flash(@conn, :info) %></p>
-          </div>
-        <% end %>
-        <%= if !is_nil(get_flash(@conn, :success)) do %>
-          <div>
-            <a></a>
-            <p><%= get_flash(@conn, :success) %></p>
-          </div>
-        <% end %>
-        <%= if !is_nil(get_flash(@conn, :error)) do %>
-          <div>
-            <a></a>
-            <p><%= get_flash(@conn, :error) %></p>
-          </div>
-        <% end %>
-      <% end %>
       <div class="main-body">
-      <%= render @view_module, @view_template, assigns %>
+        <%= render AppWeb.LayoutView, "flash.html", assigns %>
+        <%= render @view_module, @view_template, assigns %>
       </div>
     </main>
+
       <footer>
       <p>
           This is an open source project under active development by Nick Peranzi and Kyle Jensen.
           <br/>Have a feature request or bug report? Please <a href="https://github.com/kljensen/yale-class-chat/issues/new">open an issue on GitHub</a> or <a href="mailto:nick.peranzi@yale.edu;kyle.jensen@yale.edu?Subject=Yale.chat%20Feature%20Request" target="_top">contact us</a>.
       </p>
       </footer>
+
     <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </body>
 </html>

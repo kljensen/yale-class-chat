@@ -1,9 +1,7 @@
 <div class="breadcrumbs">
     <ul >
         <li>
-            <span>
-                Courses
-            </span>
+            <a href="/">Courses</a>
         </li>
         <li>
              <%= if App.Accounts.can_edit_course(@current_user, @course) do %>
@@ -23,9 +21,7 @@
         <% end %>
         <%= if !is_nil(assigns[:topic]) do %>
         <li>
-            <span>
-                <%= @topic.title %>
-            </span>
+            <%= @topic.title %>
         </li>
         <% end %>
     </ul>

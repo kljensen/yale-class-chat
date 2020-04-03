@@ -1,3 +1,4 @@
+
 $default-margin: 0.5rem;
 $default-background-color: #ecf0f1;
 $muted-background-color: #f8f8f8;
@@ -8,6 +9,43 @@ $max-width: 1000px;
 $dark-background: #222;
 $main-font-color: #222;
 $line-height: 1.3;
+$link-color: #00356b;
+$link-hover-color: #286dc0;
+
+$global-primary-background: #1e87f0;
+$global-success-background: #32d296;
+$global-warning-background: #faa05a;
+$global-danger-background: #f0506e;
+
+$alerts: (
+    "primary": (
+        "foreground": $global-primary-background,
+        "background": lighten(mix(white, $global-primary-background, 40%), 20%),
+    ),
+    "success": (
+        "foreground": $global-success-background,
+        "background": lighten(mix(white, $global-success-background, 40%), 25%),
+    ),
+    "warning": (
+        "foreground": $global-warning-background,
+        "background": lighten(mix(white, $global-warning-background, 45%), 15%),
+    ),
+    "danger": (
+        "foreground": $global-danger-background,
+        "background": lighten(mix(white, $global-danger-background, 40%), 20%),
+    ),
+);
+
+@each $name, $colors in $alerts {
+    .alert-#{$name} {
+        color: map-get($colors, "foreground");
+        background-color: map-get($colors, "background");
+        padding: 2*$default-margin;
+    }
+
+}
+
+
 
 @mixin dropshadow() {
     box-shadow: 0 5px 15px rgba(0,0,0,.08);
@@ -100,6 +138,18 @@ header {
     display: flex;
     justify-content: center;
     padding: $default-margin 2*$default-margin;
+
+    .home-link{
+        font-size: 2rem;
+        font-family: "YaleNew",Georgia,"Times New Roman",serif;
+    }
+    .home-link a{
+        color: white;
+    }
+    .home-link a:hover{
+        color: white;
+        text-decoration: none;
+    }
     nav {
         width: 100%;
         max-width: $max-width;
@@ -107,29 +157,34 @@ header {
         display: grid;
         grid-template-columns: 50% 50%;
         grid-template-columns: minmax(0, 1fr), minmax(0, 1fr);
-        padding: $default-margin 0;
         a {
             color: white;
         }
     }
     div.top-links {
+        display: flex;
+        flex-direction: row-reverse;
+        text-transform: uppercase;
+        font-variant-caps: small-caps;
+        color: $muted-text-color;
+        a {
+            color: $muted-text-color;
+        }
+        a:hover{
+            color: #666;
+        }
+        > div {
+            line-height: 2rem;
+            position: relative;
+            margin: $default-margin;
+        }
         text-align: right;
-        > ul {
+        > ul.foo {
             padding: 0;
             margin: 0;
-            display: flex;
-            flex-direction: row-reverse;
             li {
                 list-style: none;
                 font-size: $smaller-font-size;
-                a {
-                    text-transform: uppercase;
-                    font-variant-caps: small-caps;
-                    color: $muted-text-color;
-                }
-                a:hover{
-                    color: #666;
-                }
             }
         }
     }
@@ -144,18 +199,6 @@ main {
     }
 }
 
-
-.top-matter{
-    font-size: 2rem;
-    font-family: "YaleNew",Georgia,"Times New Roman",serif;
-}
-.top-matter a{
-    color: white;
-}
-.top-matter a:hover{
-    color: white;
-    text-decoration: none;
-}
 
 .card-holder {
     display: grid;
@@ -232,10 +275,10 @@ main {
 }
 
 a {
-    color: #00356b;
+    color: $link-color;
 }
 a:hover {
-    color: #286dc0;
+    color: $link-hover-color;
     text-decoration: none;
 }
 
@@ -532,3 +575,4 @@ button:hover {
 }
 /* Import style for default CSS classes (Phoenix LiveView) */
 @import "../../deps/phoenix_live_view/assets/css/live_view.css";
+@import "./menus.scss"

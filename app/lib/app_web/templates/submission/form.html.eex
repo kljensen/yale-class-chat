@@ -5,29 +5,23 @@
     </div>
   <% end %>
 
-<div>
+<fieldset>
   <%= label f, :title, class: "" %>
-  <div>
-      <%= text_input f, :title, class: "" %>
-      <%= error_tag f, :title %>
-  </div>
-</div>
+  <%= text_input f, :title, class: "" %>
+  <%= error_tag f, :title %>
+</fieldset>
 
-<div>
+<fieldset>
   <%= label f, :description, class: "" %>
-  <div>
-      <%= textarea f, :description, class: "" %>
-      <%= error_tag f, :description %>
-  </div>
-</div>
+  <%= textarea f, :description, class: "", rows: 6 %>
+  <%= error_tag f, :description %>
+</fieldset>
 
-<div>
+<fieldset>
   <%= label f, :image_url, class: "" %>
-  <div>
   <%= text_input f, :image_url, class: "" %>
   <%= error_tag f, :image_url %>
-  </div>
-</div>
+</fieldset>
 
 <%= if @topic.anonymous do %>
 <% else %>
@@ -37,7 +31,5 @@
   </div>
 <% end %>
 
-<div>
-    <%= submit "Save", class: "" %>
-</div>
+<%= submit "Save", class: "" %>
 <% end %>

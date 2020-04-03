@@ -1,0 +1,18 @@
+
+<%= if get_flash(@conn) != Map.new() do %>
+    <%= if !is_nil(get_flash(@conn, :info)) do %>
+    <div class="alert-primary">
+        <p><%= get_flash(@conn, :info) %></p>
+    </div>
+    <% end %>
+    <%= if !is_nil(get_flash(@conn, :success)) do %>
+    <div class="alert-success">
+        <p><%= get_flash(@conn, :success) %></p>
+    </div>
+    <% end %>
+    <%= if !is_nil(get_flash(@conn, :error)) do %>
+    <div class="alert-warning">
+        <p><%= get_flash(@conn, :error) %></p>
+    </div>
+    <% end %>
+<% end %>
