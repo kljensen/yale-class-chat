@@ -96,9 +96,9 @@ body {
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: subpixel-antialiased;
     -moz-osx-font-smoothing:grayscale;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    min-height: 100%
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
 }
 
 a {
@@ -191,6 +191,7 @@ header {
 
 main {
     padding: $default-margin 2*$default-margin;
+    flex: 1;
     div.main-body {
         max-width: $max-width;
         margin: auto;
