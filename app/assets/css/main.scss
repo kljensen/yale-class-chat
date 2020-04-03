@@ -36,16 +36,6 @@ $alerts: (
     ),
 );
 
-@each $name, $colors in $alerts {
-    .alert-#{$name} {
-        color: map-get($colors, "foreground");
-        background-color: map-get($colors, "background");
-        padding: 2*$default-margin;
-    }
-
-}
-
-
 
 @mixin dropshadow() {
     box-shadow: 0 5px 15px rgba(0,0,0,.08);
@@ -106,9 +96,9 @@ body {
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: subpixel-antialiased;
     -moz-osx-font-smoothing:grayscale;
-    display: flex;
-    justify-content:center;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100%
 }
 
 a {
@@ -128,6 +118,15 @@ h1, h2, h3, h4, h5 {
 }
 h2 {
     font-size: 1.7rem;   
+}
+
+@each $name, $colors in $alerts {
+    .alert-#{$name} {
+        color: map-get($colors, "foreground");
+        background-color: map-get($colors, "background");
+        padding: 2*$default-margin;
+    }
+
 }
 
 header {
@@ -196,6 +195,35 @@ main {
         max-width: $max-width;
         margin: auto;
         padding-top: 2*$default-margin;
+    }
+    .welcome {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        color: rgba(255, 255, 255, 0.7);
+        text-align: center;
+        padding: 3*$default-margin;
+        height: 400px;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: 50% 50%;
+        background:
+            linear-gradient(
+                rgba(34, 34, 34, 0.8), 
+                rgba(34, 34, 34, 0.8)
+            ),
+            url(/images/som-class-of-2020.jpg);
+        span, a {
+            letter-spacing: 0.2em;
+            font-size: $smaller-font-size;
+        }
+        a {
+            border: 1px solid white;
+            padding: 2*$default-margin 3*$default-margin;
+            color: black;
+            background-color: white;
+        }
     }
 }
 
