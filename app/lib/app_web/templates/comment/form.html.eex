@@ -5,15 +5,13 @@
     </div>
   <% end %>
 
-<div>
+<fieldset>
   <%= label f, :description, class: "" %>
   <div>
     <%= textarea f, :description, class: "", rows: "6" %>
     <%= error_tag f, :description %>
   </div>
-</div>
+</fieldset>
 
-  <div>
-    <%= submit "Save", class: "" %>
-  </div>
+<%= submit "Save", class: "" %>
 <% end %>
