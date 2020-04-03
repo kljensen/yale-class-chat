@@ -6,53 +6,48 @@
   <% end %>
 
 
-<div>
-  <%= label f, :name,  class: ""%>
-  <div>
-    <%= text_input f, :name, class: "" %>
-    <%= error_tag f, :name %>
-  </div>
+<fieldset>
+<%= label f, :name,  class: "form-label"%>
+<%= text_input f, :name, class: "" %>
+<%= error_tag f, :name %>
+</fieldset>
+
+<div class="grid-2-column">
+<fieldset>
+<%= label f, :department, class: "" %>
+<%= text_input f, :department, class: "" %>
+<%= error_tag f, :department %>
+</fieldset>
+
+<fieldset>
+<%= label f, :number, class: "" %>
+<%= number_input f, :number, class: "" %>
+<%= error_tag f, :number %>
+</fieldset>
 </div>
 
-<div>
-  <%= label f, :department, class: "" %>
-  <div>
-    <%= text_input f, :department, class: "" %>
-    <%= error_tag f, :department %>
-  </div>
-</div>
-<div>
-  <%= label f, :number, class: "" %>
-  <div>
-    <%= number_input f, :number, class: "" %>
-    <%= error_tag f, :number %>
-  </div>
-</div>
-<div>
-  <%= label f, :allow_read, class: "" %>
-  <div>
-    <%= checkbox f, :allow_read, class: "" %>
-    <%= error_tag f, :allow_read %>
-  </div>
-</div>
-<div>
-  <%= label f, :allow_write, class: "" %>
-  <div>
-    <%= checkbox f, :allow_write, class: "" %>
-    <%= error_tag f, :allow_write %>
-  </div>
-</div>
-<div>
-  <%= label f, :semester_id, class: "" %>
-  <div>
-    <%= select f, :semester_id, @semesters, class: ""  %>
-    <%= error_tag f, :semester_id %>
-  </div>
+<fieldset>
+<%= label f, :semester_id, class: "" %>
+<%= select f, :semester_id, @semesters, class: ""  %>
+<%= error_tag f, :semester_id %>
+</fieldset>
+
+<div class="grid-2-column">
+<fieldset>
+<%= label f, :allow_read, class: "" %>
+<%= checkbox f, :allow_read, class: "" %>
+<%= error_tag f, :allow_read %>
+</fieldset>
+
+<fieldset>
+<%= label f, :allow_write, class: "" %>
+<%= checkbox f, :allow_write, class: "" %>
+<%= error_tag f, :allow_write %>
+</fieldset>
 </div>
 
 
-<div>
-    <%= submit "Save", class: "" %>
-</div>
+<%= submit "Save", class: "" %>
+
 
 <% end %>

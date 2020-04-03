@@ -15,25 +15,21 @@
     </div>
   <% end %>
 
-<div>
-  <%= label f, :title, class: ""%>
-  <div>
-    <%= text_input f, :title, class: ""%>
-    <%= error_tag f, :title %>
-  </div>
-</div>
+<fieldset>
+<%= label f, :title, class: ""%>
+<%= text_input f, :title, class: ""%>
+<%= error_tag f, :title %>
+</fieldset>
 
-<div>
-  <%= label f, :crn, class: ""%>
-  <div>
-    <%= text_input f, :crn, class: ""%>
-    <%= error_tag f, :crn %>
-  </div>
-</div>
+<fieldset>
+<%= label f, :crn, class: ""%>
+<%= text_input f, :crn, class: ""%>
+<%= error_tag f, :crn %>
+</fieldset>
 
-  <%= hidden_input f, :course_id, value: @course.id %>
-<div>
-    <%= submit "Save", class: "" %>
-</div>
+<%= hidden_input f, :course_id, value: @course.id %>
+
+<%= submit "Save", class: "" %>
+
 
 <% end %>
