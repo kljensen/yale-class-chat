@@ -1,10 +1,10 @@
-defmodule SubmissionLiveComponent do
+defmodule CommentLiveComponent do
   use Phoenix.LiveComponent
-  alias App.Submissions.Submission
+  alias App.Comments.Comment
   require Logger
 
   def render(assigns) do
-    Phoenix.View.render(AppWeb.TopicView, "submission_card.html", assigns)
+    Phoenix.View.render(AppWeb.SubmissionView, "comment_bubble.html", assigns)
   end
 
   @doc """
@@ -25,7 +25,6 @@ defmodule SubmissionLiveComponent do
   is the default behavior.
   """
   def update(assigns, socket) do
-    Logger.info("Inside update of SubmissionLiveComponent")
     {:ok, assign(socket, assigns)}
   end
 end

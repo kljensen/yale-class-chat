@@ -213,6 +213,9 @@ main {
     padding: $default-margin 2*$default-margin;
     @include dropshadow();
     margin-bottom: 2*$default-margin;
+    img {
+        max-width: 100%;
+    }
 }
 
 .submission-stats {
@@ -277,54 +280,59 @@ article.uk-comment{
     padding: $default-margin;
 }
 
-li.comment{
-    margin-top: 30px;
+ul.comment-bubbles{
+    margin: 0;
+    padding: 0;
+    li {
+        margin-top: $default-margin;
+        list-style: none;
+        padding: 0;
+        > div {
+            position: relative;
+            border-radius: .4em;
+            padding: $default-margin;
+        }
+        > div:first-child {
+            background-color: white;
+            @import dropshadow();
+        }
+        > div:first-child::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 0;
+            height: 0;
+            border: 2*$default-margin solid transparent;
+            border-top-color: #fff;
+            border-bottom: 0;
+            margin-left: -$default-margin;
+            margin-bottom: -2*$default-margin;
+        }
+    }
+    li:nth-child(odd) div:first-child::after {
+        left: 3*$default-margin;
+        border-right: 0;
+    }
+    li:nth-child(even) div:first-child::after {
+        right: 2*$default-margin;
+        border-left: 0;
+    }
+    div.comment-author {
+        font-size: $smaller-font-size;
+        color: $muted-text-color;
+        margin-top: $default-margin;
+    }
+    div.comment-author-even {
+        text-align:right;
+        margin-right: 4*$default-margin;
+    }
+    div.comment-author-odd {
+        text-align:left;
+        margin-left: 4*$default-margin;
+    }
 }
 
-.uk-comment-list > :nth-child(n+2) {
-    margin-top: 30px;
-}
 
-.speech-bubble {
-    position: relative;
-    border-radius: .4em;
-}
-
-.speech-bubble:after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    width: 0;
-    height: 0;
-    border: $default-margin solid transparent;
-    border-top-color: #fff;
-    border-bottom: 0;
-    margin-left: -$default-margin;
-    margin-bottom: -$default-margin;
-}
-
-ul li.comment:nth-child(odd) .speech-bubble:after {
-    left: 30px;
-    border-right: 0;
-}
-ul li.comment:nth-child(even) .speech-bubble:after {
-    right: $default-margin;
-    border-left: 0;
-}
-
-div.comment-author {
-    font-size: 0.80rem;
-    color: #999;
-    margin-top: $default-margin;
-}
-div.comment-author-even {
-    text-align:right;
-    margin-right: 45px;
-}
-div.comment-author-odd {
-    text-align:left;
-    margin-left: 45px;
-}
 
 .breadcrumbs {
     background-color: $dark-background;

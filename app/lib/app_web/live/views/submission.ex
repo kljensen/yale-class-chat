@@ -50,6 +50,7 @@ defmodule AppWeb.SubmissionLive do
     |> assign(:id, id)
     |> assign(:net_id, net_id)
     |> assign(:conn, AppWeb.Endpoint)
+    |> assign(:breadcrumb_module, AppWeb.SubmissionView)
     |> load_submission_data(net_id, id)
 
     {:ok, socket}
