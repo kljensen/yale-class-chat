@@ -37,7 +37,6 @@ defmodule AppWeb.TopicController do
         sections = Enum.map(section_map, fn [value, key] -> {:"#{key}", value} end)
         selected_sections = Map.values(Map.new(sections))
         current_time = current_html_time()
-
         topic_params = Map.put(topic_params, "opened_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(topic_params["opened_at"]))
         topic_params = Map.put(topic_params, "closed_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(topic_params["closed_at"]))
 
@@ -110,6 +109,9 @@ defmodule AppWeb.TopicController do
     {:ok, topic} = Topics.get_user_topic(user, id)
     section = topic.section
     user = conn.assigns.current_user
+    current_time = current_html_time()
+    topic_params = Map.put(topic_params, "opened_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(topic_params["opened_at"]))
+    topic_params = Map.put(topic_params, "closed_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(topic_params["closed_at"]))
 
     case Topics.update_topic!(user, topic, topic_params) do
       {:ok, topic} ->

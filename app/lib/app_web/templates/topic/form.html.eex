@@ -32,10 +32,15 @@
 <span class="tooltip">(?)
   <span class="tooltiptext">The date and time at which the topic should open for students to post</span>
 </span>
-<% opened_value = if !is_nil(@changeset.changes["closed_at"]) do
-  @changeset.changes.closed_at
-else
-  @current_time
+<% opened_value = cond do
+  !is_nil(@changeset.changes["closed_at"]) ->
+    @changeset.changes.closed_at
+
+  !is_nil(assigns[:topic]) ->
+    nyc_to_utc(@topic.opened_at)
+
+  true ->
+    current_time("America/New_York")
 end %>
 <%= datetime_local_input f, :opened_at, value: date_to_html!(opened_value), class: "" %>
 <%= error_tag f, :opened_at %>
@@ -46,12 +51,16 @@ end %>
 <span class="tooltip">(?)
   <span class="tooltiptext">The date and time at which the topic will close, preventing students from posting</span>
 </span>
-<% closed_value = if !is_nil(@changeset.changes["closed_at"]) do
-  @changeset.changes.closed_at
-else
-  @current_time
+<% closed_value = cond do
+  !is_nil(@changeset.changes["closed_at"]) ->
+    @changeset.changes.closed_at
+
+  !is_nil(assigns[:topic]) ->
+    nyc_to_utc(@topic.closed_at)
+
+  true ->
+    shift_date(current_time("America/New_York"), 1)
 end %>
-<% closed_value = shift_date(closed_value, 1) %>
 <%= datetime_local_input f, :closed_at, value: date_to_html!(closed_value), class: "" %>
 <%= error_tag f, :closed_at %>
 </fieldset>

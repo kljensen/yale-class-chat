@@ -66,4 +66,9 @@ defmodule AppWeb.Helpers do
     Timex.shift(datetime, months: months)
   end
 
+  def nyc_to_utc(datetime) do
+    datetime
+    |> Timex.Timezone.convert("America/New_York")
+  end
+
 end
