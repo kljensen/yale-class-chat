@@ -38,9 +38,8 @@
       nyc_to_utc(@section__role.valid_to)
 
     true ->
-      current_time("America/New_York")
+      shift_date(current_time("America/New_York"), 12)
   end %>
-  <% to_value = shift_date(to_value, 12) %>
   <%= datetime_local_input f, :valid_to, value: date_to_html!(to_value) %>
   <%= error_tag f, :valid_to %>
 </fieldset>
