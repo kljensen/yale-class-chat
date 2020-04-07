@@ -30,5 +30,5 @@ liveSocket.connect()
 
 flatpickr('input[type="datetime-local"]', {
   enableTime: true,
-  dateFormat: "Y-m-d h:i K",
+  dateFormat: "Y-m-dTH:i",
 });

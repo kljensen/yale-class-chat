@@ -7,29 +7,50 @@
 
 <div class="grid-3-column">
   <fieldset>
-    <%= label f, :role %>
-    <%= select f, :role, @role_list %>
-    <%= error_tag f, :role %>
-  </fieldset>
+  <%= label f, :role, class: "" %>
+  <%= select f, :role, @role_list, class: "" %>
+  <%= error_tag f, :role %>
+</fieldset>
 
-  <fieldset>
-    <%= label f, :valid_from %>
-    <%= datetime_select f, :valid_from %>
-    <%= error_tag f, :valid_from %>
-  </fieldset>
+<fieldset>
+  <%= label f, :valid_from, class: "" %>
+  <% from_value = cond do
+    !is_nil(@changeset.changes["valid_from"]) ->
+      @changeset.changes.valid_from
 
-  <fieldset>
-    <%= label f, :valid_to %>
-    <%= datetime_select f, :valid_to %>
-    <%= error_tag f, :valid_to %>
-  </fieldset>
-</div>
+    !is_nil(assigns[:section__role]) ->
+      nyc_to_utc(@section__role.valid_from)
+
+    true ->
+      current_time("America/New_York")
+  end %>
+  <%= datetime_local_input f, :valid_from, value: date_to_html!(from_value) %>
+  <%= error_tag f, :valid_from %>
+</fieldset>
+
+<fieldset>
+  <%= label f, :valid_to, class: "" %>
+  <% to_value = cond do
+    !is_nil(@changeset.changes["valid_to"]) ->
+      @changeset.changes.valid_to
+
+    !is_nil(assigns[:section__role]) ->
+      nyc_to_utc(@section__role.valid_to)
+
+    true ->
+      current_time("America/New_York")
+  end %>
+  <% to_value = shift_date(to_value, 12) %>
+  <%= datetime_local_input f, :valid_to, value: date_to_html!(to_value) %>
+  <%= error_tag f, :valid_to %>
+</fieldset>
 
 <fieldset>
   <%= label f, :user_id %>
   <%= select f, :user_id, @user_list %>
   <%= error_tag f, :user_id %>
 </fieldset>
+</div>
 
   <div>
     <%= submit "Save" %>
