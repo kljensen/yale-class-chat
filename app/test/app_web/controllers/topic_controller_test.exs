@@ -5,9 +5,9 @@ defmodule AppWeb.TopicControllerTest do
   import Plug.Test
   import AppWeb.ControllerHelpers
 
-  @create_attrs %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2120"}, description: "some description", opened_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "3", "year" => "2020"}, slug: "some slug", sort: "some sort", title: "some title", user_submission_limit: 42, visible: true, show_user_submissions: true, type: "general"}
-  @update_attrs %{allow_submission_comments: false, allow_submission_voting: false, allow_submissions: false, anonymous: false, closed_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, description: "some updated description", opened_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, slug: "some updated slug", sort: "some updated sort", title: "some updated title", user_submission_limit: 43, visible: false, show_user_submissions: false, type: "qa"}
-  @invalid_attrs %{allow_submission_comments: nil, allow_submission_voting: nil, allow_submissions: nil, anonymous: nil, closed_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, description: nil, opened_at: %{"day" => "8", "hour" => "17", "minute" => "36", "month" => "4", "year" => "2020"}, slug: nil, sort: nil, title: nil, user_submission_limit: nil, visible: nil, show_user_submissions: nil}
+  @create_attrs %{allow_submission_comments: true, allow_submission_voting: true, allow_submissions: true, anonymous: true, closed_at: "2120-04-08T17:36", description: "some description", opened_at: "2020-03-08T17:36", slug: "some slug", sort: "some sort", title: "some title", user_submission_limit: 42, visible: true, show_user_submissions: true, type: "general"}
+  @update_attrs %{allow_submission_comments: false, allow_submission_voting: false, allow_submissions: false, anonymous: false, closed_at: "2019-04-08T17:36", description: "some updated description", opened_at: "2020-04-08T17:36", slug: "some updated slug", sort: "some updated sort", title: "some updated title", user_submission_limit: 43, visible: false, show_user_submissions: false, type: "qa"}
+  @invalid_attrs %{allow_submission_comments: nil, allow_submission_voting: nil, allow_submissions: nil, anonymous: nil, closed_at: "2019-04-08T17:36", description: nil, opened_at: "2020-04-08T17:36", slug: nil, sort: nil, title: nil, user_submission_limit: nil, visible: nil, show_user_submissions: nil}
 
   def fixture(:topic) do
     section = AppWeb.SectionControllerTest.fixture(:section)
@@ -52,8 +52,8 @@ defmodule AppWeb.TopicControllerTest do
 
       assert %{topic_id: id} = redirected_params(conn)
       topic = Topics.get_topic!(id)
-      attrstest = Map.put(@create_attrs, :opened_at, convert_NYC_datetime_to_db(@create_attrs.opened_at))
-      attrstest = Map.put(attrstest, :closed_at, convert_NYC_datetime_to_db(@create_attrs.closed_at))
+      attrstest = Map.put(@create_attrs, :opened_at, convert_NYC_datetime_to_db!(@create_attrs.opened_at))
+      attrstest = Map.put(attrstest, :closed_at, convert_NYC_datetime_to_db!(@create_attrs.closed_at))
       Enum.each  attrstest,  fn {k, v} ->
         assert Map.get(topic, k) == v
       end

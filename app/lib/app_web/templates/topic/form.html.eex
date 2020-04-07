@@ -32,7 +32,7 @@
 <span class="tooltip">(?)
   <span class="tooltiptext">The date and time at which the topic should open for students to post</span>
 </span>
-<%= text_input f, :opened_at, default: @current_time, class: "" %>
+<%= datetime_local_input f, :opened_at, default: @current_time, class: "" %>
 <%= error_tag f, :opened_at %>
 </fieldset>
 
@@ -41,7 +41,7 @@
 <span class="tooltip">(?)
   <span class="tooltiptext">The date and time at which the topic will close, preventing students from posting</span>
 </span>
-<%= text_input f, :closed_at, default: @current_time, class: "" %>
+<%= datetime_local_input f, :closed_at, default: @current_time, class: "" %>
 <%= error_tag f, :closed_at %>
 </fieldset>
 

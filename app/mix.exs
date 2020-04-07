@@ -71,7 +71,9 @@ defmodule App.MixProject do
       # Use LDAPEx for LDAP queries
       {:ldap_ex, "~> 0.2.2"},
       # Use poison for JSON parsing
-      {:poison, "~> 3.1"}
+      {:poison, "~> 3.1"},
+      # Timex for datetime string conversions
+      {:timex, "~> 3.5"}
     ]
   end
 

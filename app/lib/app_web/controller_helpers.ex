@@ -23,11 +23,24 @@ defmodule AppWeb.ControllerHelpers do
       end
   end
 
-  def convert_NYC_datetime_to_db(raw_input) do
-    {:ok, output} = NaiveDateTime.new(String.to_integer(raw_input["year"]), String.to_integer(raw_input["month"]), String.to_integer(raw_input["day"]), String.to_integer(raw_input["hour"]), String.to_integer(raw_input["minute"]), 0)
-    {:ok, output} = DateTime.from_naive(output, "America/New_York")
-    {:ok, output} = DateTime.shift_zone(output, "Etc/UTC")
-    output
+  def convert_NYC_datetime_to_db!(raw_input) do
+    case Timex.parse(raw_input, "{ISOdate}T{h24}:{m}") do
+      {:ok, parsed_date} ->
+        parsed_date
+        |> DateTime.from_naive!("America/New_York")
+        |> Timex.Timezone.convert("Etc/UTC")
+
+        _ ->
+          nil
+        end
+    #{:ok, output} = NaiveDateTime.new(String.to_integer(raw_input["year"]), String.to_integer(raw_input["month"]), String.to_integer(raw_input["day"]), String.to_integer(raw_input["hour"]), String.to_integer(raw_input["minute"]), 0)
+    #{:ok, output} = DateTime.from_naive(output, "America/New_York")
+    #{:ok, output} = DateTime.shift_zone(output, "Etc/UTC")
+    #output
+  end
+
+  def current_html_time() do
+    Timex.now("America/New_York")|> Timex.format!("{ISOdate}T{h24}:{m}")
   end
 
 end

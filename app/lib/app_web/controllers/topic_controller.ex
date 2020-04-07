@@ -20,7 +20,7 @@ defmodule AppWeb.TopicController do
         section_map = Enum.map(section_list, fn (x) -> [x.id, x.title] end)
         sections = Enum.map(section_map, fn [value, key] -> {:"#{key}", value} end)
         selected_sections = Map.values(Map.new(sections))
-        {:ok, current_time} = DateTime.now("America/New_York")
+        current_time = current_html_time()
         render(conn, "new.html", changeset: changeset, course: course, sections: sections, selected_sections: selected_sections, current_time: current_time, sort_list: @sort_list)
 
       false -> render_error(conn, "forbidden")
@@ -36,10 +36,10 @@ defmodule AppWeb.TopicController do
         section_map = Enum.map(section_list, fn (x) -> [x.id, x.title] end)
         sections = Enum.map(section_map, fn [value, key] -> {:"#{key}", value} end)
         selected_sections = Map.values(Map.new(sections))
-        {:ok, current_time} = DateTime.now("America/New_York")
+        current_time = current_html_time()
 
-        topic_params = Map.put(topic_params, "opened_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db(topic_params["opened_at"]))
-        topic_params = Map.put(topic_params, "closed_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db(topic_params["closed_at"]))
+        topic_params = Map.put(topic_params, "opened_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(topic_params["opened_at"]))
+        topic_params = Map.put(topic_params, "closed_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(topic_params["closed_at"]))
 
         case section_ids do
           nil ->
@@ -95,7 +95,7 @@ defmodule AppWeb.TopicController do
         case App.Accounts.can_edit_topic(user, topic) do
           true ->
             changeset = Topics.change_topic(topic)
-            {:ok, current_time} = DateTime.now("America/New_York")
+            current_time = current_html_time()
             render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time, section: section, sort_list: @sort_list, section: section, course: course)
 
           false -> render_error(conn, "forbidden")
@@ -118,7 +118,7 @@ defmodule AppWeb.TopicController do
         |> redirect(to: Routes.topic_path(conn, :show, topic))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:ok, current_time} = DateTime.now("America/New_York")
+        current_time = current_html_time()
         render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time, section: section, sort_list: @sort_list, course: section.course)
 
       {:error, message} -> render_error(conn, message)
