@@ -5,21 +5,31 @@
     </div>
   <% end %>
 
-  <%= label f, :role %>
-  <%= select f, :role, @role_list %>
-  <%= error_tag f, :role %>
+<div class="grid-3-column">
+  <fieldset>
+    <%= label f, :role %>
+    <%= select f, :role, @role_list %>
+    <%= error_tag f, :role %>
+  </fieldset>
 
-  <%= label f, :valid_from %>
-  <%= datetime_select f, :valid_from %>
-  <%= error_tag f, :valid_from %>
+  <fieldset>
+    <%= label f, :valid_from %>
+    <%= datetime_select f, :valid_from %>
+    <%= error_tag f, :valid_from %>
+  </fieldset>
 
-  <%= label f, :valid_to %>
-  <%= datetime_select f, :valid_to %>
-  <%= error_tag f, :valid_to %>
+  <fieldset>
+    <%= label f, :valid_to %>
+    <%= datetime_select f, :valid_to %>
+    <%= error_tag f, :valid_to %>
+  </fieldset>
+</div>
 
+<fieldset>
   <%= label f, :user_id %>
   <%= select f, :user_id, @user_list %>
   <%= error_tag f, :user_id %>
+</fieldset>
 
   <div>
     <%= submit "Save" %>

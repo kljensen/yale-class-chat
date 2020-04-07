@@ -10,8 +10,8 @@ defmodule AppWeb.Helpers do
     end
   end
 
-  def current_time(_) do
-    {:ok, curtime} = DateTime.now("Etc/UTC")
+  def current_time(tz \\ "Etc/UTC") do
+    {:ok, curtime} = DateTime.now(tz)
     curtime
   end
 

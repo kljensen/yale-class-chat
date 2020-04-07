@@ -5,9 +5,9 @@
 
     <% topic_status = cond do
 
-    DateTime.compare(@topic.closed_at, current_time(0)) == :lt ->
+    DateTime.compare(@topic.closed_at, current_time("Etc/UTC")) == :lt ->
     "closed"
-    DateTime.compare(@topic.opened_at, current_time(0)) == :gt ->
+    DateTime.compare(@topic.opened_at, current_time("Etc/UTC")) == :gt ->
     "closed"
     true ->
     "open"

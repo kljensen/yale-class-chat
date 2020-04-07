@@ -7,41 +7,43 @@
     </div>
   <% end %>
 
-<div>
+<div class="grid-3-column">
+  <fieldset>
   <%= label f, :role, class: "" %>
-  <div>
   <%= select f, :role, @role_list, class: "" %>
   <%= error_tag f, :role %>
-  </div>
-</div>
+</fieldset>
 
-<div>
+<fieldset>
   <%= label f, :valid_from, class: "" %>
-  <div>
-  <%= datetime_select f, :valid_from %>
+  <% from_value = if !is_nil(@changeset.changes["valid_from"]) do
+    @changeset.changes.valid_from
+  else
+    current_time("America/New_York")
+  end %>
+  <%= datetime_local_input f, :valid_from, value: date_to_html!(from_value) %>
   <%= error_tag f, :valid_from %>
-  </div>
-</div>
+</fieldset>
 
-<div>
+<fieldset>
   <%= label f, :valid_to, class: "" %>
-  <div>
-  <%= datetime_select f, :valid_to %>
+  <% to_value = if !is_nil(@changeset.changes["valid_to"]) do
+    @changeset.changes.valid_to
+  else
+    current_time("America/New_York")
+  end %>
+  <%= datetime_local_input f, :valid_to, value: date_to_html!(to_value) %>
   <%= error_tag f, :valid_to %>
-  </div>
-</div>
+</fieldset>
 
-<div>
+<fieldset class="full-width">
   <%= label f, :user_id_list, class: "" do %>
     List of net ids (separated by comma, space, and/or semicolon)
   <% end %>
-  <div>
   <%= text_input f, :user_id_list, class: "" %>
   <%= error_tag f, :user_id_list %>
-  </div>
+</fieldset>
 </div>
-
-<div>
   <div>
     <%= submit "Save", class: "" %>
   </div>
