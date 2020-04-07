@@ -6,14 +6,17 @@ defmodule App.Application do
   use Application
 
   def start(_type, _args) do
+    import Supervisor.Spec
     # List all child processes to be supervised
     children = [
       # Start the Ecto repository
       App.Repo,
       # Start the endpoint when the application starts
-      AppWeb.Endpoint
+      AppWeb.Endpoint,
       # Starts a worker by calling: App.Worker.start_link(arg)
       # {App.Worker, arg},
+      worker(App.Notifications, ["events"], id: :database_events),
+      worker(App.LiveViewNotifications, [], id: :live_view_notifications)
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

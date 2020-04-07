@@ -1,0 +1,19 @@
+<div class="card color-<%= 1 + rem @topic.id + 1, 16 %>">
+    <a href="<%= Routes.topic_path(@conn, :show, @topic) %>">
+        <h3>
+            <%= @topic.title %>
+        </h3>
+        <div>
+            <%= render AppWeb.HelperView, "multiparagraph_text.html", text: @topic.description, truncate: true, pclass: "" %>
+        </div>
+        <%= if @can_edit do %>
+        <div>
+            <div class="details">
+                <%= link "Edit", to: Routes.topic_path(@conn, :edit, @topic) %>
+                |
+                <%= link "Delete", to: Routes.topic_path(@conn, :delete, @topic), method: :delete, data: [confirm: "Are you sure?"] %>
+            </div>
+        </div>
+        <% end %>
+    </a>
+</div>

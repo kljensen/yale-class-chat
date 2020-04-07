@@ -60,6 +60,7 @@ defmodule App.AccountsTest do
       assert user == initialuser
     end
 
+    @tag :skip
     test "update_user_ldap/1 updates user if found on server (WILL FAIL IF NOT ON VPN)" do
       attrs = Map.put(@valid_attrs, :net_id, "klj39")
       {:ok, %User{}} = Accounts.create_user(attrs)

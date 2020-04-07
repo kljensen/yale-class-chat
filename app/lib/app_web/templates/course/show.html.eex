@@ -1,114 +1,88 @@
 <h1><%= @course.department %> <%= @course.number %>: <%= @course.name %></h1>
 
-<div class="uk-grid-medium uk-child-width-1-3@s" uk-grid>
-  <div>
-  <div class="uk-card uk-card-small uk-card-default uk-card-hover">
-    <div class="uk-card-header">
-      <h3 class="uk-card-title uk-margin-remove-bottom">Course Details</h3>
-    </div>
-    <div class="uk-card-body">
-      <ul>
-        <li>
-          <strong>Student viewing:</strong>
-          <%= if @course.allow_read do %>
-            Allowed
-          <%= else %>
-            Not allowed
-          <%= end %>
-        </li>
-
-        <li>
-          <strong>Student participation:</strong>
-          <%= if @course.allow_write do %>
-            Allowed
-          <%= else %>
-            Not allowed
-          <%= end %>
-        </li>
-
-        <li>
-          <strong>Semester:</strong>
-          <%= @semester.name %>
-        </li>
-
-      </ul>
-    </div>
-    <div class="uk-card-footer">
-      <div class="details uk-width-expand">
-        <%= link "Edit Details", to: Routes.course_path(@conn, :edit, @course) %>
-        <%= if @role == "owner" do %>
-        |
-        <%= link "Delete", to: Routes.course_path(@conn, :delete, @course), method: :delete, data: [confirm: "Are you absolutely sure you would like to delete the course? This cannot be undone!"] %>
+<div class="card-holder">
+  <div class="card">
+    <h3>Course Details</h3>
+    <ul>
+      <li>
+        <strong>Student viewing:</strong>
+        <%= if @course.allow_read do %>
+          Allowed
+        <%= else %>
+          Not allowed
         <%= end %>
-      </div>
-    </div>
-  </div>
-  </div>
-<div>
-<div class="uk-card uk-card-small uk-card-default uk-card-hover">
-    <div class="uk-card-header">
-      <h3 class="uk-card-title uk-margin-remove-bottom">Administration</h3>
-    </div>
-    <div class="uk-card-body">
-      Topics
-      <ul>
-        <li><%= link "Create Topic", to: Routes.course_topic_path(@conn, :new, @course) %></li>
-      </ul>
-      Course Roles (Professors/TAs)
-      <ul class="uk-margin-remove-top">
-        <li><%= link "View Existing Course Roles", to: Routes.course_course__role_path(@conn, :index, @course) %></li>
-        <%= if @role == "owner" do %>
-          <li><%= link "Add New Course Roles", to: Routes.course_course__role_path(@conn, :bulk_new, @course) %></li>
+      </li>
+
+      <li>
+        <strong>Student participation:</strong>
+        <%= if @course.allow_write do %>
+          Allowed
+        <%= else %>
+          Not allowed
         <%= end %>
-      </ul>
+      </li>
+
+      <li>
+        <strong>Semester:</strong>
+        <%= @semester.name %>
+      </li>
+
+    </ul>
+    <div class="course-admin">
+      <%= link "Edit Details", to: Routes.course_path(@conn, :edit, @course) %>
+      <%= if @role == "owner" do %>
+      |
+      <%= link "Delete", to: Routes.course_path(@conn, :delete, @course), method: :delete, data: [confirm: "Are you absolutely sure you would like to delete the course? This cannot be undone!"] %>
+      <%= end %>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Administration</h3>
+    Topics
+    <ul>
+      <li><%= link "Create Topic", to: Routes.course_topic_path(@conn, :new, @course) %></li>
+    </ul>
+    Course Roles (Professors/TAs)
+    <ul>
+      <li><%= link "View Existing Course Roles", to: Routes.course_course__role_path(@conn, :index, @course) %></li>
+      <%= if @role == "owner" do %>
+        <li><%= link "Add New Course Roles", to: Routes.course_course__role_path(@conn, :bulk_new, @course) %></li>
+      <%= end %>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Sections</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>CRN</th>
+          <th><%= if @role == "owner" do %>Actions<%= else %>View<%= end %></th>
+        </tr>
+      </thead>
+      <tbody>
+      <%= for section <- @sections do %>
+        <tr>
+          <td><%= section.title %></td>
+          <td><%= section.crn %></td>
+
+          <td>
+            <span><%= link "View", to: Routes.section_path(@conn, :show, section) %></span>
+            <%= if @role == "owner" do %>
+              <span><%= link "Edit", to: Routes.section_path(@conn, :edit, section) %></span>
+              <span><%= link "Delete", to: Routes.section_path(@conn, :delete, section), method: :delete, data: [confirm: "Are you sure?"] %></span>
+            <%= end %>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+    <div class="course-admin">
+      <%= link "Create Section", to: Routes.course_section_path(@conn, :new, @course) %>
     </div>
   </div>
 </div>
 
-<div>
-  <div class="uk-card uk-card-small uk-card-default uk-card-hover">
-    <div class="uk-card-header">
-      <h3 class="uk-card-title uk-margin-remove-bottom">Sections in <%= @course.name %></h3>
-    </div>
-    <div class="uk-card-body">
-      <table class="uk-table  uk-table-small">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>CRN</th>
-            <th><%= if @role == "owner" do %>Actions<%= else %>View<%= end %></th>
-          </tr>
-        </thead>
-        <tbody>
-        <%= for section <- @sections do %>
-          <tr>
-            <td><%= section.title %></td>
-            <td><%= section.crn %></td>
-
-            <td>
-              <span><%= link "View", to: Routes.section_path(@conn, :show, section) %></span>
-              <%= if @role == "owner" do %>
-                <span><%= link "Edit", to: Routes.section_path(@conn, :edit, section) %></span>
-                <span><%= link "Delete", to: Routes.section_path(@conn, :delete, section), method: :delete, data: [confirm: "Are you sure?"] %></span>
-              <%= end %>
-            </td>
-          </tr>
-        <% end %>
-        </tbody>
-      </table>
-    </div>
-    <div class="uk-card-footer">
-      <div class="details uk-width-expand">
-        <%= link "Create Section", to: Routes.course_section_path(@conn, :new, @course) %>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-
-</div>
 
 <span><%= link "Return to Course List", to: Routes.course_path(@conn, :index) %></span>
 

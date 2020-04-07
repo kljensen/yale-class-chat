@@ -1,80 +1,80 @@
-<div class="uk-sticky-placeholder" style="height: 80px; margin: 0px;" hidden=""></div>
-  <div class="tm-main uk-section uk-section-default">
-    <div class="uk-container uk-container-xsmall uk-position-relative">
+<div  style="height: 80px; margin: 0px;" hidden=""></div>
+  <div class="tm-main">
+    <div>
       <div>
-      <div class="uk-container uk-container-small uk-position-relative">
+      <div>
         <div>
           <div>
-            <h1 id="section" class="uk-h1 tm-heading-fragment"><a href="#section">About Yale Chat</a></h1>
-            <p class="uk-text-lead">Designed to facilitate seamless in-class communication, Yale Chat provides many avenues for interacting with professors and students.</p>
+            <h1 id="section" class="tm-heading-fragment"><a href="#section">About Yale Chat</a></h1>
+            <p>Designed to facilitate seamless in-class communication, Yale Chat provides many avenues for interacting with professors and students.</p>
 
-            <h1 id="students" class="uk-h2 tm-heading-fragment"><a href="#students">Students</a></h1>
-            <h2 id="home" class="uk-h3 tm-heading-fragment"><a href="#home">Home Page</a></h2>
+            <h1 id="students" class="tm-heading-fragment"><a href="#students">Students</a></h1>
+            <h2 id="home" class="tm-heading-fragment"><a href="#home">Home Page</a></h2>
             <p>When you first log in, you'll see a list of the courses or sections you have access to.</p>
-            <img data-src="/images/about-home.png" width="" height="" alt="" uk-img>
+            <img data-src="/images/about-home.png" width="" height="" alt="">
             <p>Click on any section to see all topics posted in that section. Alternatively, if you have been assigned to a section by mistake, you can click "Leave Section" to be removed. This can't be undone, so be sure before leaving the section!</p>
 
-            <hr class="uk-margin-medium">
+            <hr>
 
-            <h2 id="topics-student" class="uk-h3 tm-heading-fragment"><a href="#topics-student">Topics</a></h2>
+            <h2 id="topics-student" class="tm-heading-fragment"><a href="#topics-student">Topics</a></h2>
             <p>Once you see the topics in a section, simply click one to see the complete description and other students' submissions.</p>
-            <img data-src="/images/about-topics-student.png" width="" height="" alt="" uk-img>
+            <img data-src="/images/about-topics-student.png" width="" height="" alt="">
 
-            <hr class="uk-margin-medium">
+            <hr>
 
-            <h2 id="submissions" class="uk-h3 tm-heading-fragment"><a href="#submissions">Submissions</a></h2>
+            <h2 id="submissions" class="tm-heading-fragment"><a href="#submissions">Submissions</a></h2>
             <p>Your professors will periodically post topics to your section, like "Submit Ideas Here" or "What questions do you have for our speaker"?
             <br/><br/>
             You can post submissions in response. Simply click the + sign in the lower right corner of your screen to create a new submission.</p>
-            <img data-src="/images/about-submission-student.png" width="" height="" alt="" uk-img>
+            <img data-src="/images/about-submission-student.png" width="" height="" alt="">
             <p>If you need to edit your submission after it's posted, click on your submission on the topic page and you'll see an Edit link just below the description.</p>
             <p>If there are other submissions on the topic, you'll be able to see them on the topic view page. Click any of the cards to see the submission details and comment on or rate the submission.</p>
-            <img data-src="/images/about-view-submissions.png" width="" height="" alt="" uk-img>
+            <img data-src="/images/about-view-submissions.png" width="" height="" alt="">
             <p><br/></p>
-            <img data-src="/images/about-submission-detail.png" width="" height="" alt="" uk-img>
+            <img data-src="/images/about-submission-detail.png" width="" height="" alt="">
 
-            <hr class="uk-margin-medium">
+            <hr>
 
-            <h2 id="comments" class="uk-h3 tm-heading-fragment"><a href="#comments">Comments</a></h2>
+            <h2 id="comments" class="tm-heading-fragment"><a href="#comments">Comments</a></h2>
             <p>When viewing a submission, click the + button on the lower right corner of the screen or scroll down to see the comment box. Fill out your comment and click submit to add it to the submission.</p>
-            <img data-src="/images/about-comment-submit.png" width="" height="" alt="" uk-img>
+            <img data-src="/images/about-comment-submit.png" width="" height="" alt="">
             <p>You will be able to see your comment, along with those from other students, on the submission page. Just like submissions, you can edit or delete if necessary.</p>
-            <img data-src="/images/about-comment-view.png" width="" height="" alt="" uk-img>
+            <img data-src="/images/about-comment-view.png" width="" height="" alt="">
 
-            <hr class="uk-margin-medium">
+            <hr>
 
-            <h2 id="ratings" class="uk-h3 tm-heading-fragment"><a href="#ratings">Ratings</a></h2>
+            <h2 id="ratings" class="tm-heading-fragment"><a href="#ratings">Ratings</a></h2>
             <p>Submitting ratings is even easier than comments; on the submission page, just change the rating dropdown and your rating will be submitted.</p>
-            <img data-src="/images/about-rating-submit.png" width="" height="" alt="" uk-img>
+            <img data-src="/images/about-rating-submit.png" width="" height="" alt="">
             <p>Once a submission has been rated, you will be able to see the average of all ratings (if the professors have allowed students to view rating averages).</p>
 
-            <hr class="uk-margin-large">
+            <hr>
 
-            <h1 id="professors" class="uk-h2 tm-heading-fragment"><a href="#professors">Professors</a></h1>
-            <h2 id="courses" class="uk-h3 tm-heading-fragment"><a href="#courses">Courses</a></h2>
+            <h1 id="professors" class="tm-heading-fragment"><a href="#professors">Professors</a></h1>
+            <h2 id="courses" class="tm-heading-fragment"><a href="#courses">Courses</a></h2>
             <p>Your home page will show all courses you own or administrate; click New Course to create a new one.</p>
-            <img data-src="/images/about-course-home.png" width="" height="" alt="" uk-img>
+            <img data-src="/images/about-course-home.png" width="" height="" alt="">
             <p>When viewing a course, you'll see a number of editable fields. You can add other professors or TAs to the course using the "Add New Course Roles" link.</p>
-            <img data-src="/images/about-course-roles.png" width="" height="" alt="" uk-img>
+            <img data-src="/images/about-course-roles.png" width="" height="" alt="">
             <p>Owners can add, remove, and modify course roles; generally, only professors should have this role. TAs should be administrators, which allows them to add students but not other TAs or professors to the course.</p>
             <p>Also from the course detail page, you can create sections using the "Create Section" link. We <strong>highly</strong> recommend entering the accurate CRN for each section, as this allows you to add students to the section automatically.</p>
-            <img data-src="/images/about-add-section.png" width="" height="" alt="" uk-img>
+            <img data-src="/images/about-add-section.png" width="" height="" alt="">
 
-            <hr class="uk-margin-medium">
+            <hr>
 
-            <h2 id="sections" class="uk-h3 tm-heading-fragment"><a href="#sections">Sections</a></h2>
+            <h2 id="sections" class="tm-heading-fragment"><a href="#sections">Sections</a></h2>
             <p>Once you've created a section, you can click "Show" next to it on the course view. This takes you to the section administration page.</p>
-            <img data-src="/images/about-section-admin.png" width="" height="" alt="" uk-img>
+            <img data-src="/images/about-section-admin.png" width="" height="" alt="">
             <p>You can add students to the section using the "Manually Add Students to Section" link (which will require you to paste a list of net ids) or the "Automatically Add Registered Students to Section" link, which uses the Yale Course API to add all registered students with one click.</p>
-            <img data-src="/images/about-section-roles.png" width="" height="" alt="" uk-img>
+            <img data-src="/images/about-section-roles.png" width="" height="" alt="">
             <p>When adding students to sections, pick the appropriate role ("student" can post while "defunct_student" or "guest" can only view), select the start and end date for the role, optionally decide to update student emails and names and/or to delete old section roles, then click Add All Registered Users.</p>
 
-            <hr class="uk-margin-medium">
+            <hr>
 
-            <h2 id="topics" class="uk-h3 tm-heading-fragment"><a href="#topics">Topics</a></h2>
+            <h2 id="topics" class="tm-heading-fragment"><a href="#topics">Topics</a></h2>
             <p>You can also post topics from the section or course detail page. Click Create Topic to see the new topic form.</p>
-            <img data-src="/images/about-create-topic-1.png" width="" height="" alt="" uk-img>
-            <img data-src="/images/about-create-topic-2.png" width="" height="" alt="" uk-img>
+            <img data-src="/images/about-create-topic-1.png" width="" height="" alt="">
+            <img data-src="/images/about-create-topic-2.png" width="" height="" alt="">
 
             <p>You'll see a variety of options; one of the most important is the "Post Topic to Sections" field. You can post a topic to one, many, or all sections in your course. Be sure to highlight only the sections to which you'd like to post the topic.</p>
 
@@ -82,27 +82,27 @@
         </div>
       </div>
       </div>
-      <div class="tm-sidebar-right uk-visible@l">
-        <div uk-sticky="offset: 160" class="uk-sticky uk-active uk-sticky-fixed" style="position: fixed; top: 160px; width: 200px;">
-          <ul uk-scrollspy-nav="closest: li; scroll: true; offset: 100" class="uk-nav uk-nav-default tm-nav uk-nav-parent-icon">
-            <li class="uk-nav-header">Students</li>
-            <li class="uk-active">
+      <div class="tm-sidebar-right@l">
+        <div="offset: 160"  style="position: fixed; top: 160px; width: 200px;">
+          <ul="closest: li; scroll: true; offset: 100" class="tm-nav">
+            <li>Students</li>
+            <li>
               <a href="#home">Home Page</a>
             </li>
             <li class="topics-student">
               <a href="#topics-student">Topics</a>
             </li>
-            <li class="">
+            <li>
               <a href="#submissions">Submissions</a>
             </li>
-            <li class="">
+            <li>
               <a href="#comments">Comments</a>
             </li>
-            <li class="">
+            <li>
               <a href="#ratings">Ratings</a>
             </li>
-            <li class="uk-nav-divider"></li>
-            <li class="uk-nav-header">Professors/TAs</li>
+            <li></li>
+            <li>Professors/TAs</li>
             <li>
               <a href="#courses">Courses</a>
             </li>
@@ -112,10 +112,10 @@
             <li>
               <a href="#topics">Topics</a>
             </li>
-            <li class="uk-nav-divider"></li>
+            <li></li>
             <li>
               <a href="https://github.com/kljensen/yale-class-chat/issues" target="_blank">
-                <span uk-icon="warning" class="uk-margin-small-right uk-icon">
+                <span="warning">
                   <svg width="20" height="20" viewBox="0 0 20 20"
                     xmlns="http://www.w3.org/2000/svg" data-svg="warning">
                     <circle cx="10" cy="14" r="1"></circle>
@@ -123,12 +123,12 @@
                     <path d="M10.97,7.72 C10.85,9.54 10.56,11.29 10.56,11.29 C10.51,11.87 10.27,12 9.99,12 C9.69,12 9.49,11.87 9.43,11.29 C9.43,11.29 9.16,9.54 9.03,7.72 C8.96,6.54 9.03,6 9.03,6 C9.03,5.45 9.46,5.02 9.99,5 C10.53,5.01 10.97,5.44 10.97,6 C10.97,6 11.04,6.54 10.97,7.72 L10.97,7.72 Z"></path>
                   </svg>
                 </span>
-                <span class="uk-text-middle">Report issue</span>
+                <span>Report issue</span>
               </a>
             </li>
           </ul>
         </div>
-        <div class="uk-sticky-placeholder" style="height: 0px; margin: 0px;"></div>
+        <div  style="height: 0px; margin: 0px;"></div>
       </div>
     </div>
 </div>

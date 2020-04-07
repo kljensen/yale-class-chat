@@ -1,4 +1,9 @@
 defmodule App.Submissions do
+  require Logger
+  alias App.Accounts.User
+  alias App.Topics
+  alias App.Courses
+
   @course_owner_roles ["owner"]
   @course_admin_roles ["administrator", "owner"]
   @section_write_roles ["student"]
@@ -143,6 +148,57 @@ defmodule App.Submissions do
     end
 
     Repo.all(query)
+  end
+
+  def get_submission_data_for_user_id!(user_id, submission_id) do
+    user = App.Accounts.get_user!(user_id)
+    get_submission_data_for_user(user, submission_id)
+  end
+
+  def get_submission_data_for_net_id!(net_id, submission_id) do
+    # Logger.info("net_id = #{net_id}")
+    # IEx.Info.info(net_id)
+    # |> inspect()
+    # |> Logger.info()
+    user = Repo.get_by!(User, net_id: net_id)
+    get_submission_data_for_user(user, submission_id)
+  end
+
+  @doc """
+  Grabs all the submission data we need for rendering a view.
+  THIS ASSUMES THE 
+  """
+  def get_submission_data_for_user(user, id) do
+    case get_user_submission!(user, id) do
+      {:error, message} -> {:error, message}
+      {:ok, submission} ->
+        my_rating = get_user_submission_rating(user.id, id)
+        submission_check = get_submission!(id)
+        topic = Topics.get_topic!(submission.topic_id)
+        can_edit = App.Accounts.can_edit_submission(user, submission_check)
+        is_admin = App.Accounts.can_edit_topic(user, topic)
+        can_edit_topic = App.Accounts.can_edit_topic(user, topic)
+        comments = list_user_comments!(user, submission_check)
+        section = Courses.get_section!(topic.section_id)
+        course = Courses.get_course!(section.course_id)
+        comment_changeset = change_comment(%App.Submissions.Comment{})
+        rating_changeset = change_rating(%App.Submissions.Rating{})
+        {:ok, %{
+          submission: submission,
+          topic: topic,
+          can_edit: can_edit,
+          uid: user.id,
+          can_edit_topic: can_edit_topic,
+          comments: comments,
+          section: section,
+          course: course,
+          is_admin: is_admin,
+          comment_changeset: comment_changeset,
+          rating_changeset: rating_changeset,
+          my_rating: my_rating
+        }}
+    end
+
   end
 
   def order_query(query, "date - descending"),
@@ -737,6 +793,19 @@ defmodule App.Submissions do
     return
   end
 
+  def create_comment!(user_info, submission_id, attrs \\ %{})
+
+  def create_comment!(user_id, submission_id, attrs) when (is_integer(user_id)) do
+    user = Repo.get_by!(User, id: user_id)
+    submission = Repo.get_by!(Submission, id: submission_id)
+    create_comment!(user, submission, attrs)
+  end
+
+  def create_comment!(net_id, submission_id, attrs) when (is_binary(net_id)) do
+    user = Repo.get_by!(User, net_id: net_id)
+    submission = Repo.get_by!(Submission, id: submission_id)
+    create_comment!(user, submission, attrs)
+  end
 
   @doc """
   Creates a comment.
@@ -750,7 +819,7 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_comment!(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
+  def create_comment!(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs) do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
@@ -1063,6 +1132,20 @@ defmodule App.Submissions do
     return
   end
 
+  def create_rating!(user_info, submission_id, attrs \\ %{})
+
+  def create_rating!(user_id, submission_id, attrs) when (is_integer(user_id)) do
+    user = Repo.get_by!(User, id: user_id)
+    submission = Repo.get_by!(Submission, id: submission_id)
+    create_rating!(user, submission, attrs)
+  end
+
+  def create_rating!(net_id, submission_id, attrs) when (is_binary(net_id)) do
+    user = Repo.get_by!(User, net_id: net_id)
+    submission = Repo.get_by!(Submission, id: submission_id)
+    create_rating!(user, submission, attrs)
+  end
+
   @doc """
   Creates a rating.
 
@@ -1075,7 +1158,7 @@ defmodule App.Submissions do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_rating!(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs \\ %{}) do
+  def create_rating!(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission, attrs) do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
@@ -1104,7 +1187,10 @@ defmodule App.Submissions do
     |> Rating.changeset(attrs)
     |> Ecto.Changeset.put_assoc(:user, user)
     |> Ecto.Changeset.put_assoc(:submission, submission)
-    |> Repo.insert()
+    |> Repo.insert(
+        on_conflict: :replace_all,
+        conflict_target: [:submission_id, :user_id]
+      )
   end
 
   @doc """

@@ -1,0 +1,61 @@
+// We are using the technique described here:
+// https://dev.to/jacobmparis/hamburger-menu-in-pure-css-mga
+
+.sidebar {
+    background: #fff;
+    visibility: hidden;
+    opacity: 0;
+    // transition: visibility 0s, opacity 0.25s linear;
+    position: absolute;
+    top: 3*$default-margin;
+    right: 2*$default-margin;
+    z-index: 2;
+    padding: $default-margin;
+    @include dropshadow();
+    li {
+        list-style: none;
+        padding: $default-margin;
+    }
+    a {
+        color: $link-color;
+    }
+    a:hover {
+        color: $link-hover-color;
+    }
+
+    &__button-open {
+    }
+  
+    &__trigger {
+      display: none;
+      &:not(:checked) {
+        & + label > .sidebar__button-open {
+          display: none;
+        }
+      }
+      &:checked {
+        & + label > .sidebar__button-close {
+          display: none;
+        }
+  
+        & ~ .sidebar {
+          visibility: visible;
+          opacity: 1;
+        }
+      }
+    }
+    
+    &__button {
+        padding: 2*$default-margin;
+        svg {
+            height:1rem;
+            width:1rem;
+            margin: 0;
+            margin-bottom: -0.175rem;
+            margin-left: 0.5*$default-margin;
+        }
+    }
+  }
+  
+  
+  

@@ -5,7 +5,7 @@ defmodule AppWeb.TopicController do
   alias App.Topics.Topic
   alias App.Courses
   alias App.Submissions
-
+  alias Phoenix.LiveView
 
 
   @sort_list ["date - ascending", "date - descending", "rating - ascending", "rating - descending", "rating - ascending", "random"]
@@ -20,7 +20,7 @@ defmodule AppWeb.TopicController do
         section_map = Enum.map(section_list, fn (x) -> [x.id, x.title] end)
         sections = Enum.map(section_map, fn [value, key] -> {:"#{key}", value} end)
         selected_sections = Map.values(Map.new(sections))
-        {:ok, current_time} = DateTime.now("America/New_York")
+        current_time = current_html_time()
         render(conn, "new.html", changeset: changeset, course: course, sections: sections, selected_sections: selected_sections, current_time: current_time, sort_list: @sort_list)
 
       false -> render_error(conn, "forbidden")
@@ -36,10 +36,9 @@ defmodule AppWeb.TopicController do
         section_map = Enum.map(section_list, fn (x) -> [x.id, x.title] end)
         sections = Enum.map(section_map, fn [value, key] -> {:"#{key}", value} end)
         selected_sections = Map.values(Map.new(sections))
-        {:ok, current_time} = DateTime.now("America/New_York")
-
-        topic_params = Map.put(topic_params, "opened_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db(topic_params["opened_at"]))
-        topic_params = Map.put(topic_params, "closed_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db(topic_params["closed_at"]))
+        current_time = current_html_time()
+        topic_params = Map.put(topic_params, "opened_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(topic_params["opened_at"]))
+        topic_params = Map.put(topic_params, "closed_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(topic_params["closed_at"]))
 
         case section_ids do
           nil ->
@@ -76,24 +75,12 @@ defmodule AppWeb.TopicController do
 
   def show(conn, %{"id" => id}) do
     user = conn.assigns.current_user
-    case Topics.get_user_topic(user, id) do
+    # TODO: notice I'm pulling in data multiple times here. Should
+    # Fix this. Most of these controllers need to be refactored.
+    case Topics.user_can_view_topic(user, id) do
       {:ok, topic} ->
-        can_edit = App.Accounts.can_edit_topic(user, topic)
-        section = topic.section
-        course = topic.section.course
-        submissions = case topic.show_user_submissions do
-          true ->
-            Submissions.list_user_submissions!(user, topic)
-          false ->
-            case can_edit do
-              true ->
-                Submissions.list_user_submissions!(user, topic)
-              false ->
-                Submissions.list_user_own_submissions(user, topic)
-              end
-          end
-        render(conn, "show.html", topic: topic, submissions: submissions, can_edit: can_edit, uid: user.id, section: section, course: course)
-
+        topic_data = App.Topics.get_topic_data_for_user_id(user.id, id)
+        render(conn, "show.html", topic_data)
       {:error, message} -> render_error(conn, message)
       end
   end
@@ -107,7 +94,7 @@ defmodule AppWeb.TopicController do
         case App.Accounts.can_edit_topic(user, topic) do
           true ->
             changeset = Topics.change_topic(topic)
-            {:ok, current_time} = DateTime.now("America/New_York")
+            current_time = current_html_time()
             render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time, section: section, sort_list: @sort_list, section: section, course: course)
 
           false -> render_error(conn, "forbidden")
@@ -122,6 +109,9 @@ defmodule AppWeb.TopicController do
     {:ok, topic} = Topics.get_user_topic(user, id)
     section = topic.section
     user = conn.assigns.current_user
+    current_time = current_html_time()
+    topic_params = Map.put(topic_params, "opened_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(topic_params["opened_at"]))
+    topic_params = Map.put(topic_params, "closed_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(topic_params["closed_at"]))
 
     case Topics.update_topic!(user, topic, topic_params) do
       {:ok, topic} ->
@@ -130,7 +120,7 @@ defmodule AppWeb.TopicController do
         |> redirect(to: Routes.topic_path(conn, :show, topic))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:ok, current_time} = DateTime.now("America/New_York")
+        current_time = current_html_time()
         render(conn, "edit.html", topic: topic, changeset: changeset, current_time: current_time, section: section, sort_list: @sort_list, course: section.course)
 
       {:error, message} -> render_error(conn, message)

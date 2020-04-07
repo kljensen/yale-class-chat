@@ -5,15 +5,13 @@
     </div>
   <% end %>
 
-<div class="uk-margin">
-  <%= label f, :description, class: "uk-form-label" %>
-  <div class="uk-form-controls">
-    <%= textarea f, :description, class: "uk-textarea", rows: "6" %>
+<fieldset>
+  <%= label f, :description, class: "" %>
+  <div>
+    <%= textarea f, :description, class: "", rows: "6" %>
     <%= error_tag f, :description %>
   </div>
-</div>
+</fieldset>
 
-  <div class="uk-margin">
-    <%= submit "Save", class: "uk-button-secondary uk-button" %>
-  </div>
+<%= submit "Save", class: "" %>
 <% end %>

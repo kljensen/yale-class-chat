@@ -40,6 +40,7 @@ services:
       - LDAP_SSL=${LDAP_SSL}
       - LDAP_USER=${LDAP_USER}
       - LDAP_PASS=${LDAP_PASS}
+      - SIGNING_SALT=${SIGNING_SALT}
     volumes:
       - type: bind
         source: ./app
@@ -81,6 +82,7 @@ services:
       - LDAP_SSL=${LDAP_SSL}
       - LDAP_USER=${LDAP_USER}
       - LDAP_PASS=${LDAP_PASS}
+      - SIGNING_SALT=${SIGNING_SALT}
     volumes:
       - type: bind
         source: ./app

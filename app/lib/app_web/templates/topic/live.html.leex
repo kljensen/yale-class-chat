@@ -1,0 +1,51 @@
+<div>
+    <div class="topic-details">
+        <h1><%= @topic.title %></h1>
+
+        <%= render AppWeb.HelperView, "multiparagraph_text.html", text: @topic.description %>
+
+    <% topic_status = cond do
+        DateTime.compare(@topic.closed_at, current_time("Etc/UTC")) == :lt ->
+        "closed"
+        DateTime.compare(@topic.opened_at, current_time("Etc/UTC")) == :gt ->
+        "closed"
+        true ->
+        "open"
+    end %>
+
+    <%= if @can_edit do %>
+    <hr>
+    <div>
+    <%= link "Edit", to: Routes.topic_path(@conn, :edit, @topic.id) %>
+    |
+    <%= link "Delete", to: Routes.topic_path(@conn, :delete, @topic.id), method: :delete, data: [confirm: "Are you sure?"] %>
+    <p><%= if @topic.anonymous, do: "posted submissions are anonymous / " %>
+    <%= "topic is " <> topic_status <>" / " %>
+    <%= "submissions: "%><%= if @topic.allow_submissions == false, do: "not "%><%= "allowed /"%>
+    <%= "comments: "%><%= if @topic.allow_submission_comments == false, do: "not "%><%= "allowed /"%>
+    <%= "ratings: "%><%= if @topic.allow_submission_voting == false, do: "not "%><%= "allowed /"%>
+    <%= "viewing other user submissions: "%><%= if @topic.show_user_submissions == false, do: "not "%><%= "allowed"%>
+    <%= "submission limit: "%><%= Integer.to_string(@topic.user_submission_limit) %>
+    </p>
+    </div>
+    <% end %>
+
+    </div>
+
+</div>
+
+
+<div class="card-holder">
+    <%= for submission <- @submissions do %>
+        <%= live_component @socket, SubmissionLiveComponent, id: submission.id, submission: submission, topic: @topic %>
+    <% end %>
+</div>
+
+
+<div class="mobile-add-button">
+<a href="<%= Routes.topic_submission_path(@conn, :new, @topic.id)%>">
+&#43;
+</a>
+</div>
+
+

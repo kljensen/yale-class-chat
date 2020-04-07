@@ -1,6 +1,6 @@
 <h1>Listing Course roles</h1>
 
-<table class="uk-table">
+<table>
   <thead>
     <tr>
       <th>User</th>
@@ -29,7 +29,7 @@
   </tbody>
 </table>
 <%= if @role == "owner" do %>
-<section class="container uk-padding-small uk-padding-remove-left">
-    <%= link "Add Course Roles", to: Routes.course_course__role_path(@conn, :bulk_new, @course), class: "uk-button uk-button-secondary" %>
+<section class="container">
+    <%= link "Add Course Roles", to: Routes.course_course__role_path(@conn, :bulk_new, @course), class: "" %>
 </section>
 <% end %>

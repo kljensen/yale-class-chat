@@ -10,8 +10,8 @@ defmodule AppWeb.Helpers do
     end
   end
 
-  def current_time(_) do
-    {:ok, curtime} = DateTime.now("Etc/UTC")
+  def current_time(tz \\ "Etc/UTC") do
+    {:ok, curtime} = DateTime.now(tz)
     curtime
   end
 
@@ -57,5 +57,18 @@ defmodule AppWeb.Helpers do
     {was_truncated, paragraphs}
   end
 
+  def date_to_html!(datetime) do
+    datetime
+    |> Timex.format!("{ISOdate}T{h24}:{m}")
+  end
+
+  def shift_date(datetime, months) do
+    Timex.shift(datetime, months: months)
+  end
+
+  def nyc_to_utc(datetime) do
+    datetime
+    |> Timex.Timezone.convert("America/New_York")
+  end
 
 end

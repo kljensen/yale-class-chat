@@ -2,12 +2,12 @@
 
 <p>Select "Switch" next to any user below to imitate them throughout the app. Please be careful!</p>
 
-<section class="container uk-padding-small uk-padding-remove-left">
-    <%= link "Switch Back (" <> @true_netid <> ")", to: Routes.superuser_path(@conn, :switch, %{net_id: @true_netid}), class: "uk-button uk-button-secondary" %>
+<section class="container">
+    <%= link "Switch Back (" <> @true_netid <> ")", to: Routes.superuser_path(@conn, :switch, %{net_id: @true_netid}), class: "" %>
 </section>
 
 <section class="container">
-    <table class="uk-table">
+    <table>
         <thead>
             <tr>
             <th>NetID</th>

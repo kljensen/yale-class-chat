@@ -1,0 +1,28 @@
+<div class="card color-<%= 1 + rem @submission.id, 16 %>">
+    <a href="<%= Routes.submission_path(@socket, :show, @submission.id) %>">
+        <h5>
+            <%= @submission.title %>
+        </h5>
+        <%= render AppWeb.HelperView, "multiparagraph_text.html", text: @submission.description, truncate: true %>
+        <div class="details">
+            <%= if @topic.anonymous do %>
+            <% else %>
+            <b><%= @submission.user_display_name %></b>
+            /
+            <% end %>
+            <%= if @submission.rating_count> 0 do %>
+            <%= stars @submission.avg_rating %>
+            (<%= @submission.rating_count |> Integer.to_string %>
+                <%= if @submission.rating_count> 1 do %>ratings<% else %>rating<% end %>)
+            <% else %>
+                No ratings yet.
+            <% end %>
+            <span class="comment-icon-count">
+                <svg width="14" height="14" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" data-svg="comments"><polyline fill="none" stroke="#999" points="2 0.5 19.5 0.5 19.5 13"></polyline><path stroke="#999" d="M5,19.71 L5,15 L0,15 L0,2 L18,2 L18,15 L9.71,15 L5,19.71 L5,19.71 L5,19.71 Z M1,14 L6,14 L6,17.29 L9.29,14 L17,14 L17,3 L1,3 L1,14 L1,14 L1,14 Z"></path></svg>
+                <%= @submission.comment_count |> Integer.to_string %>
+            </span>
+            <br>
+            <span>Posted <%= @submission.inserted_at %></span>
+        </div>
+    </a>
+</div>

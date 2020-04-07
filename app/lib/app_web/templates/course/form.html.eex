@@ -1,4 +1,4 @@
-<%= form_for @changeset, @action, [class: "uk-form-stacked"], fn f -> %>
+<%= form_for @changeset, @action, [class: ""], fn f -> %>
   <%= if @changeset.action do %>
     <div class="alert alert-danger">
       <p>Oops, something went wrong! Please check the errors below.</p>
@@ -6,53 +6,48 @@
   <% end %>
 
 
-<div class="uk-margin">
-  <%= label f, :name,  class: "uk-form-label"%>
-  <div class="uk-form-controls">
-    <%= text_input f, :name, class: "uk-input" %>
-    <%= error_tag f, :name %>
-  </div>
+<fieldset>
+<%= label f, :name,  class: "form-label"%>
+<%= text_input f, :name, class: "" %>
+<%= error_tag f, :name %>
+</fieldset>
+
+<div class="grid-2-column">
+<fieldset>
+<%= label f, :department, class: "" %>
+<%= text_input f, :department, class: "" %>
+<%= error_tag f, :department %>
+</fieldset>
+
+<fieldset>
+<%= label f, :number, class: "" %>
+<%= number_input f, :number, class: "" %>
+<%= error_tag f, :number %>
+</fieldset>
 </div>
 
-<div class="uk-margin">
-  <%= label f, :department, class: "uk-form-label" %>
-  <div class="uk-form-controls">
-    <%= text_input f, :department, class: "uk-input" %>
-    <%= error_tag f, :department %>
-  </div>
-</div>
-<div class="uk-margin">
-  <%= label f, :number, class: "uk-form-label" %>
-  <div class="uk-form-controls">
-    <%= number_input f, :number, class: "uk-input" %>
-    <%= error_tag f, :number %>
-  </div>
-</div>
-<div class="uk-margin">
-  <%= label f, :allow_read, class: "uk-form-label" %>
-  <div class="uk-form-controls">
-    <%= checkbox f, :allow_read, class: "uk-checkbox" %>
-    <%= error_tag f, :allow_read %>
-  </div>
-</div>
-<div class="uk-margin">
-  <%= label f, :allow_write, class: "uk-form-label" %>
-  <div class="uk-form-controls">
-    <%= checkbox f, :allow_write, class: "uk-checkbox" %>
-    <%= error_tag f, :allow_write %>
-  </div>
-</div>
-<div class="uk-margin">
-  <%= label f, :semester_id, class: "uk-form-label" %>
-  <div class="uk-form-controls">
-    <%= select f, :semester_id, @semesters, class: "uk-select"  %>
-    <%= error_tag f, :semester_id %>
-  </div>
+<fieldset>
+<%= label f, :semester_id, class: "" %>
+<%= select f, :semester_id, @semesters, class: ""  %>
+<%= error_tag f, :semester_id %>
+</fieldset>
+
+<div class="grid-2-column">
+<fieldset>
+<%= label f, :allow_read, class: "" %>
+<%= checkbox f, :allow_read, class: "" %>
+<%= error_tag f, :allow_read %>
+</fieldset>
+
+<fieldset>
+<%= label f, :allow_write, class: "" %>
+<%= checkbox f, :allow_write, class: "" %>
+<%= error_tag f, :allow_write %>
+</fieldset>
 </div>
 
 
-<div class="uk-margin">
-    <%= submit "Save", class: "uk-button-secondary uk-button" %>
-</div>
+<%= submit "Save", class: "" %>
+
 
 <% end %>

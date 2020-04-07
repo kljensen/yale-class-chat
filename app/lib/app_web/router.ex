@@ -1,5 +1,6 @@
 defmodule AppWeb.Router do
   use AppWeb, :router
+  import Phoenix.LiveView.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -58,11 +59,13 @@ defmodule AppWeb.Router do
       delete "/leave_section", Section_RoleController, :self_delete
     end
 
-    resources "/topics", TopicController, only: [:show] do
+    resources "/topics", TopicController, only: [] do
+      live "/", TopicLive
       resources "/submissions", SubmissionController, except: [:show, :index]
     end
 
-    resources "/submissions", SubmissionController, only: [:show] do
+    resources "/submissions", SubmissionController, only: [] do
+      live "/", SubmissionLive
       resources "/comments", CommentController, except: [:index, :show, :new]
       resources "/ratings", RatingController, except: [:index, :show, :new, :edit]
     end

@@ -3,6 +3,7 @@ defmodule App.Topics do
   @course_admin_roles ["administrator", "owner"]
   @section_write_roles ["student"]
   @section_read_roles ["student", "defunct_student", "guest"]
+  require Logger
 
   @moduledoc """
   The Topics context.
@@ -10,8 +11,9 @@ defmodule App.Topics do
 
   import Ecto.Query, warn: false
   alias App.Repo
-
+  alias App.Accounts.User
   alias App.Topics.Topic
+  alias App.Submissions
 
   @doc """
   Returns the list of topics.
@@ -89,6 +91,44 @@ defmodule App.Topics do
     Repo.all(query)
   end
 
+  # TODO: clean up these methods. Notice that these
+  # are making two database round trips. We should be
+  # able to make a query that takes either net_id or
+  # id and get the same result in a single trip.
+  def get_topic_data_for_user_id(user_id, topic_id) do
+    user = App.Accounts.get_user!(user_id)
+    get_topic_data_for_user(user, topic_id)
+  end
+  def get_topic_data_for_net_id(net_id, topic_id) do
+    user = Repo.get_by!(User, net_id: net_id)
+    get_topic_data_for_user(user, topic_id)
+  end
+
+  def get_topic_data_for_user(user, topic_id) do
+    Logger.info("about to call get_with_couse_and_section(#{topic_id})")
+    topic = get_with_couse_and_section(topic_id)
+    Logger.info("got topic")
+    topic
+    |> inspect()
+    |> Logger.info()
+    can_edit = App.Accounts.can_edit_topic(user, topic)
+    section = topic.section
+    course = topic.section.course
+    submissions = case topic.show_user_submissions do
+      true ->
+        Submissions.list_user_submissions!(user, topic)
+      false ->
+        case can_edit do
+          true ->
+            Submissions.list_user_submissions!(user, topic)
+          false ->
+            Submissions.list_user_own_submissions(user, topic)
+          end
+      end
+    %{topic: topic, submissions: submissions, can_edit: can_edit, uid: user.id, section: section, course: course}
+  end
+
+
   @doc """
   Gets a single topic.
 
@@ -105,21 +145,27 @@ defmodule App.Topics do
   """
   def get_topic!(id), do: Repo.get!(Topic, id)
 
-  def get_user_topic(%App.Accounts.User{} = user, topic_id) do
-    allowed_course_roles = @course_admin_roles
-    uid = user.id
+  def user_can_view_topic(%App.Accounts.User{} = user, topic_id) do
+    get_user_topic(user, topic_id)
+  end
+
+  def get_with_couse_and_section(id) do
     query = from t in Topic,
-              where: t.id == ^topic_id,
+              where: t.id == ^id,
               left_join: s in assoc(t, :section),
               on: t.section_id == s.id,
               left_join: c in assoc(s, :course),
               on: s.course_id == c.id,
               select: t
-    result = if !is_nil(query) do
-      query = query
-        |> preload([t, s, c], [section: {s, course: c}])
-      Repo.one(query)
-    end
+    query
+    |> preload([t, s, c], [section: {s, course: c}])
+    |> Repo.one()
+  end
+
+  def get_user_topic(%App.Accounts.User{} = user, topic_id) do
+    allowed_course_roles = @course_admin_roles
+    uid = user.id
+    result = get_with_couse_and_section(topic_id)
 
     if is_nil(result) do
       query = from t in Topic, where: t.id == ^topic_id

@@ -33,17 +33,29 @@ module.exports = (env, options) => ({
         use: [MiniCssExtractPlugin.loader, 'css-loader']
       },
       {
+        test: /\.s[ac]ss$/i,
+        use: [
+          // Creates `style` nodes from JS strings
+          // 'style-loader',
+          // Translates CSS into CommonJS
+          MiniCssExtractPlugin.loader,
+          // Compiles Sass to CSS
+          'css-loader',
+          'sass-loader',
+        ],
+      },
+      {
         test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/, // needed for font-awesome
-            use: [
-                {
-                    loader: 'file-loader',
-                    options: {
-                        name: '[name].[ext]',
-                        outputPath: '../fonts',
-                    },
-                },
-            ],
-        },
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: '../fonts',
+            },
+          },
+        ],
+      },
     ]
   },
   plugins: [

@@ -1,0 +1,22 @@
+<li>
+    <div>
+        <%= @comment.description %>
+    </div>
+    <div class="comment-author comment-author-<%= if rem(@i+1, 2) == 0 do %>even<% else %>odd<% end %>">
+        <%= if @topic.anonymous do %>
+                <% else %>
+                <b><%= @comment.user.display_name %></b>
+                /
+            said <br>
+        at
+        <% end %>
+        <%= @comment.inserted_at %>
+        <%= if @is_admin || @uid == @comment.user_id do %>
+            <div>
+                <%= link "Edit", to: Routes.comment_path(@socket, :edit, @comment.id) %>
+                |
+                <%= link "Delete", to: Routes.comment_path(@socket, :delete, @comment.id), method: :delete, data: [confirm: "Are you sure?"] %>
+            </div>
+        <% end %>
+    </div>
+</li>

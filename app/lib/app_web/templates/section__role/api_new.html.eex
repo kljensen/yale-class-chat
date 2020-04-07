@@ -1,50 +1,54 @@
 <h1>Add Section Roles From Course Registrations</h1>
 
-<%= form_for @changeset, Routes.section_section__role_path(@conn, :api_create, @section.id), [class: "uk-form-stacked"], fn f -> %>
+<%= form_for @changeset, Routes.section_section__role_path(@conn, :api_create, @section.id), [class: ""], fn f -> %>
   <%= if @changeset.action do %>
     <div class="alert alert-danger">
       <p>Oops, something went wrong! Please check the errors below.</p>
     </div>
   <% end %>
 
-<div class="uk-margin">
-  <%= label f, :role, class: "uk-form-label" %>
-  <div class="uk-form-controls">
-  <%= select f, :role, @role_list, class: "uk-select" %>
+<div class="grid-3-column">
+  <fieldset>
+  <%= label f, :role, class: "" %>
+  <%= select f, :role, @role_list, class: "" %>
   <%= error_tag f, :role %>
-  </div>
-</div>
+</fieldset>
 
-<div class="uk-margin">
-  <%= label f, :valid_from, class: "uk-form-label" %>
-  <div class="uk-form-controls">
-  <%= datetime_select f, :valid_from %>
+<fieldset>
+  <%= label f, :valid_from, class: "" %>
+  <% from_value = if !is_nil(@changeset.changes["valid_from"]) do
+    @changeset.changes.valid_from
+  else
+    current_time("America/New_York")
+  end %>
+  <%= datetime_local_input f, :valid_from, value: date_to_html!(from_value) %>
   <%= error_tag f, :valid_from %>
-  </div>
-</div>
+</fieldset>
 
-<div class="uk-margin">
-  <%= label f, :valid_to, class: "uk-form-label" %>
-  <div class="uk-form-controls">
-  <%= datetime_select f, :valid_to %>
+<fieldset>
+  <%= label f, :valid_to, class: "" %>
+  <% to_value = if !is_nil(@changeset.changes["valid_to"]) do
+    @changeset.changes.valid_to
+  else
+    current_time("America/New_York")
+  end %>
+  <% to_value = shift_date(to_value, 12) %>
+  <%= datetime_local_input f, :valid_to, value: date_to_html!(to_value) %>
   <%= error_tag f, :valid_to %>
-  </div>
-</div>
+</fieldset>
 
-<div class="uk-margin">
-  <%= label f, :overwrite_roles, class: "uk-form-label" do %>
+<fieldset class="full-width">
+  <%= label f, :overwrite_roles, class: "" do %>
     Overwrite all existing students in section with API results
   <% end %>
-
-  <div class="uk-form-controls">
-  <%= checkbox f, :overwrite_roles, class: "uk-checkbox" %>
+  <%= checkbox f, :overwrite_roles, class: "" %>
   <%= error_tag f, :overwrite_roles %>
-  </div>
+</fieldset>
 </div>
 
-<div class="uk-margin">
+<div>
   <div>
-    <%= submit "Add All Registered Users", class: "uk-button-secondary uk-button" %>
+    <%= submit "Add All Registered Users", class: "" %>
   </div>
 
   <% end %>

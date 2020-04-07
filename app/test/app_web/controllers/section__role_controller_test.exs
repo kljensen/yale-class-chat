@@ -4,8 +4,8 @@ defmodule AppWeb.Section_RoleControllerTest do
 
   alias App.Accounts
 
-  @create_attrs %{role: "some role", valid_from: "2010-04-17T14:00:00Z", valid_to: "2010-04-17T14:00:00Z"}
-  @update_attrs %{role: "some updated role", valid_from: "2011-05-18T15:01:01Z", valid_to: "2011-05-18T15:01:01Z"}
+  @create_attrs %{role: "some role", valid_from: "2010-04-17T14:00", valid_to: "2010-04-17T14:00"}
+  @update_attrs %{role: "some updated role", valid_from: "2011-05-18T15:01", valid_to: "2011-05-18T15:01"}
   @invalid_attrs %{role: nil, valid_from: nil, valid_to: nil}
 
   setup [:create_section_and_student]

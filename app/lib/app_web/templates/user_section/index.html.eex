@@ -1,30 +1,7 @@
 <%= if length(@sections) == 0 do %>
   <span>Looks like you don't have any courses yet! Reach out to your professor or TA to get access.</span>
 <% else %>
-    <div class="uk-grid-column-medium uk-grid-row-medium uk-child-width-1-3@s uk-grid-match" uk-grid>
-        <%= for {section, i} <- Enum.with_index(@sections) do %>
-        <div>
-            <a href="<%= Routes.section_path(@conn, :show, section.id) %>">
-                <div class="uk-card uk-card-small uk-card-default uk-card-hover color-<%= 1 + rem section.course_num + 1, 20 %>">
-                    <div class="uk-card-header">
-                        <div class="uk-width-expand">
-                            <h3 class="uk-card-title uk-margin-remove-bottom">
-                            <%= section.course_dept %><%=  Integer.to_string(section.course_num)  %>: <%= section.title %>
-                            </h3>
-                            <p class="uk-text-meta uk-margin-remove-top uk-margin-remove-bottom">
-                            <%= section.course_name %> &mdash;
-                            <%= section.semester_name %>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="uk-card-footer">
-                        <div class="details uk-width-expand">
-                            <%= link "Leave Section", to: Routes.section_section__role_path(@conn, :self_delete, section.id), method: :delete, data: [confirm: "Are you sure? This cannot be undone; please only leave sections if you have been accidentally assigned."] %>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <% end %>
+    <div class="card-holder">
+        <%= render_many @sections, AppWeb.UserSectionView, "section-card.html", as: :section, conn: @conn %>
     </div>
 <% end %>
