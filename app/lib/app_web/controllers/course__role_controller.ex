@@ -43,12 +43,21 @@ defmodule AppWeb.Course_RoleController do
     case App.Accounts.can_edit_course(user_auth, course) do
       true ->
         user_ids = course__role_params["user_id_list"]
+        current_time = current_html_time()
+        course__role_params = Map.put(course__role_params, "valid_from", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(course__role_params["valid_from"]))
+        course__role_params = Map.put(course__role_params, "valid_to", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(course__role_params["valid_to"]))
         case user_ids do
+          "" ->
+            changeset = Accounts.change_course__role(%Course_Role{})
+            conn
+            |> put_flash(:error, "Must submit at least one net_id")
+            |> render("bulk_new.html", course: course, changeset: changeset, role_list: @course_admin_roles)
+
           nil ->
-            changeset = %Ecto.Changeset{}
-              |> Ecto.Changeset.apply_action(:create)
-              |> Ecto.Changeset.add_error(:user_id_list, "Must submit at least one net_id")
-            render(conn, "bulk_new.html", course: course, changeset: changeset, role_list: @course_admin_roles)
+            changeset = Accounts.change_course__role(%Course_Role{})
+            conn
+            |> put_flash(:error, "Must submit at least one net_id")
+            |> render("bulk_new.html", course: course, changeset: changeset, role_list: @course_admin_roles)
 
           _ ->
             net_id_list = String.split(user_ids, [" ", ",",";"], trim: true)
@@ -107,6 +116,9 @@ defmodule AppWeb.Course_RoleController do
     user = Accounts.get_user!(uid)
     net_id = user.net_id
     user = Accounts.get_user_by!(net_id)
+    current_time = current_html_time()
+    course__role_params = Map.put(course__role_params, "valid_from", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(course__role_params["valid_from"]))
+    course__role_params = Map.put(course__role_params, "valid_to", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(course__role_params["valid_to"]))
     case Accounts.create_course__role(user_auth, user, course, course__role_params) do
       {:ok, course__role} ->
         conn
@@ -141,6 +153,9 @@ defmodule AppWeb.Course_RoleController do
   def update(conn, %{"id" => id, "course__role" => course__role_params}) do
     course__role = Accounts.get_course__role!(id)
     user = conn.assigns.current_user
+    current_time = current_html_time()
+    course__role_params = Map.put(course__role_params, "valid_from", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(course__role_params["valid_from"]))
+    course__role_params = Map.put(course__role_params, "valid_to", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(course__role_params["valid_to"]))
 
     case Accounts.update_course__role!(user, course__role, course__role_params) do
       {:ok, course__role} ->
