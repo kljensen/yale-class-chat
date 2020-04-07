@@ -40,7 +40,8 @@ defmodule AppWeb.ControllerHelpers do
   end
 
   def current_html_time() do
-    Timex.now("America/New_York")|> Timex.format!("{ISOdate}T{h24}:{m}")
+    Timex.now("America/New_York")
+    #|> Timex.format!("{ISOdate}T{h24}:{m}")
   end
 
 end

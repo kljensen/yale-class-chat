@@ -586,6 +586,11 @@ input, select:not([multiple]):not([size]) {
 	vertical-align: middle;
 	display: inline-block;
 }
+div.flatpickr-calendar {
+  div.flatpickr-current-month {
+    padding: 0;
+  }
+}
 
 button {
 	margin: 0;

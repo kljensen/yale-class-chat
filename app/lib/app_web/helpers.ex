@@ -57,5 +57,13 @@ defmodule AppWeb.Helpers do
     {was_truncated, paragraphs}
   end
 
+  def date_to_html!(datetime) do
+    datetime
+    |> Timex.format!("{ISOdate}T{h24}:{m}")
+  end
+
+  def shift_date(datetime, months) do
+    Timex.shift(datetime, months: months)
+  end
 
 end
