@@ -8,7 +8,7 @@ case "$CHALLENGE_METHOD" in
         ;;
     [Dd][Nn][Ss] )
         echo "Using DNS challenge validation method"
-        CERTBOT_OPTIONS="--dns-route53 --dns-route53-propagation-seconds 30"
+        CERTBOT_OPTIONS="--dns-route53 --dns-route53-propagation-seconds 30 -n"
         ;;
      *)
         echo "NOT using HTTP challenge validation method. Quitting."
