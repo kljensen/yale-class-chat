@@ -17,15 +17,6 @@ defmodule AppWeb.Course_RoleController do
     render(conn, "index.html", course_roles: course_roles, course: course, user_list: user_list, role: role)
   end
 
-  def new(conn, %{"course_id" => course_id}) do
-    course = Courses.get_course!(course_id)
-    user = conn.assigns.current_user
-    list = Accounts.list_users_for_course__roles(user, course)
-    user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-    changeset = Accounts.change_course__role(%Course_Role{})
-    render(conn, "new.html", changeset: changeset, course: course, role_list: @course_admin_roles, user_list: user_list)
-  end
-
   def bulk_new(conn, %{"course_id" => course_id}) do
     course = Courses.get_course!(course_id)
     user = conn.assigns.current_user
@@ -107,31 +98,6 @@ defmodule AppWeb.Course_RoleController do
 
       false -> render_error(conn, "forbidden")
       end
-  end
-
-  def create(conn, %{"course__role" => course__role_params, "course_id" => course_id}) do
-    course = Courses.get_course!(course_id)
-    user_auth = conn.assigns.current_user
-    uid = course__role_params["user_id"]
-    user = Accounts.get_user!(uid)
-    net_id = user.net_id
-    user = Accounts.get_user_by!(net_id)
-    current_time = current_html_time()
-    course__role_params = Map.put(course__role_params, "valid_from", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(course__role_params["valid_from"]))
-    course__role_params = Map.put(course__role_params, "valid_to", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(course__role_params["valid_to"]))
-    case Accounts.create_course__role(user_auth, user, course, course__role_params) do
-      {:ok, course__role} ->
-        conn
-        |> put_flash(:success, "Course  role created successfully.")
-        |> redirect(to: Routes.course_course__role_path(conn, :show, course, course__role))
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        list = Accounts.list_users_for_course__roles(user_auth, course)
-        user_list = Map.new(Enum.map(list, fn [value, key] -> {:"#{key}", value} end))
-        render(conn, "new.html", changeset: changeset, course: course, role_list: @course_admin_roles, user_list: user_list)
-
-      {:error, message} -> render_error(conn, message)
-    end
   end
 
   def show(conn, %{"id" => id}) do
