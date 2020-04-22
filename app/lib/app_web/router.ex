@@ -47,6 +47,7 @@ defmodule AppWeb.Router do
       resources "/topics", TopicController, only: [:new, :create]
       get "/add_course_roles", Course_RoleController, :bulk_new
       post "/add_course_roles", Course_RoleController, :bulk_create
+      get "/participation", ParticipationController, :course
     end
 
     resources "/sections", SectionController, except: [:index, :new] do
@@ -57,6 +58,7 @@ defmodule AppWeb.Router do
       post "/add_section_roles_api", Section_RoleController, :api_create
       resources "/section_roles", Section_RoleController
       delete "/leave_section", Section_RoleController, :self_delete
+      get "/participation", ParticipationController, :section
     end
 
     resources "/topics", TopicController, only: [] do

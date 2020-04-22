@@ -34,6 +34,10 @@
           <li><%= link "Manually Add Students to Section", to: Routes.section_section__role_path(@conn, :bulk_new, @section) %></li>
           <li><%= link "Automatically Add Registered Students to Section", to: Routes.section_section__role_path(@conn, :api_new, @section) %> <br/>(uses course registration API to add students automatically)</li>
       </ul>
+      Participation
+      <ul>
+        <li><%= link "Download Participation Report", to: Routes.section_participation_path(@conn, :section, @section) %></li>
+      </ul>
     </div>
   </div>
 <%= end %>
