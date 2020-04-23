@@ -5,7 +5,7 @@ defmodule AppWeb.ParticipationController do
     current_user = conn.assigns.current_user
 
     #Generate CSV file
-    filename = App.Submissions.get_participation_csv!(current_user, 37, 73)
+    filename = App.Submissions.get_participation_csv!(current_user, 37, "course")
 
     #Send file to user's browser for download
     file = File.read!(filename)
