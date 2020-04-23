@@ -338,7 +338,7 @@ defmodule App.Courses do
   """
 
   def update_course(%App.Accounts.User{} = user, %Course{} = course, attrs) do
-    course_role = App.Accounts.get_current_course__role(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course.id, "course")
 
     if Enum.member?(@course_owner_roles, course_role) do
       do_update_course(course, attrs)
@@ -366,7 +366,7 @@ defmodule App.Courses do
 
   """
   def delete_course(%App.Accounts.User{} = user, %Course{} = course) do
-    course_role = App.Accounts.get_current_course__role(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course.id, "course")
 
     if Enum.member?(@course_owner_roles, course_role) do
       do_delete_course(course)
@@ -469,7 +469,7 @@ defmodule App.Courses do
   """
   def list_user_sections(%Course{} = course, %App.Accounts.User{} = user, inherit_course_role \\ true) do
     allowed_course_roles = @course_admin_roles
-    auth_role = App.Accounts.get_current_course__role(user, course)
+    auth_role = App.Accounts.get_current_course__role(user, course.id, "course")
     uid = user.id
     cid = course.id
     allowed_section_roles = @section_read_roles
@@ -528,7 +528,7 @@ defmodule App.Courses do
     section = Repo.get(Section, section_id)
     query = if !is_nil(section) do
       course = Repo.get(Course, section.course_id)
-      auth_role = App.Accounts.get_current_course__role(user, course)
+      auth_role = App.Accounts.get_current_course__role(user, course.id, "course")
       uid = user.id
       cid = course.id
       allowed_section_roles = @section_read_roles
@@ -589,7 +589,7 @@ defmodule App.Courses do
 
   """
   def create_section(%App.Accounts.User{} = user, %App.Courses.Course{} = course, attrs \\ %{}) do
-    course_role = App.Accounts.get_current_course__role(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course.id, "course")
 
     cond do
       course.allow_write == false ->
@@ -623,7 +623,7 @@ defmodule App.Courses do
   def update_section!(%App.Accounts.User{} = user, %Section{} = section, attrs) do
     #If user role is Administrator or Owner, then allow update of a section
     course = get_course!(section.course_id)
-    course_role = App.Accounts.get_current_course__role(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course.id, "course")
 
     cond do
       course.allow_write == false ->
@@ -655,7 +655,7 @@ defmodule App.Courses do
   """
   def delete_section!(%App.Accounts.User{} = user, %Section{} = section) do
     course = get_course!(section.course_id)
-    course_role = App.Accounts.get_current_course__role(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course.id, "course")
 
     cond do
       course.allow_write == false ->

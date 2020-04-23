@@ -40,7 +40,7 @@ defmodule App.Accounts do
   def list_users_for_course__roles(%App.Accounts.User{} = user, %App.Courses.Course{} = course) do
     uid = user.id
     cid = course.id
-    auth_role = get_current_course__role(user, course)
+    auth_role = get_current_course__role(user, course.id, "course")
     if Enum.member?(@course_admin_roles, auth_role) do
       query = from u in "users",
                 order_by: u.net_id,
@@ -55,7 +55,7 @@ defmodule App.Accounts do
     uid = user.id
     cid = section.course_id
     course = App.Courses.get_course!(cid)
-    auth_role = get_current_course__role(user, course)
+    auth_role = get_current_course__role(user, course.id, "course")
     if Enum.member?(@course_admin_roles, auth_role) do
       query = from u in "users",
                 select: [u.id, u.net_id]
@@ -326,7 +326,7 @@ defmodule App.Accounts do
   def list_course_all_course_roles(%App.Accounts.User{} = user, %App.Courses.Course{} = course) do
     uid = user.id
     cid = course.id
-    auth_role = get_current_course__role(user, course)
+    auth_role = get_current_course__role(user, course.id, "course")
     if Enum.member?(@course_admin_roles, auth_role) do
       query = from u_r in Course_Role,
                 where: u_r.course_id == ^cid,
@@ -340,7 +340,7 @@ defmodule App.Accounts do
   def list_course__role_users(%App.Accounts.User{} = user, %App.Courses.Course{} = course) do
     uid = user.id
     cid = course.id
-    auth_role = get_current_course__role(user, course)
+    auth_role = get_current_course__role(user, course.id, "course")
     if Enum.member?(@course_admin_roles, auth_role) do
       query = from u_r in Course_Role,
                 left_join: u in "users",
@@ -376,97 +376,54 @@ defmodule App.Accounts do
 
   ## Examples
 
-      iex> get_current_course__role(%User{}, %Course{})
+      iex> get_current_course__role(%User{}, id, "course")
       %Course_Role{}
 
-      iex> get_current_course__role(%InvalidUser{}, %InvalidCourse{})
+      iex> get_current_course__role(%InvalidUser{}, invalid_id, "course")
       ** (Ecto.NoResultsError)
 
   """
-  def get_current_course__role(%App.Accounts.User{} = user, %App.Courses.Course{} = course) do
+  def get_current_course__role(%App.Accounts.User{} = user, id, type) do
     {:ok, current_time} = DateTime.now("Etc/UTC")
     uid = user.id
-    cid = course.id
-    query = from u_r in "course_roles",
-              where: u_r.user_id == ^uid and u_r.course_id == ^cid  and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
-              limit: 1,
-              select: u_r.role
+    filter_type =
+      case type do
+        "course" ->
+          dynamic([course_roles: cr], cr.course_id == ^id)
 
-    Repo.one(query)
-  end
+        "section" ->
+          dynamic([sections: s], s.id == ^id)
 
-  def get_current_course__role(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
-    {:ok, current_time} = DateTime.now("Etc/UTC")
-    uid = user.id
-    cid = section.course_id
-    query = from u_r in "course_roles",
-              where: u_r.user_id == ^uid and u_r.course_id == ^cid  and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
-              limit: 1,
-              select: u_r.role
+        "topic" ->
+          dynamic([topics: t], t.id == ^id)
 
-    Repo.one(query)
-  end
+        "submission" ->
+          dynamic([submissions: su], su.id == ^id)
 
-  def get_current_course__role(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic) do
-    {:ok, current_time} = DateTime.now("Etc/UTC")
-    uid = user.id
-    sid = topic.section_id
-    query = from u_r in "course_roles",
-              left_join: s in "sections",
-              on: s.course_id == u_r.course_id,
-              where: s.id == ^sid and u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
-              limit: 1,
-              select: u_r.role
+        "comment" ->
+          dynamic([comments: co], co.id == ^id)
 
-    Repo.one(query)
-  end
+        "rating" ->
+          dynamic([ratings: ra], ra.id == ^id)
 
-  def get_current_course__role(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission) do
-    {:ok, current_time} = DateTime.now("Etc/UTC")
-    uid = user.id
-    tid = submission.topic_id
-    query = from u_r in "course_roles",
-              left_join: s in "sections",
-              on: s.course_id == u_r.course_id,
-              left_join: t in "topics",
-              on: t.section_id == s.id,
-              where: t.id == ^tid and u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
-              limit: 1,
-              select: u_r.role
+        _ ->
+          false
 
-    Repo.one(query)
-  end
+        end
 
-  def get_current_course__role(%App.Accounts.User{} = user, %App.Submissions.Comment{} = comment) do
-    {:ok, current_time} = DateTime.now("Etc/UTC")
-    uid = user.id
-    suid = comment.submission_id
-    query = from u_r in "course_roles",
-              left_join: s in "sections",
-              on: s.course_id == u_r.course_id,
-              left_join: t in "topics",
-              on: t.section_id == s.id,
-              left_join: su in "submissions",
-              on: su.topic_id == t.id,
-              where: su.id == ^suid and u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
-              limit: 1,
-              select: u_r.role
-
-    Repo.one(query)
-  end
-
-  def get_current_course__role(%App.Accounts.User{} = user, %App.Submissions.Rating{} = rating) do
-    {:ok, current_time} = DateTime.now("Etc/UTC")
-    uid = user.id
-    suid = rating.submission_id
-    query = from u_r in "course_roles",
-              left_join: s in "sections",
-              on: s.course_id == u_r.course_id,
-              left_join: t in "topics",
-              on: t.section_id == s.id,
-              left_join: su in "submissions",
-              on: su.topic_id == t.id,
-              where: su.id == ^suid and u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
+    query = from u_r in "course_roles", as: :course_roles,
+              left_join: s in "sections", as: :sections,
+              on: u_r.course_id == s.course_id,
+              left_join: t in "topics", as: :topics,
+              on: s.id == t.section_id,
+              left_join: su in "submissions", as: :submissions,
+              on: t.id == su.topic_id,
+              left_join: co in "comments", as: :comments,
+              on: su.id == co.submission_id,
+              left_join: ra in "ratings", as: :ratings,
+              on: su.id == ra.submission_id,
+              where: u_r.user_id == ^uid and u_r.valid_from <= ^current_time and u_r.valid_to >= ^current_time,
+              where: ^filter_type,
               limit: 1,
               select: u_r.role
 
@@ -489,33 +446,94 @@ defmodule App.Accounts do
   """
 
   def can_edit_course(%App.Accounts.User{} = user, %App.Courses.Course{} = course) do
-    course_role = get_current_course__role(user, course)
+    course_role = get_current_course__role(user, course.id, "course")
     Enum.member?(@course_admin_roles, course_role)
   end
 
   def can_edit_section(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
-    course_role = get_current_course__role(user, section)
+    course_role = get_current_course__role(user, section.id, "section")
     Enum.member?(@course_admin_roles, course_role)
   end
 
   def can_edit_topic(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic) do
-    course_role = get_current_course__role(user, topic)
+    course_role = get_current_course__role(user, topic.id, "topic")
     Enum.member?(@course_admin_roles, course_role)
   end
 
   def can_edit_submission(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission) do
-    course_role = get_current_course__role(user, submission)
-    Enum.member?(@course_admin_roles, course_role) || user.id == submission.user_id
+    case user.id == submission.user_id do
+      true ->
+        true
+
+      false ->
+        course_role = get_current_course__role(user, submission.id, "submission")
+        Enum.member?(@course_admin_roles, course_role)
+
+      end
   end
 
   def can_edit_comment(%App.Accounts.User{} = user, %App.Submissions.Comment{} = comment) do
-    course_role = get_current_course__role(user, comment)
-    Enum.member?(@course_admin_roles, course_role) || user.id == comment.user_id
+    case user.id == comment.user_id do
+      true ->
+        true
+
+      false ->
+        course_role = get_current_course__role(user, comment.id, "comment")
+        Enum.member?(@course_admin_roles, course_role)
+
+      end
   end
 
   def can_edit_rating(%App.Accounts.User{} = user, %App.Submissions.Rating{} = rating) do
-    course_role = get_current_course__role(user, rating)
-    Enum.member?(@course_admin_roles, course_role) || user.id == rating.user_id
+    case user.id == rating.user_id do
+      true ->
+        true
+
+      false ->
+        course_role = get_current_course__role(user, rating.id, "rating")
+        Enum.member?(@course_admin_roles, course_role)
+
+      end
+  end
+
+  @doc """
+  Returns true if the user is a course admin
+
+  Raises `Ecto.NoResultsError` if the Course  role does not exist.
+
+  ## Examples
+
+      iex> is_course_admin(%User{}, 1, "course")
+      true
+
+      iex> is_course_admin(%NonAuthUser{}, 1, "course")
+      false
+
+  """
+
+  def is_course_admin(%App.Accounts.User{} = user, id, type) do
+    course_role = get_current_course__role(user, id, type)
+    Enum.member?(@course_admin_roles, course_role)
+  end
+
+  @doc """
+  Returns true if the user is a course admin
+
+  Raises `Ecto.NoResultsError` if the Course  role does not exist.
+
+  ## Examples
+
+      iex> is_course_owner(%User{}, 1, "course")
+      true
+
+      iex> is_course_owner(%NonAuthUser{}, 1, "course")
+      false
+
+  """
+
+  def is_course_owner(%App.Accounts.User{} = user, id, type) do
+    course_role = get_current_course__role(user, id, type)
+    Enum.member?(@course_owner_roles, course_role)
   end
 
 
@@ -532,7 +550,7 @@ defmodule App.Accounts do
 
   """
   def create_course__role(%App.Accounts.User{} = user_auth, %App.Accounts.User{} = user, %App.Courses.Course{} = course, attrs \\ %{}) do
-    auth_role = App.Accounts.get_current_course__role(user_auth, course)
+    auth_role = App.Accounts.get_current_course__role(user_auth, course.id, "course")
     cond do
       course.allow_write == false ->
         {:error, "course write not allowed"}
@@ -565,7 +583,7 @@ defmodule App.Accounts do
   """
   def update_course__role!(%App.Accounts.User{} = user_auth, %Course_Role{} = course__role, attrs) do
     course = App.Courses.get_course!(course__role.course_id)
-    auth_role = get_current_course__role(user_auth, course)
+    auth_role = get_current_course__role(user_auth, course.id, "course")
     cond do
       course.allow_write == false ->
         {:error, "course write not allowed"}
@@ -596,7 +614,7 @@ defmodule App.Accounts do
   """
   def delete_course__role!(%App.Accounts.User{} = user_auth, %Course_Role{} = course__role) do
     course = App.Courses.get_course!(course__role.course_id)
-    auth_role = get_current_course__role(user_auth, course)
+    auth_role = get_current_course__role(user_auth, course.id, "course")
 
     cond do
       course.allow_write == false ->
@@ -737,10 +755,10 @@ defmodule App.Accounts do
 
   ## Examples
 
-      iex> get_current_course__role(%User{}, %Section{})
+      iex> get_current_section__role(%User{}, %Section{})
       %Section_Role{}
 
-      iex> get_current_course__role(%InvalidUser{}, %InvalidSection{})
+      iex> get_current_section__role(%InvalidUser{}, %InvalidSection{})
       ** (Ecto.NoResultsError)
 
   """
@@ -752,7 +770,7 @@ defmodule App.Accounts do
     course_role = if inherit_course_role == true do
                     cid = section.course_id
                     course = App.Courses.get_course!(cid)
-                    course_role = get_current_course__role(user, course)
+                    course_role = get_current_course__role(user, course.id, "course")
                   else
                     nil
                   end
@@ -773,10 +791,10 @@ defmodule App.Accounts do
 
   ## Examples
 
-      iex> get_current_course__role(%User{}, %Section{})
+      iex> get_registered_students(%Section{})
       %Section_Role{}
 
-      iex> get_current_course__role(%InvalidUser{}, %InvalidSection{})
+      iex> get_registered_students(%InvalidSection{})
       ** (Ecto.NoResultsError)
 
   """
@@ -801,7 +819,7 @@ defmodule App.Accounts do
   """
   def create_section__role!(%App.Accounts.User{} = user_auth, %App.Accounts.User{} = user, %App.Courses.Section{} = section, attrs \\ %{}) do
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_course__role(user_auth, course)
+    auth_role = App.Accounts.get_current_course__role(user_auth, course.id, "course")
 
     cond do
       course.allow_write == false ->
@@ -836,7 +854,7 @@ defmodule App.Accounts do
   def update_section__role!(%App.Accounts.User{} = user_auth, %Section_Role{} = section__role, attrs) do
     section = App.Courses.get_section!(section__role.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_course__role(user_auth, course)
+    auth_role = App.Accounts.get_current_course__role(user_auth, course.id, "course")
 
     cond do
       course.allow_write == false ->
@@ -869,7 +887,7 @@ defmodule App.Accounts do
   def delete_section__role!(%App.Accounts.User{} = user_auth, %Section_Role{} = section__role) do
     section = App.Courses.get_section!(section__role.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_course__role(user_auth, course)
+    auth_role = App.Accounts.get_current_course__role(user_auth, course.id, "course")
 
     cond do
       course.allow_write == false ->
@@ -899,7 +917,7 @@ defmodule App.Accounts do
   """
   def delete_all_section__roles!(%App.Accounts.User{} = user_auth, %App.Courses.Section{} = section) do
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_course__role(user_auth, course)
+    auth_role = App.Accounts.get_current_course__role(user_auth, course.id, "course")
 
     cond do
       course.allow_write == false ->

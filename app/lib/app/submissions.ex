@@ -109,7 +109,7 @@ defmodule App.Submissions do
     query = if inherit_course_role do
       section = App.Courses.get_section!(sid)
       course = App.Courses.get_course!(section.course_id)
-      auth_role = App.Accounts.get_current_course__role(user, course)
+      auth_role = App.Accounts.get_current_course__role(user, course.id, "course")
       query_tmp = if Enum.member?(@course_admin_roles, auth_role) do
         q = from su in Submission,
           left_join: ra in App.Submissions.Rating,
@@ -427,7 +427,7 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_section__role!(user, section)
-    course_role = App.Accounts.get_current_course__role(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course.id, "course")
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
     #Only allow admins to hide/unhide submissions or allow them to be ranked
@@ -493,7 +493,7 @@ defmodule App.Submissions do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_course__role(user, course)
+    auth_role = App.Accounts.get_current_course__role(user, course.id, "course")
     {:ok, current_time} = DateTime.now("Etc/UTC")
     authorized = Enum.member?(@course_admin_roles, auth_role) or user.id == submission.user_id
 
@@ -665,7 +665,7 @@ defmodule App.Submissions do
             |> preload([co, su, t, s, c, r, u], [user: u])
 
     query = if inherit_course_role do
-      auth_role = App.Accounts.get_current_course__role(user, topic)
+      auth_role = App.Accounts.get_current_course__role(user, topic.id, "topic")
       if Enum.member?(@course_admin_roles, auth_role) do
         querytmp = from co in Comment,
                       left_join: u in App.Accounts.User,
@@ -824,7 +824,7 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_section__role!(user, section)
-    course_role = App.Accounts.get_current_course__role(user, section)
+    course_role = App.Accounts.get_current_course__role(user, section.id, "section")
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
@@ -869,7 +869,7 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     {:ok, current_time} = DateTime.now("Etc/UTC")
-    course_role = App.Accounts.get_current_course__role(user, section)
+    course_role = App.Accounts.get_current_course__role(user, section.id, "section")
 
     cond do
       topic.allow_submission_comments == false ->
@@ -911,7 +911,7 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     {:ok, current_time} = DateTime.now("Etc/UTC")
-    course_role = App.Accounts.get_current_course__role(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course.id, "course")
 
     cond do
       topic.allow_submission_comments == false ->
@@ -1018,7 +1018,7 @@ defmodule App.Submissions do
     query = if inherit_course_role do
       section = App.Courses.get_section!(sid)
       course = App.Courses.get_course!(section.course_id)
-      auth_role = App.Accounts.get_current_course__role(user, course)
+      auth_role = App.Accounts.get_current_course__role(user, course.id, "course")
       if Enum.member?(@course_admin_roles, auth_role) do
         from ra in Rating,
           where: ra.submission_id == ^suid
@@ -1163,7 +1163,7 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_section__role!(user, section)
-    course_role = App.Accounts.get_current_course__role(user, section)
+    course_role = App.Accounts.get_current_course__role(user, section.id, "section")
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
@@ -1211,7 +1211,7 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     {:ok, current_time} = DateTime.now("Etc/UTC")
-    course_role = App.Accounts.get_current_course__role(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course.id, "course")
 
     cond do
       topic.allow_submission_voting == false ->
@@ -1253,7 +1253,7 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     {:ok, current_time} = DateTime.now("Etc/UTC")
-    course_role = App.Accounts.get_current_course__role(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course.id, "course")
 
     cond do
       topic.allow_submission_voting == false ->
@@ -1290,35 +1290,32 @@ defmodule App.Submissions do
 
 
   def get_participation_csv!(%App.Accounts.User{} = user_auth, id, type) do
-    [course_id, section_id] = case type do
-                                "course" ->
-                                  [id, "*"]
-
-                                "section" ->
-                                  ["*", id]
-                                end
 
     filename = "participation.csv" # Update this to include datetime to prevent collision errors
-    data_to_csv!(filename, course_id, section_id)
+    data_to_csv!(filename, id, type)
 
     #Return filename
     filename
   end
 
-  def data_to_csv!(filename, course_id, section_id  \\ nil) do
+  def data_to_csv!(filename, id, type) do
     file = File.open!(filename, [:write, :utf8])
 
-    section_id = case section_id do
-                    nil ->
-                      "*"
+    filter_course_or_section =
+      case type do
+        "course" ->
+          dynamic([courses: c], c.id == ^id)
 
-                    sid ->
-                      sid
-                    end
+        "section" ->
+          dynamic([sections: s], s.id == ^id)
+
+        _ ->
+          true
+        end
 
     query = from u in "users",
-            join: c in "courses",
-            join: s in "sections",
+            join: c in "courses", as: :courses,
+            join: s in "sections", as: :sections,
             on: c.id == s.course_id,
             join: t in "topics",
             on: s.id == t.section_id,
@@ -1331,7 +1328,7 @@ defmodule App.Submissions do
             join: ra in "ratings",
             on: su_all.id == ra.submission_id and u.id == ra.user_id,
             order_by: u.net_id,
-            where: c.id == ^course_id,
+            where: ^filter_course_or_section,
             order_by: [asc: s.title, desc: u.display_name],
             group_by: [c.id, s.id, u.id],
             select: [c.name,

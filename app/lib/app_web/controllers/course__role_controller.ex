@@ -13,7 +13,7 @@ defmodule AppWeb.Course_RoleController do
     list = Accounts.list_course__role_users(user, course)
     user_list = Map.new(Enum.map(list, fn [key, value] -> {:"#{key}", value} end))
     course_roles = Accounts.list_course_all_course_roles(user, course)
-    role = App.Accounts.get_current_course__role(user, course)
+    role = App.Accounts.get_current_course__role(user, course.id, "course")
     render(conn, "index.html", course_roles: course_roles, course: course, user_list: user_list, role: role)
   end
 

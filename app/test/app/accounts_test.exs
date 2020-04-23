@@ -152,12 +152,12 @@ defmodule App.AccountsTest do
       {:ok, comment} = App.Submissions.create_comment!(user_faculty, submission, %{description: "some description"})
       {:ok, rating} = App.Submissions.create_rating!(user_faculty, submission, %{score: 5})
       user = Accounts.get_user_by!("some net_id")
-      assert Accounts.get_current_course__role(user, course) == "some role"
-      assert Accounts.get_current_course__role(user, section) == "some role"
-      assert Accounts.get_current_course__role(user, topic) == "some role"
-      assert Accounts.get_current_course__role(user, submission) == "some role"
-      assert Accounts.get_current_course__role(user, comment) == "some role"
-      assert Accounts.get_current_course__role(user, rating) == "some role"
+      assert Accounts.get_current_course__role(user, course.id, "course") == "some role"
+      assert Accounts.get_current_course__role(user, section.id, "section") == "some role"
+      assert Accounts.get_current_course__role(user, topic.id, "topic") == "some role"
+      assert Accounts.get_current_course__role(user, submission.id, "submission") == "some role"
+      assert Accounts.get_current_course__role(user, comment.id, "comment") == "some role"
+      assert Accounts.get_current_course__role(user, rating.id, "rating") == "some role"
     end
 
     test "create_course__role/4 with valid data creates a course__role" do
