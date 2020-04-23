@@ -166,7 +166,7 @@ defmodule App.Submissions do
 
   @doc """
   Grabs all the submission data we need for rendering a view.
-  THIS ASSUMES THE 
+  THIS ASSUMES THE
   """
   def get_submission_data_for_user(user, id) do
     case get_user_submission!(user, id) do
@@ -1286,5 +1286,41 @@ defmodule App.Submissions do
   """
   def change_rating(%Rating{} = rating) do
     Rating.changeset(rating, %{})
+  end
+
+
+  def get_participation_csv!(%App.Accounts.User{} = user_auth, course_id, section_id  \\ nil) do
+    filename = "participation2.csv" # Update this to include datetime to prevent collision errors
+    data_to_csv!(filename, course_id, section_id)
+
+    #Return filename
+    filename
+  end
+
+  def data_to_csv!(filename, course_id, section_id  \\ nil) do
+    file = File.open!(filename, [:write, :utf8])
+
+    query = from u in "users",
+            order_by: u.net_id,
+            select: [u.id, u.net_id]
+
+    data = Repo.all(query)
+    headers = [
+      "User ID",
+      "Net ID"
+    ]
+    headerstr = Enum.join(headers, ", ")
+
+    #Write headers to file
+    IO.write(file, headerstr)
+
+    CSV.encode(data)
+    |> Enum.each(&IO.write(file, &1))
+
+    File.close(file)
+  end
+
+  def delete_csv(filename) do
+    File.rm(filename)
   end
 end
