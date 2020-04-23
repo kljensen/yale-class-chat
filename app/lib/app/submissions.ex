@@ -1333,17 +1333,20 @@ defmodule App.Submissions do
             order_by: u.net_id,
             where: c.id == ^course_id,
             order_by: [asc: s.title, desc: u.display_name],
-            select: [s.title,
+            group_by: [c.id, s.id, u.id],
+            select: [c.name,
+                      s.title,
                       u.display_name,
                       u.net_id,
                       u.email,
-                      su.id,
-                      co.id,
-                      ra.id
+                      count(su.id, :distinct),
+                      count(co.id, :distinct),
+                      count(ra.id, :distinct)
                     ]
 
     data = Repo.all(query)
     headers = [
+      "Course",
       "Section",
       "Name",
       "Net ID",
