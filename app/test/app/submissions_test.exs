@@ -1302,4 +1302,29 @@ defmodule App.SubmissionsTest do
       assert %Ecto.Changeset{} = Submissions.change_rating(rating)
     end
   end
+
+  describe "participation" do
+    #@tag :working
+    test "get_participation_csv!/3 produces correct output for section", context do
+      user_faculty = context[:user_faculty]
+      submitter = context[:submitter]
+      student = context[:student]
+      student2 = context[:student2]
+      section = context[:section]
+      submission = submission_fixture(submitter, context[:topic])
+      _comment = comment_fixture(student, submission)
+      _rating = rating_fixture(student2, submission)
+
+      filename = Submissions.get_participation_csv!(user_faculty, section.id, "section")
+
+      expected_output =
+        "Course, Section, Name, Net ID, Email, Submissions Created, Comments Created, Ratings Created\n"
+        <> "some name,some title,some display_name,submitter,some email,1,0,0\n"
+        <> "some name,some title,some display_name,student,some email,0,1,0\n"
+        <> "some name,some title,some display_name,student2,some email,0,0,1\n"
+
+      assert File.read!(filename) == expected_output
+
+    end
+  end
 end

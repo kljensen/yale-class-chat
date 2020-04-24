@@ -24,7 +24,5 @@ defmodule AppWeb.ParticipationController do
         "attachment; filename=\"#{filename}\"")
       |> send_resp(200, file)
 
-    #Delete file
-    App.Submissions.delete_csv(filename)
   end
 end
