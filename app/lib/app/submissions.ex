@@ -789,6 +789,7 @@ defmodule App.Submissions do
                                 {:error, message} ->
                                   {:error, message}
                                 end
+                  returntmp
               end
     return
   end
@@ -1291,41 +1292,67 @@ defmodule App.Submissions do
 
   def get_participation_csv!(%App.Accounts.User{} = user_auth, id, type) do
 
-    filename = "participation.csv" # Update this to include datetime to prevent collision errors
-    data_to_csv!(filename, id, type)
+    filename = "user_downloads/participation.csv" # Update this to include datetime to prevent collision errors
+    data = case App.Accounts.is_course_admin(user_auth, id, type) do
+      true -> get_participation_data(id, type)
+      false -> nil
+      end
+
+    headers = [
+      "Course",
+      "Section",
+      "Name",
+      "Net ID",
+      "Email",
+      "Submissions Created",
+      "Comments Created",
+      "Ratings Created"
+    ]
+    data_to_csv!(filename, headers, data)
 
     #Return filename
     filename
   end
 
-  def data_to_csv!(filename, id, type) do
+  defp data_to_csv!(filename, headers, data) do
     file = File.open!(filename, [:write, :utf8])
+
+    headerstr = Enum.join(headers, ", ")
+
+    #Write headers to file
+    IO.write(file, headerstr)
+    IO.write(file, "\n")
+
+    if !is_nil(data) do
+      CSV.encode(data)
+      |> Enum.each(&IO.write(file, &1))
+    end
+
+    File.close(file)
+  end
+
+  def get_participation_data(id, type) do
 
     filter_course_or_section =
       case type do
-        "course" ->
-          dynamic([courses: c], c.id == ^id)
-
-        "section" ->
-          dynamic([sections: s], s.id == ^id)
-
-        _ ->
-          true
+        "course" -> dynamic([courses: c], c.id == ^id)
+        "section" -> dynamic([sections: s], s.id == ^id)
+        _ -> false
         end
 
     query = from u in "users",
-            join: c in "courses", as: :courses,
-            join: s in "sections", as: :sections,
+            left_join: c in "courses", as: :courses,
+            left_join: s in "sections", as: :sections,
             on: c.id == s.course_id,
-            join: t in "topics",
+            left_join: t in "topics",
             on: s.id == t.section_id,
-            join: su in "submissions",
+            left_join: su in "submissions",
             on: t.id == su.topic_id and u.id == su.user_id,
-            join: su_all in "submissions",
+            left_join: su_all in "submissions",
             on: t.id == su_all.topic_id,
-            join: co in "comments",
+            left_join: co in "comments",
             on: su_all.id == co.submission_id and u.id == co.user_id,
-            join: ra in "ratings",
+            left_join: ra in "ratings",
             on: su_all.id == ra.submission_id and u.id == ra.user_id,
             order_by: u.net_id,
             where: ^filter_course_or_section,
@@ -1341,27 +1368,7 @@ defmodule App.Submissions do
                       count(ra.id, :distinct)
                     ]
 
-    data = Repo.all(query)
-    headers = [
-      "Course",
-      "Section",
-      "Name",
-      "Net ID",
-      "Email",
-      "Submissions Created",
-      "Comments Created",
-      "Ratings Created"
-    ]
-    headerstr = Enum.join(headers, ", ")
-
-    #Write headers to file
-    IO.write(file, headerstr)
-    IO.write(file, "\n")
-
-    CSV.encode(data)
-    |> Enum.each(&IO.write(file, &1))
-
-    File.close(file)
+    Repo.all(query)
   end
 
   def delete_csv(filename) do

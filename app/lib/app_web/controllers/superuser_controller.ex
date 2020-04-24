@@ -2,7 +2,6 @@ defmodule AppWeb.SuperuserController do
   use AppWeb, :controller
 
   alias App.Accounts
-  alias App.Accounts.User
 
   def index(conn, _params) do
     case get_session(conn, :is_superuser) do

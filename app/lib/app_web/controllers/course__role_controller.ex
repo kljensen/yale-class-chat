@@ -34,7 +34,6 @@ defmodule AppWeb.Course_RoleController do
     case App.Accounts.can_edit(user_auth, course.id, "course") do
       true ->
         user_ids = course__role_params["user_id_list"]
-        current_time = current_html_time()
         course__role_params = Map.put(course__role_params, "valid_from", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(course__role_params["valid_from"]))
         course__role_params = Map.put(course__role_params, "valid_to", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(course__role_params["valid_to"]))
         case user_ids do
@@ -119,7 +118,6 @@ defmodule AppWeb.Course_RoleController do
   def update(conn, %{"id" => id, "course__role" => course__role_params}) do
     course__role = Accounts.get_course__role!(id)
     user = conn.assigns.current_user
-    current_time = current_html_time()
     course__role_params = Map.put(course__role_params, "valid_from", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(course__role_params["valid_from"]))
     course__role_params = Map.put(course__role_params, "valid_to", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(course__role_params["valid_to"]))
 
