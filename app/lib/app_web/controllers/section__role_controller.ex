@@ -10,7 +10,7 @@ defmodule AppWeb.Section_RoleController do
     section = Courses.get_section!(section_id)
     course = Courses.get_course!(section.course_id)
     user = conn.assigns.current_user
-    case App.Accounts.can_edit_section(user, section) do
+    case App.Accounts.can_edit(user, section.id, "section") do
       true ->
         list = Accounts.list_section__role_users!(user, section)
         user_list = Map.new(Enum.map(list, fn [key, value] -> {:"#{key}", value} end))
@@ -34,7 +34,7 @@ defmodule AppWeb.Section_RoleController do
   def api_new(conn, %{"section_id" => section_id}) do
     section = Courses.get_section!(section_id)
     user = conn.assigns.current_user
-    case App.Accounts.can_edit_section(user, section) do
+    case App.Accounts.can_edit(user, section.id, "section") do
       true ->
         course = Courses.get_course!(section.course_id)
         changeset = Accounts.change_section__role(%Section_Role{})
@@ -50,7 +50,7 @@ defmodule AppWeb.Section_RoleController do
     current_time = current_html_time()
     section__role_params = Map.put(section__role_params, "valid_from", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(section__role_params["valid_from"]))
     section__role_params = Map.put(section__role_params, "valid_to", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(section__role_params["valid_to"]))
-    case App.Accounts.can_edit_section(user_auth, section) do
+    case App.Accounts.can_edit(user_auth, section.id, "section") do
       true ->
         course = Courses.get_course!(section.course_id)
         semester = Courses.get_semester!(course.semester_id)
@@ -153,7 +153,7 @@ defmodule AppWeb.Section_RoleController do
     section = Courses.get_section!(section_id)
     course = Courses.get_course!(section.course_id)
     user = conn.assigns.current_user
-    case App.Accounts.can_edit_section(user, section) do
+    case App.Accounts.can_edit(user, section.id, "section") do
       true ->
         changeset = Accounts.change_section__role(%Section_Role{})
         render(conn, "bulk_new.html", section: section, changeset: changeset, role_list: @section_read_roles, course: course)
@@ -168,7 +168,7 @@ defmodule AppWeb.Section_RoleController do
     current_time = current_html_time()
     section__role_params = Map.put(section__role_params, "valid_from", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(section__role_params["valid_from"]))
     section__role_params = Map.put(section__role_params, "valid_to", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(section__role_params["valid_to"]))
-    case App.Accounts.can_edit_section(user_auth, section) do
+    case App.Accounts.can_edit(user_auth, section.id, "section") do
       true ->
         user_ids = section__role_params["user_id_list"]
         case user_ids do
@@ -269,7 +269,7 @@ defmodule AppWeb.Section_RoleController do
     section = Courses.get_section!(section__role.section_id)
     course = Courses.get_course!(section.course_id)
     user = conn.assigns.current_user
-    case App.Accounts.can_edit_section(user, section) do
+    case App.Accounts.can_edit(user, section.id, "section") do
       true ->
         changeset = Accounts.change_section__role(section__role)
         list = Accounts.list_users_for_section__roles!(user, section)

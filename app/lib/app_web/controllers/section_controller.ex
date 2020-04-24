@@ -10,14 +10,14 @@ defmodule AppWeb.SectionController do
     course = Courses.get_course!(course_id)
     user = conn.assigns.current_user
     sections = Courses.list_user_sections(course, user)
-    can_edit = App.Accounts.can_edit_course(user, course)
+    can_edit = App.Accounts.can_edit(user, course.id, "course")
     render(conn, "index.html", sections: sections, course: course, can_edit: can_edit)
   end
 
   def new(conn, %{"course_id" => course_id}) do
     course = Courses.get_course!(course_id)
     user = conn.assigns.current_user
-    case App.Accounts.can_edit_course(user, course) do
+    case App.Accounts.can_edit(user, course.id, "course") do
       true ->
         changeset = Courses.change_section(%Section{})
         render(conn, "new.html", changeset: changeset, course: course)
@@ -49,7 +49,7 @@ defmodule AppWeb.SectionController do
       {:ok, section} ->
         course = section.course
         topics = Topics.list_user_topics!(user, section)
-        can_edit = App.Accounts.can_edit_section(user, section)
+        can_edit = App.Accounts.can_edit(user, section.id, "section")
         render(conn, "show.html", course: course, section: section, topics: topics, can_edit: can_edit)
       {:error, message} -> render_error(conn, message)
     end
@@ -59,7 +59,7 @@ defmodule AppWeb.SectionController do
     user = conn.assigns.current_user
     case Courses.get_user_section(user, id) do
       {:ok, section} ->
-        case App.Accounts.can_edit_section(user, section) do
+        case App.Accounts.can_edit(user, section.id, "section") do
           true ->
             course = section.course
             changeset = Courses.change_section(section)
@@ -93,7 +93,7 @@ defmodule AppWeb.SectionController do
     {:ok, section} = Courses.get_user_section(user, id)
     cid = section.course_id
 
-    case App.Accounts.can_edit_section(user, section) do
+    case App.Accounts.can_edit(user, section.id, "section") do
       true ->
         {:ok, _section} = Courses.delete_section!(user, section)
         conn

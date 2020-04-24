@@ -20,7 +20,7 @@ defmodule AppWeb.Course_RoleController do
   def bulk_new(conn, %{"course_id" => course_id}) do
     course = Courses.get_course!(course_id)
     user = conn.assigns.current_user
-    case App.Accounts.can_edit_course(user, course) do
+    case App.Accounts.can_edit(user, course.id, "course") do
       true ->
         changeset = Accounts.change_course__role(%Course_Role{})
         render(conn, "bulk_new.html", course: course, changeset: changeset, role_list: @course_admin_roles)
@@ -31,7 +31,7 @@ defmodule AppWeb.Course_RoleController do
   def bulk_create(conn, %{"course__role" => course__role_params, "course_id" => course_id}) do
     course = Courses.get_course!(course_id)
     user_auth = conn.assigns.current_user
-    case App.Accounts.can_edit_course(user_auth, course) do
+    case App.Accounts.can_edit(user_auth, course.id, "course") do
       true ->
         user_ids = course__role_params["user_id_list"]
         current_time = current_html_time()

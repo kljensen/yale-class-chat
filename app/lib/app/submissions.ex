@@ -175,9 +175,9 @@ defmodule App.Submissions do
         my_rating = get_user_submission_rating(user.id, id)
         submission_check = get_submission!(id)
         topic = Topics.get_topic!(submission.topic_id)
-        can_edit = App.Accounts.can_edit_submission(user, submission_check)
-        is_admin = App.Accounts.can_edit_topic(user, topic)
-        can_edit_topic = App.Accounts.can_edit_topic(user, topic)
+        can_edit = App.Accounts.can_edit(user, submission_check.id, "submission")
+        is_admin = App.Accounts.is_course_admin(user, topic.id, "topic")
+        can_edit_topic = App.Accounts.can_edit(user, topic.id, "topic")
         comments = list_user_comments!(user, submission_check)
         section = Courses.get_section!(topic.section_id)
         course = Courses.get_course!(section.course_id)
@@ -311,7 +311,7 @@ defmodule App.Submissions do
   """
   def get_user_submission!(%App.Accounts.User{} = user, id) do
     submission = Repo.get!(Submission, id)
-    result = case App.Accounts.can_edit_submission(user, submission) do
+    result = case App.Accounts.can_edit(user, submission.id, "submission") do
                 true ->
                   query = from su in Submission,
                             join: t in App.Topics.Topic,
@@ -750,7 +750,7 @@ defmodule App.Submissions do
   """
   def get_user_comment!(%App.Accounts.User{} = user, id) do
     comment = Repo.get!(Comment, id)
-    return = case App.Accounts.can_edit_comment(user, comment) do
+    return = case App.Accounts.can_edit(user, comment.id, "comment") do
                 true ->
                   {:ok, comment}
                 false ->
@@ -1093,7 +1093,7 @@ defmodule App.Submissions do
   """
   def get_user_rating!(%App.Accounts.User{} = user, id) do
     rating = Repo.get!(Rating, id)
-    return = case App.Accounts.can_edit_rating(user, rating) do
+    return = case App.Accounts.can_edit(user, rating.id, "rating") do
                 true ->
                   rating
                 false ->

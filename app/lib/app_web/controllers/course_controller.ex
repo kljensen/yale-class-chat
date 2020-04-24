@@ -95,7 +95,7 @@ defmodule AppWeb.CourseController do
   def delete(conn, %{"id" => id}) do
     course = Courses.get_course!(id)
     user = conn.assigns.current_user
-    case App.Accounts.can_edit_course(user, course) do
+    case App.Accounts.can_edit(user, course.id, "course") do
       true ->
         {:ok, _course} = Courses.delete_course(user, course)
         conn

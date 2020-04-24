@@ -111,7 +111,7 @@ defmodule App.Topics do
     topic
     |> inspect()
     |> Logger.info()
-    can_edit = App.Accounts.can_edit_topic(user, topic)
+    can_edit = App.Accounts.can_edit(user, topic.id, "topic")
     section = topic.section
     course = topic.section.course
     submissions = case topic.show_user_submissions do

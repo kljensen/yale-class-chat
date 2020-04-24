@@ -437,61 +437,41 @@ defmodule App.Accounts do
 
   ## Examples
 
-      iex> can_edit_course(%User{}, %Course{})
+      iex> can_edit(%User{}, id, "course")
       true
 
-      iex> can_edit_course(%NonAuthUser{}, %Course{})
+      iex> can_edit(%NonAuthUser{}, id, "course")
       false
 
   """
 
-  def can_edit_course(%App.Accounts.User{} = user, %App.Courses.Course{} = course) do
-    course_role = get_current_course__role(user, course.id, "course")
-    Enum.member?(@course_admin_roles, course_role)
-  end
-
-  def can_edit_section(%App.Accounts.User{} = user, %App.Courses.Section{} = section) do
-    course_role = get_current_course__role(user, section.id, "section")
-    Enum.member?(@course_admin_roles, course_role)
-  end
-
-  def can_edit_topic(%App.Accounts.User{} = user, %App.Topics.Topic{} = topic) do
-    course_role = get_current_course__role(user, topic.id, "topic")
-    Enum.member?(@course_admin_roles, course_role)
-  end
-
-  def can_edit_submission(%App.Accounts.User{} = user, %App.Submissions.Submission{} = submission) do
-    case user.id == submission.user_id do
+  def can_edit(%App.Accounts.User{} = user, id, type) do
+    case is_creator(user, id, type) do
       true ->
         true
 
       false ->
-        course_role = get_current_course__role(user, submission.id, "submission")
-        Enum.member?(@course_admin_roles, course_role)
+        is_course_admin(user, id, type)
 
       end
   end
 
-  def can_edit_comment(%App.Accounts.User{} = user, %App.Submissions.Comment{} = comment) do
-    case user.id == comment.user_id do
-      true ->
-        true
+  defp is_creator(%App.Accounts.User{} = user, id, type) do
+    case type do
+      "submission" ->
+        test = App.Submissions.get_submission!(id)
+        test.user_id == user.id
 
-      false ->
-        course_role = get_current_course__role(user, comment.id, "comment")
-        Enum.member?(@course_admin_roles, course_role)
+      "comment" ->
+        test = App.Submissions.get_comment!(id)
+        test.user_id == user.id
 
-      end
-  end
+      "rating" ->
+        test = App.Submissions.get_rating!(id)
+        test.user_id == user.id
 
-  def can_edit_rating(%App.Accounts.User{} = user, %App.Submissions.Rating{} = rating) do
-    case user.id == rating.user_id do
-      true ->
-        true
-
-      false ->
-        course_role = get_current_course__role(user, rating.id, "rating")
-        Enum.member?(@course_admin_roles, course_role)
+      _ ->
+        false
 
       end
   end

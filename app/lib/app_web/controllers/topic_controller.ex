@@ -13,7 +13,7 @@ defmodule AppWeb.TopicController do
   def new(conn, %{"course_id" => course_id}) do
     course = Courses.get_course!(course_id)
     user = conn.assigns.current_user
-    case App.Accounts.can_edit_course(user, course) do
+    case App.Accounts.can_edit(user, course.id, "course") do
       true ->
         changeset = Topics.change_topic(%Topic{})
         section_list = Courses.list_user_sections(course, user)
@@ -91,7 +91,7 @@ defmodule AppWeb.TopicController do
       {:ok, topic} ->
         section = topic.section
         course = section.course
-        case App.Accounts.can_edit_topic(user, topic) do
+        case App.Accounts.can_edit(user, topic.id, "topic") do
           true ->
             changeset = Topics.change_topic(topic)
             current_time = current_html_time()
