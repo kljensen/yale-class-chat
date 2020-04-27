@@ -1292,46 +1292,39 @@ defmodule App.Submissions do
 
   def get_participation_csv!(%App.Accounts.User{} = user_auth, id, type) do
 
-    filename = "user_downloads/participation.csv" # Update this to include datetime to prevent collision errors
-    data = case App.Accounts.is_course_admin(user_auth, id, type) do
-      true -> get_participation_data(id, type)
-      false -> nil
-      end
+    if App.Accounts.is_course_admin(user_auth, id, type) do
+      data = get_participation_data(id, type)
+      headers = [
+        "Course",
+        "Section",
+        "Name",
+        "Net ID",
+        "Email",
+        "Submissions Created",
+        "Comments Created",
+        "Ratings Created"
+      ]
 
-    headers = [
-      "Course",
-      "Section",
-      "Name",
-      "Net ID",
-      "Email",
-      "Submissions Created",
-      "Comments Created",
-      "Ratings Created"
-    ]
-    data_to_csv!(filename, headers, data)
-
-    #Return filename
-    filename
-  end
-
-  defp data_to_csv!(filename, headers, data) do
-    file = File.open!(filename, [:write, :utf8])
-
-    headerstr = Enum.join(headers, ", ")
-
-    #Write headers to file
-    IO.write(file, headerstr)
-    IO.write(file, "\n")
-
-    if !is_nil(data) do
-      CSV.encode(data)
-      |> Enum.each(&IO.write(file, &1))
+      data_to_csv!(headers, data)
+    else
+      "You do not have permission to view this content."
     end
-
-    File.close(file)
   end
 
-  def get_participation_data(id, type) do
+  defp data_to_csv!(headers, data) do
+    if !is_nil(data) do
+      headerstr = Enum.join(headers, ", ")
+
+      datastr = CSV.encode(data)
+                |> Enum.join("")
+
+      Enum.join([headerstr, datastr], "\r\n")
+    else
+      "No participation data is available."
+    end
+  end
+
+  defp get_participation_data(id, type) do
 
     filter_course_or_section =
       case type do
@@ -1341,9 +1334,12 @@ defmodule App.Submissions do
         end
 
     query = from u in "users",
-            left_join: c in "courses", as: :courses,
+            join: sr in "section_roles",
+            on: u.id == sr.user_id,
             left_join: s in "sections", as: :sections,
-            on: c.id == s.course_id,
+            on: sr.section_id == s.id,
+            join: c in "courses", as: :courses,
+            on: s.course_id == c.id,
             left_join: t in "topics",
             on: s.id == t.section_id,
             left_join: su in "submissions",
@@ -1369,9 +1365,5 @@ defmodule App.Submissions do
                     ]
 
     Repo.all(query)
-  end
-
-  def delete_csv(filename) do
-    File.rm(filename)
   end
 end

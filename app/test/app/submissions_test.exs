@@ -1304,7 +1304,7 @@ defmodule App.SubmissionsTest do
   end
 
   describe "participation" do
-    #@tag :working
+    @tag :working
     test "get_participation_csv!/3 produces correct output for section", context do
       user_faculty = context[:user_faculty]
       submitter = context[:submitter]
@@ -1315,16 +1315,35 @@ defmodule App.SubmissionsTest do
       _comment = comment_fixture(student, submission)
       _rating = rating_fixture(student2, submission)
 
-      filename = Submissions.get_participation_csv!(user_faculty, section.id, "section")
+      output = Submissions.get_participation_csv!(user_faculty, section.id, "section")
 
       expected_output =
-        "Course, Section, Name, Net ID, Email, Submissions Created, Comments Created, Ratings Created\n"
-        <> "some name,some title,some display_name,submitter,some email,1,0,0\n"
-        <> "some name,some title,some display_name,student,some email,0,1,0\n"
-        <> "some name,some title,some display_name,student2,some email,0,0,1\n"
+        "Course, Section, Name, Net ID, Email, Submissions Created, Comments Created, Ratings Created\r\n"
+        <> "some name,some title,some display_name,student,some_email@yale.edu,0,1,0\r\n"
+        <> "some name,some title,some display_name,student2,some_email@yale.edu,0,0,1\r\n"
+        <> "some name,some title,some display_name,submitter,some_email@yale.edu,1,0,0\r\n"
 
-      assert File.read!(filename) == expected_output
+      assert output == expected_output
 
     end
+
+    test "get_participation_csv!/3 renders error if user unauthorized", context do
+      user_faculty = context[:user_faculty]
+      submitter = context[:submitter]
+      student = context[:student]
+      student2 = context[:student2]
+      section = context[:section]
+      submission = submission_fixture(submitter, context[:topic])
+      _comment = comment_fixture(student, submission)
+      _rating = rating_fixture(student2, submission)
+
+      output = Submissions.get_participation_csv!(student, section.id, "section")
+
+      expected_output =
+        "You do not have permission to view this content."
+
+      assert output == expected_output
+    end
+
   end
 end
