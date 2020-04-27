@@ -2,14 +2,14 @@ defmodule AppWeb.ParticipationController do
   use AppWeb, :controller
 
   def course(conn, %{"course_id" => course_id}) do
-    handle_download(conn, String.to_integer(course_id), "course")
+    handle_download!(conn, String.to_integer(course_id), "course")
   end
 
   def section(conn, %{"section_id" => section_id}) do
-    handle_download(conn, String.to_integer(section_id), "section")
+    handle_download!(conn, String.to_integer(section_id), "section")
   end
 
-  defp handle_download(conn, id, type) do
+  defp handle_download!(conn, id, type) do
     current_user = conn.assigns.current_user
 
     #Generate CSV file
