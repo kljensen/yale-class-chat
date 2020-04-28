@@ -1302,7 +1302,14 @@ defmodule App.Submissions do
         "Email",
         "Submissions Created",
         "Comments Created",
-        "Ratings Created"
+        "Ratings Created",
+        "Unique Topics Submitted To",
+        "Unique Submissions Commented On",
+        "Unique Submissions Rated",
+        "Average Rating of Created Submissions",
+        "Average Ratings Per Created Submission",
+        "Total Ratings on Created Submissions",
+        "Total Comment Length"
       ]
 
       data_to_csv!(headers, data)
@@ -1328,40 +1335,123 @@ defmodule App.Submissions do
 
     filter_course_or_section =
       case type do
-        "course" -> dynamic([courses: c], c.id == ^id)
+        "course" -> dynamic([sections: s], s.course_id == ^id)
         "section" -> dynamic([sections: s], s.id == ^id)
         _ -> false
         end
 
+    per_submission_stats = from su in "submissions",
+                  left_join: ra in "ratings",
+                  on: su.id == ra.submission_id,
+                  left_join: co in "comments",
+                  on: su.id == co.submission_id,
+                  left_join: t in "topics",
+                  on: su.topic_id == t.id,
+                  group_by: [su.id, t.section_id],
+                  select: %{
+                    id: su.id,
+                    user_id: su.user_id,
+                    section_id: t.section_id,
+                    avg_rating: avg(ra.score),
+                    rating_count: count(ra.id, :distinct),
+                    topic_id: su.topic_id,
+                    comment_count: count(co.id, :distinct)
+                  }
+
+    user_submission_stats = from u in "users",
+                            join: su_stat in subquery(per_submission_stats),
+                            on: u.id == su_stat.user_id,
+                            group_by: [u.id, su_stat.section_id],
+                            select: %{
+                              user_id: u.id,
+                              section_id: su_stat.section_id,
+                              count: count(su_stat.id, :distinct),
+                              topic_count: count(su_stat.topic_id, :distinct),
+                              comment_count: sum(su_stat.comment_count),
+                              avg_rating_count: avg(su_stat.rating_count),
+                              sum_rating_count: sum(su_stat.rating_count),
+                              avg_rating_score: avg(su_stat.avg_rating)
+                            }
+
+    user_comment_stats = from u in "users",
+                          join: co in "comments",
+                          on: u.id == co.user_id,
+                          left_join: su in "submissions",
+                          on: co.submission_id == su.id,
+                          left_join: t in "topics",
+                          on: su.topic_id == t.id,
+                          group_by: [u.id, t.section_id],
+                          select: %{
+                            user_id: u.id,
+                            section_id: t.section_id,
+                            count: count(co.id, :distinct),
+                            submission_count: count(co.submission_id, :distinct),
+                            total_length: sum(fragment("char_length(?)", co.description))
+                          }
+
+    user_rating_stats = from u in "users",
+                          join: ra in "ratings",
+                          on: u.id == ra.user_id,
+                          left_join: su in "submissions",
+                          on: ra.submission_id == su.id,
+                          left_join: t in "topics",
+                          on: su.topic_id == t.id,
+                          group_by: [u.id, t.section_id],
+                          select: %{
+                            user_id: u.id,
+                            section_id: t.section_id,
+                            count: count(ra.id, :distinct),
+                            submission_count: count(ra.submission_id, :distinct)
+                          }
+
+    section_details = from s in "sections",
+                        left_join: c in "courses",
+                        on: s.course_id == c.id,
+                        group_by: s.id,
+                        select: %{
+                          id: s.id,
+                          title: s.title,
+                          course_id: s.course_id,
+                          course_name: max(c.name)
+                        }
+
+    user_section_roles = from sr in "section_roles",
+                          distinct: true,
+                          select: %{
+                            user_id: sr.user_id,
+                            section_id: sr.section_id
+                          }
+
+
     query = from u in "users",
-            join: sr in "section_roles",
+            join: sr in subquery(user_section_roles),
             on: u.id == sr.user_id,
-            left_join: s in "sections", as: :sections,
+            join: s in subquery(section_details), as: :sections,
             on: sr.section_id == s.id,
-            join: c in "courses", as: :courses,
-            on: s.course_id == c.id,
-            left_join: t in "topics",
-            on: s.id == t.section_id,
-            left_join: su in "submissions",
-            on: t.id == su.topic_id and u.id == su.user_id,
-            left_join: su_all in "submissions",
-            on: t.id == su_all.topic_id,
-            left_join: co in "comments",
-            on: su_all.id == co.submission_id and u.id == co.user_id,
-            left_join: ra in "ratings",
-            on: su_all.id == ra.submission_id and u.id == ra.user_id,
+            left_join: sub_stat in subquery(user_submission_stats),
+            on: u.id == sub_stat.user_id and s.id == sub_stat.section_id,
+            left_join: com_stat in subquery(user_comment_stats),
+            on: u.id == com_stat.user_id and s.id == com_stat.section_id,
+            left_join: rat_stat in subquery(user_rating_stats),
+            on: u.id == rat_stat.user_id and s.id == rat_stat.section_id,
             order_by: u.net_id,
             where: ^filter_course_or_section,
             order_by: [asc: s.title, desc: u.display_name],
-            group_by: [c.id, s.id, u.id],
-            select: [c.name,
+            select: [s.course_name,
                       s.title,
                       u.display_name,
                       u.net_id,
                       u.email,
-                      count(su.id, :distinct),
-                      count(co.id, :distinct),
-                      count(ra.id, :distinct)
+                      sub_stat.count,
+                      com_stat.count,
+                      rat_stat.count,
+                      sub_stat.topic_count,
+                      com_stat.submission_count,
+                      rat_stat.submission_count,
+                      sub_stat.avg_rating_score,
+                      sub_stat.avg_rating_count,
+                      sub_stat.sum_rating_count,
+                      com_stat.total_length
                     ]
 
     Repo.all(query)

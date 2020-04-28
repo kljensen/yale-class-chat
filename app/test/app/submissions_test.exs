@@ -1318,10 +1318,13 @@ defmodule App.SubmissionsTest do
       output = Submissions.get_participation_csv!(user_faculty, section.id, "section")
 
       expected_output =
-        "Course, Section, Name, Net ID, Email, Submissions Created, Comments Created, Ratings Created\r\n"
-        <> "some name,some title,some display_name,student,some_email@yale.edu,0,1,0\r\n"
-        <> "some name,some title,some display_name,student2,some_email@yale.edu,0,0,1\r\n"
-        <> "some name,some title,some display_name,submitter,some_email@yale.edu,1,0,0\r\n"
+
+
+
+        "Course, Section, Name, Net ID, Email, Submissions Created, Comments Created, Ratings Created, Unique Topics Submitted To, Unique Submissions Commented On, Unique Submissions Rated, Average Rating of Created Submissions, Average Ratings Per Created Submission, Total Ratings on Created Submissions, Total Comment Length\r\n"
+        <> "some name,some title,some display_name,student,some_email@yale.edu,,1,,,1,,,,,16\r\n"
+        <> "some name,some title,some display_name,student2,some_email@yale.edu,,,1,,,1,,,,\r\n"
+        <> "some name,some title,some display_name,submitter,some_email@yale.edu,1,,,1,,,42.0000000000000000,1.00000000000000000000,1,\r\n"
 
       assert output == expected_output
 
