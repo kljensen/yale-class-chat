@@ -8,7 +8,7 @@ defmodule AppWeb.RatingController do
     submission = Submissions.get_submission!(submission_id)
     user = conn.assigns.current_user
     ratings = Submissions.list_user_ratings!(user, submission)
-    can_edit = App.Accounts.can_edit_submission(user, submission)
+    can_edit = App.Accounts.can_edit(user, submission.id, "submission")
     render(conn, "index.html", ratings: ratings, submission: submission, can_edit: can_edit)
   end
 
@@ -41,7 +41,7 @@ defmodule AppWeb.RatingController do
 
       rating ->
         submission = Submissions.get_submission!(rating.submission_id)
-        can_edit = App.Accounts.can_edit_rating(user, rating)
+        can_edit = App.Accounts.can_edit(user, rating.id, "rating")
         render(conn, "show.html", rating: rating, submission: submission, can_edit: can_edit, uid: user.id)
       end
   end
@@ -52,7 +52,7 @@ defmodule AppWeb.RatingController do
       nil -> render_error(conn, "not found")
 
       rating ->
-        case App.Accounts.can_edit_rating(user, rating) do
+        case App.Accounts.can_edit(user, rating.id, "rating") do
           true ->
             submission = Submissions.get_submission!(rating.submission_id)
             changeset = Submissions.change_rating(rating)
@@ -66,7 +66,7 @@ defmodule AppWeb.RatingController do
   def update(conn, %{"id" => id, "rating" => rating_params}) do
     rating = Submissions.get_rating!(id)
     user = conn.assigns.current_user
-    case App.Accounts.can_edit_rating(user, rating) do
+    case App.Accounts.can_edit(user, rating.id, "rating") do
       true ->
         submission = Submissions.get_submission!(rating.submission_id)
         case Submissions.update_rating!(user, rating, rating_params) do
@@ -90,7 +90,7 @@ defmodule AppWeb.RatingController do
     submission = Submissions.get_submission!(rating.submission_id)
     user = conn.assigns.current_user
 
-    case App.Accounts.can_edit_rating(user, rating) do
+    case App.Accounts.can_edit(user, rating.id, "rating") do
       true ->
         {:ok, _rating} = Submissions.delete_rating!(user, rating)
         conn

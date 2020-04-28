@@ -49,6 +49,10 @@
         <li><%= link "Add New Course Roles", to: Routes.course_course__role_path(@conn, :bulk_new, @course) %></li>
       <%= end %>
     </ul>
+    Participation
+    <ul>
+      <li><%= link "Download Participation Report (All Sections)", to: Routes.course_participation_path(@conn, :course, @course) %></li>
+    </ul>
   </div>
   <div class="card">
     <h3>Sections</h3>

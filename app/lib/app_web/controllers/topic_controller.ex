@@ -13,7 +13,7 @@ defmodule AppWeb.TopicController do
   def new(conn, %{"course_id" => course_id}) do
     course = Courses.get_course!(course_id)
     user = conn.assigns.current_user
-    case App.Accounts.can_edit_course(user, course) do
+    case App.Accounts.can_edit(user, course.id, "course") do
       true ->
         changeset = Topics.change_topic(%Topic{})
         section_list = Courses.list_user_sections(course, user)
@@ -78,7 +78,7 @@ defmodule AppWeb.TopicController do
     # TODO: notice I'm pulling in data multiple times here. Should
     # Fix this. Most of these controllers need to be refactored.
     case Topics.user_can_view_topic(user, id) do
-      {:ok, topic} ->
+      {:ok, _topic} ->
         topic_data = App.Topics.get_topic_data_for_user_id(user.id, id)
         render(conn, "show.html", topic_data)
       {:error, message} -> render_error(conn, message)
@@ -91,7 +91,7 @@ defmodule AppWeb.TopicController do
       {:ok, topic} ->
         section = topic.section
         course = section.course
-        case App.Accounts.can_edit_topic(user, topic) do
+        case App.Accounts.can_edit(user, topic.id, "topic") do
           true ->
             changeset = Topics.change_topic(topic)
             current_time = current_html_time()
@@ -109,7 +109,6 @@ defmodule AppWeb.TopicController do
     {:ok, topic} = Topics.get_user_topic(user, id)
     section = topic.section
     user = conn.assigns.current_user
-    current_time = current_html_time()
     topic_params = Map.put(topic_params, "opened_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(topic_params["opened_at"]))
     topic_params = Map.put(topic_params, "closed_at", AppWeb.ControllerHelpers.convert_NYC_datetime_to_db!(topic_params["closed_at"]))
 

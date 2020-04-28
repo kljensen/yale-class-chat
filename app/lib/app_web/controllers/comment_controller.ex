@@ -8,7 +8,7 @@ defmodule AppWeb.CommentController do
     submission = Submissions.get_submission!(submission_id)
     user = conn.assigns.current_user
     comments = Submissions.list_user_comments!(user, submission)
-    can_edit = App.Accounts.can_edit_submission(user, submission)
+    can_edit = App.Accounts.can_edit(user, submission.id, "submission")
     render(conn, "index.html", comments: comments, submission: submission, can_edit: can_edit)
   end
 
@@ -39,7 +39,7 @@ defmodule AppWeb.CommentController do
     case App.Submissions.get_user_comment!(user, id) do
       {:ok, comment} ->
         submission = Submissions.get_submission!(comment.submission_id)
-        can_edit = App.Accounts.can_edit_comment(user, comment)
+        can_edit = App.Accounts.can_edit(user, comment.id, "comment")
         render(conn, "show.html", comment: comment, submission: submission, can_edit: can_edit, uid: user.id)
 
       {:error, message} -> render_error(conn, message)
@@ -50,7 +50,7 @@ defmodule AppWeb.CommentController do
     user = conn.assigns.current_user
     case App.Submissions.get_user_comment!(user, id) do
       {:ok, comment} ->
-        case App.Accounts.can_edit_comment(user, comment) do
+        case App.Accounts.can_edit(user, comment.id, "comment") do
           true ->
             submission = Submissions.get_submission!(comment.submission_id)
             changeset = Submissions.change_comment(comment)
@@ -66,7 +66,7 @@ defmodule AppWeb.CommentController do
     user = conn.assigns.current_user
     case App.Submissions.get_user_comment!(user, id) do
       {:ok, comment} ->
-        case App.Accounts.can_edit_comment(user, comment) do
+        case App.Accounts.can_edit(user, comment.id, "comment") do
           true ->
             submission = Submissions.get_submission!(comment.submission_id)
             case Submissions.update_comment!(user, comment, comment_params) do
@@ -92,7 +92,7 @@ defmodule AppWeb.CommentController do
     comment = Submissions.get_comment!(id)
     submission = Submissions.get_submission!(comment.submission_id)
     user = conn.assigns.current_user
-    case App.Accounts.can_edit_comment(user, comment) do
+    case App.Accounts.can_edit(user, comment.id, "comment") do
       true ->
         case Submissions.delete_comment!(user, comment) do
           {:ok, _comment} ->

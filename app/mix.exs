@@ -73,7 +73,9 @@ defmodule App.MixProject do
       # Use poison for JSON parsing
       {:poison, "~> 3.1"},
       # Timex for datetime string conversions
-      {:timex, "~> 3.5"}
+      {:timex, "~> 3.5"},
+      # CSV for participation report downloads
+      {:csv, "~> 2.3"}
     ]
   end
 

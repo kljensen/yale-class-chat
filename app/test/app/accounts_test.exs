@@ -105,6 +105,95 @@ defmodule App.AccountsTest do
     end
   end
 
+  describe "authorization" do
+
+    defp authorization_setup() do
+
+      alias App.Submissions
+
+      # Create topic as starting point
+      topic = App.TopicsTest.topic_fixture()
+
+      # Get section (needed to get the course ID for testing)
+      section = Courses.get_section!(topic.section_id)
+
+      # Get/create users
+      user_faculty = Accounts.get_user_by!("faculty net id")
+      user_faculty2 = user_fixture(%{is_faculty: true, net_id: "faculty net id 2"})
+      student = user_fixture(%{is_faculty: false, net_id: "student net id"})
+      student2 = user_fixture(%{is_faculty: false, net_id: "student net id 2"})
+
+      # Create student roles
+      {:ok, current_time} = DateTime.now("Etc/UTC")
+      params = %{role: "student", valid_from: DateTime.add(current_time, -7200, :second), valid_to: DateTime.add(current_time, 7200, :second)}
+      {:ok, _} = App.Accounts.create_section__role!(user_faculty, student, section, params)
+      {:ok, _} = App.Accounts.create_section__role!(user_faculty, student2, section, params)
+
+      # Create submission as student 1
+      params = %{description: "some description", image_url: "http://i.imgur.com/u3vyMCW.jpg", title: "some title", allow_ranking: true, visible: true}
+      {:ok, submission} = Submissions.create_submission!(student, topic, params)
+
+      # Create comment and rating as student 2
+      params = %{score: 1}
+      {:ok, rating} = Submissions.create_rating!(student2, submission, params)
+      params = %{description: "some description"}
+      {:ok, comment} = Submissions.create_comment!(student2, submission, params)
+
+      # Return relevant variables to tests
+      [
+        topic: topic,
+        section: section,
+        user_faculty: user_faculty,
+        user_faculty2: user_faculty2,
+        student: student,
+        student2: student2,
+        submission: submission,
+        rating: rating,
+        comment: comment
+      ]
+    end
+
+    test "can_edit/3 returns true if user has valid course role" do
+      setupvars = authorization_setup()
+      user_faculty = setupvars[:user_faculty]
+
+      assert Accounts.can_edit(user_faculty, setupvars[:section].course_id, "course")
+      assert Accounts.can_edit(user_faculty, setupvars[:section].id, "section")
+      assert Accounts.can_edit(user_faculty, setupvars[:topic].id, "topic")
+      assert Accounts.can_edit(user_faculty, setupvars[:submission].id, "submission")
+      assert Accounts.can_edit(user_faculty, setupvars[:comment].id, "comment")
+      assert Accounts.can_edit(user_faculty, setupvars[:rating].id, "rating")
+    end
+
+    test "can_edit/3 returns true if user is creator" do
+      setupvars = authorization_setup()
+      student = setupvars[:student]
+      student2 = setupvars[:student2]
+
+      assert Accounts.can_edit(student, setupvars[:submission].id, "submission")
+      assert Accounts.can_edit(student2, setupvars[:comment].id, "comment")
+      assert Accounts.can_edit(student2, setupvars[:rating].id, "rating")
+    end
+
+    test "can_edit/3 returns false if user is not creator and has no valid course role" do
+      setupvars = authorization_setup()
+      student = setupvars[:student]
+      student2 = setupvars[:student2]
+
+      refute Accounts.can_edit(student, setupvars[:section].course_id, "course")
+      refute Accounts.can_edit(student, setupvars[:section].id, "section")
+      refute Accounts.can_edit(student, setupvars[:topic].id, "topic")
+      refute Accounts.can_edit(student, setupvars[:comment].id, "comment")
+      refute Accounts.can_edit(student, setupvars[:rating].id, "rating")
+
+      refute Accounts.can_edit(student2, setupvars[:section].course_id, "course")
+      refute Accounts.can_edit(student2, setupvars[:section].id, "section")
+      refute Accounts.can_edit(student2, setupvars[:topic].id, "topic")
+      refute Accounts.can_edit(student2, setupvars[:submission].id, "submission")
+    end
+
+  end
+
   describe "course_roles" do
     alias App.Accounts.Course_Role
 
@@ -152,12 +241,12 @@ defmodule App.AccountsTest do
       {:ok, comment} = App.Submissions.create_comment!(user_faculty, submission, %{description: "some description"})
       {:ok, rating} = App.Submissions.create_rating!(user_faculty, submission, %{score: 5})
       user = Accounts.get_user_by!("some net_id")
-      assert Accounts.get_current_course__role(user, course) == "some role"
-      assert Accounts.get_current_course__role(user, section) == "some role"
-      assert Accounts.get_current_course__role(user, topic) == "some role"
-      assert Accounts.get_current_course__role(user, submission) == "some role"
-      assert Accounts.get_current_course__role(user, comment) == "some role"
-      assert Accounts.get_current_course__role(user, rating) == "some role"
+      assert Accounts.get_current_course__role(user, course.id, "course") == "some role"
+      assert Accounts.get_current_course__role(user, section.id, "section") == "some role"
+      assert Accounts.get_current_course__role(user, topic.id, "topic") == "some role"
+      assert Accounts.get_current_course__role(user, submission.id, "submission") == "some role"
+      assert Accounts.get_current_course__role(user, comment.id, "comment") == "some role"
+      assert Accounts.get_current_course__role(user, rating.id, "rating") == "some role"
     end
 
     test "create_course__role/4 with valid data creates a course__role" do

@@ -77,7 +77,7 @@ defmodule App.Topics do
 
     query = if inherit_course_role do
       course = App.Courses.get_course!(cid)
-      auth_role = App.Accounts.get_current_course__role(user, course)
+      auth_role = App.Accounts.get_current_course__role(user, course.id, "course")
       if Enum.member?(@course_admin_roles, auth_role) do
         from t in Topic,
           where: t.section_id == ^sid,
@@ -111,7 +111,7 @@ defmodule App.Topics do
     topic
     |> inspect()
     |> Logger.info()
-    can_edit = App.Accounts.can_edit_topic(user, topic)
+    can_edit = App.Accounts.can_edit(user, topic.id, "topic")
     section = topic.section
     course = topic.section.course
     submissions = case topic.show_user_submissions do
@@ -194,7 +194,7 @@ defmodule App.Topics do
   """
   def create_topic!(%App.Accounts.User{} = user, %App.Courses.Section{} = section, attrs \\ %{}) do
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_course__role(user, course)
+    auth_role = App.Accounts.get_current_course__role(user, course.id, "course")
 
     cond do
       course.allow_write == false ->
@@ -228,7 +228,7 @@ defmodule App.Topics do
   def update_topic!(%App.Accounts.User{} = user, %Topic{} = topic, attrs \\ %{}) do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_course__role(user, course)
+    auth_role = App.Accounts.get_current_course__role(user, course.id, "course")
 
     cond do
       course.allow_write == false ->
@@ -261,7 +261,7 @@ defmodule App.Topics do
   def delete_topic!(%App.Accounts.User{} = user, %Topic{} = topic) do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_course__role(user, course)
+    auth_role = App.Accounts.get_current_course__role(user, course.id, "course")
 
     cond do
       course.allow_write == false ->

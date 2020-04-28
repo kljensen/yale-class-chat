@@ -1302,4 +1302,51 @@ defmodule App.SubmissionsTest do
       assert %Ecto.Changeset{} = Submissions.change_rating(rating)
     end
   end
+
+  describe "participation" do
+    @tag :working
+    test "get_participation_csv!/3 produces correct output for section", context do
+      user_faculty = context[:user_faculty]
+      submitter = context[:submitter]
+      student = context[:student]
+      student2 = context[:student2]
+      section = context[:section]
+      submission = submission_fixture(submitter, context[:topic])
+      _comment = comment_fixture(student, submission)
+      _rating = rating_fixture(student2, submission)
+
+      output = Submissions.get_participation_csv!(user_faculty, section.id, "section")
+
+      expected_output =
+
+
+
+        "Course, Section, Name, Net ID, Email, Submissions Created, Comments Created, Ratings Created, Unique Topics Submitted To, Unique Submissions Commented On, Unique Submissions Rated, Average Rating of Created Submissions, Average Ratings Per Created Submission, Total Ratings on Created Submissions, Total Comment Length\r\n"
+        <> "some name,some title,some display_name,student,some_email@yale.edu,,1,,,1,,,,,16\r\n"
+        <> "some name,some title,some display_name,student2,some_email@yale.edu,,,1,,,1,,,,\r\n"
+        <> "some name,some title,some display_name,submitter,some_email@yale.edu,1,,,1,,,42.0000000000000000,1.00000000000000000000,1,\r\n"
+
+      assert output == expected_output
+
+    end
+
+    test "get_participation_csv!/3 renders error if user unauthorized", context do
+      user_faculty = context[:user_faculty]
+      submitter = context[:submitter]
+      student = context[:student]
+      student2 = context[:student2]
+      section = context[:section]
+      submission = submission_fixture(submitter, context[:topic])
+      _comment = comment_fixture(student, submission)
+      _rating = rating_fixture(student2, submission)
+
+      output = Submissions.get_participation_csv!(student, section.id, "section")
+
+      expected_output =
+        "You do not have permission to view this content."
+
+      assert output == expected_output
+    end
+
+  end
 end

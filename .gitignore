@@ -1,3 +1,5 @@
 .env*
 app/assets/node_modules
 *.swp
+app/user_downloads/*
+!.gitkeep

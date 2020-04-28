@@ -54,7 +54,7 @@ defmodule AppWeb.CourseController do
         semester = Courses.get_semester!(course.semester_id)
         user = conn.assigns.current_user
         sections = Courses.list_user_sections(course, user)
-        role = App.Accounts.get_current_course__role(user, course)
+        role = App.Accounts.get_current_course__role(user, course.id, "course")
 
         render(conn, "show.html", course: course, semester: semester, sections: sections, role: role)
       {:error, message} -> render_error(conn, message)
@@ -95,7 +95,7 @@ defmodule AppWeb.CourseController do
   def delete(conn, %{"id" => id}) do
     course = Courses.get_course!(id)
     user = conn.assigns.current_user
-    case App.Accounts.can_edit_course(user, course) do
+    case App.Accounts.can_edit(user, course.id, "course") do
       true ->
         {:ok, _course} = Courses.delete_course(user, course)
         conn

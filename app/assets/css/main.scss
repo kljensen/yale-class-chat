@@ -4,6 +4,7 @@ $default-background-color: #ecf0f1;
 $muted-background-color: #f8f8f8;
 $muted-text-color: #666;
 $muted-line-color: #e5e5e5;
+$muted-header-text-color: #999;
 $smaller-font-size: 0.875em;
 $max-width: 1000px;
 $dark-background: #222;
@@ -165,12 +166,12 @@ header {
         flex-direction: row-reverse;
         text-transform: uppercase;
         font-variant-caps: small-caps;
-        color: $muted-text-color;
+        color: $muted-header-text-color;
         a {
-            color: $muted-text-color;
+            color: $muted-header-text-color;
         }
         a:hover{
-            color: #666;
+            color: $muted-text-color;
         }
         > div {
             line-height: 2rem;
@@ -186,6 +187,18 @@ header {
                 font-size: $smaller-font-size;
             }
         }
+    }
+    .icon-login {
+      fill: none;
+      stroke: $muted-header-text-color;
+    }
+    .icon-user {
+      fill: $muted-header-text-color;
+      stroke: none;
+    }
+    .icon-menu {
+      fill: $muted-header-text-color;
+      stroke: $muted-header-text-color;
     }
 }
 

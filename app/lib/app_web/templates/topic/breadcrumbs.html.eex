@@ -4,7 +4,7 @@
             <a href="/">Courses</a>
         </li>
         <li>
-             <%= if App.Accounts.can_edit_course(@current_user, @course) do %>
+             <%= if App.Accounts.can_edit(@current_user, @course.id, "course") do %>
              <a href="<%= Routes.course_path(@conn, :show, @course.id) %>">
              <% else %>
              <a href="<%= Routes.section_path(@conn, :show, @section.id) %>">

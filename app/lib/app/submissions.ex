@@ -109,7 +109,7 @@ defmodule App.Submissions do
     query = if inherit_course_role do
       section = App.Courses.get_section!(sid)
       course = App.Courses.get_course!(section.course_id)
-      auth_role = App.Accounts.get_current_course__role(user, course)
+      auth_role = App.Accounts.get_current_course__role(user, course.id, "course")
       query_tmp = if Enum.member?(@course_admin_roles, auth_role) do
         q = from su in Submission,
           left_join: ra in App.Submissions.Rating,
@@ -166,7 +166,7 @@ defmodule App.Submissions do
 
   @doc """
   Grabs all the submission data we need for rendering a view.
-  THIS ASSUMES THE 
+  THIS ASSUMES THE
   """
   def get_submission_data_for_user(user, id) do
     case get_user_submission!(user, id) do
@@ -175,9 +175,9 @@ defmodule App.Submissions do
         my_rating = get_user_submission_rating(user.id, id)
         submission_check = get_submission!(id)
         topic = Topics.get_topic!(submission.topic_id)
-        can_edit = App.Accounts.can_edit_submission(user, submission_check)
-        is_admin = App.Accounts.can_edit_topic(user, topic)
-        can_edit_topic = App.Accounts.can_edit_topic(user, topic)
+        can_edit = App.Accounts.can_edit(user, submission_check.id, "submission")
+        is_admin = App.Accounts.is_course_admin(user, topic.id, "topic")
+        can_edit_topic = App.Accounts.can_edit(user, topic.id, "topic")
         comments = list_user_comments!(user, submission_check)
         section = Courses.get_section!(topic.section_id)
         course = Courses.get_course!(section.course_id)
@@ -311,7 +311,7 @@ defmodule App.Submissions do
   """
   def get_user_submission!(%App.Accounts.User{} = user, id) do
     submission = Repo.get!(Submission, id)
-    result = case App.Accounts.can_edit_submission(user, submission) do
+    result = case App.Accounts.can_edit(user, submission.id, "submission") do
                 true ->
                   query = from su in Submission,
                             join: t in App.Topics.Topic,
@@ -427,7 +427,7 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_section__role!(user, section)
-    course_role = App.Accounts.get_current_course__role(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course.id, "course")
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
     #Only allow admins to hide/unhide submissions or allow them to be ranked
@@ -493,7 +493,7 @@ defmodule App.Submissions do
     topic = App.Topics.get_topic!(submission.topic_id)
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
-    auth_role = App.Accounts.get_current_course__role(user, course)
+    auth_role = App.Accounts.get_current_course__role(user, course.id, "course")
     {:ok, current_time} = DateTime.now("Etc/UTC")
     authorized = Enum.member?(@course_admin_roles, auth_role) or user.id == submission.user_id
 
@@ -665,7 +665,7 @@ defmodule App.Submissions do
             |> preload([co, su, t, s, c, r, u], [user: u])
 
     query = if inherit_course_role do
-      auth_role = App.Accounts.get_current_course__role(user, topic)
+      auth_role = App.Accounts.get_current_course__role(user, topic.id, "topic")
       if Enum.member?(@course_admin_roles, auth_role) do
         querytmp = from co in Comment,
                       left_join: u in App.Accounts.User,
@@ -750,7 +750,7 @@ defmodule App.Submissions do
   """
   def get_user_comment!(%App.Accounts.User{} = user, id) do
     comment = Repo.get!(Comment, id)
-    return = case App.Accounts.can_edit_comment(user, comment) do
+    return = case App.Accounts.can_edit(user, comment.id, "comment") do
                 true ->
                   {:ok, comment}
                 false ->
@@ -789,6 +789,7 @@ defmodule App.Submissions do
                                 {:error, message} ->
                                   {:error, message}
                                 end
+                  returntmp
               end
     return
   end
@@ -824,7 +825,7 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_section__role!(user, section)
-    course_role = App.Accounts.get_current_course__role(user, section)
+    course_role = App.Accounts.get_current_course__role(user, section.id, "section")
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
@@ -869,7 +870,7 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     {:ok, current_time} = DateTime.now("Etc/UTC")
-    course_role = App.Accounts.get_current_course__role(user, section)
+    course_role = App.Accounts.get_current_course__role(user, section.id, "section")
 
     cond do
       topic.allow_submission_comments == false ->
@@ -911,7 +912,7 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     {:ok, current_time} = DateTime.now("Etc/UTC")
-    course_role = App.Accounts.get_current_course__role(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course.id, "course")
 
     cond do
       topic.allow_submission_comments == false ->
@@ -1018,7 +1019,7 @@ defmodule App.Submissions do
     query = if inherit_course_role do
       section = App.Courses.get_section!(sid)
       course = App.Courses.get_course!(section.course_id)
-      auth_role = App.Accounts.get_current_course__role(user, course)
+      auth_role = App.Accounts.get_current_course__role(user, course.id, "course")
       if Enum.member?(@course_admin_roles, auth_role) do
         from ra in Rating,
           where: ra.submission_id == ^suid
@@ -1093,7 +1094,7 @@ defmodule App.Submissions do
   """
   def get_user_rating!(%App.Accounts.User{} = user, id) do
     rating = Repo.get!(Rating, id)
-    return = case App.Accounts.can_edit_rating(user, rating) do
+    return = case App.Accounts.can_edit(user, rating.id, "rating") do
                 true ->
                   rating
                 false ->
@@ -1163,7 +1164,7 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     auth_role = App.Accounts.get_current_section__role!(user, section)
-    course_role = App.Accounts.get_current_course__role(user, section)
+    course_role = App.Accounts.get_current_course__role(user, section.id, "section")
     {:ok, current_time} = DateTime.now("Etc/UTC")
 
     cond do
@@ -1211,7 +1212,7 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     {:ok, current_time} = DateTime.now("Etc/UTC")
-    course_role = App.Accounts.get_current_course__role(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course.id, "course")
 
     cond do
       topic.allow_submission_voting == false ->
@@ -1253,7 +1254,7 @@ defmodule App.Submissions do
     section = App.Courses.get_section!(topic.section_id)
     course = App.Courses.get_course!(section.course_id)
     {:ok, current_time} = DateTime.now("Etc/UTC")
-    course_role = App.Accounts.get_current_course__role(user, course)
+    course_role = App.Accounts.get_current_course__role(user, course.id, "course")
 
     cond do
       topic.allow_submission_voting == false ->
@@ -1286,5 +1287,173 @@ defmodule App.Submissions do
   """
   def change_rating(%Rating{} = rating) do
     Rating.changeset(rating, %{})
+  end
+
+
+  def get_participation_csv!(%App.Accounts.User{} = user_auth, id, type) do
+
+    if App.Accounts.is_course_admin(user_auth, id, type) do
+      data = get_participation_data(id, type)
+      headers = [
+        "Course",
+        "Section",
+        "Name",
+        "Net ID",
+        "Email",
+        "Submissions Created",
+        "Comments Created",
+        "Ratings Created",
+        "Unique Topics Submitted To",
+        "Unique Submissions Commented On",
+        "Unique Submissions Rated",
+        "Average Rating of Created Submissions",
+        "Average Ratings Per Created Submission",
+        "Total Ratings on Created Submissions",
+        "Total Comment Length"
+      ]
+
+      data_to_csv!(headers, data)
+    else
+      "You do not have permission to view this content."
+    end
+  end
+
+  defp data_to_csv!(headers, data) do
+    if !is_nil(data) do
+      headerstr = Enum.join(headers, ", ")
+
+      datastr = CSV.encode(data)
+                |> Enum.join("")
+
+      Enum.join([headerstr, datastr], "\r\n")
+    else
+      "No participation data is available."
+    end
+  end
+
+  defp get_participation_data(id, type) do
+
+    filter_course_or_section =
+      case type do
+        "course" -> dynamic([sections: s], s.course_id == ^id)
+        "section" -> dynamic([sections: s], s.id == ^id)
+        _ -> false
+        end
+
+    per_submission_stats = from su in "submissions",
+                  left_join: ra in "ratings",
+                  on: su.id == ra.submission_id,
+                  left_join: co in "comments",
+                  on: su.id == co.submission_id,
+                  left_join: t in "topics",
+                  on: su.topic_id == t.id,
+                  group_by: [su.id, t.section_id],
+                  select: %{
+                    id: su.id,
+                    user_id: su.user_id,
+                    section_id: t.section_id,
+                    avg_rating: avg(ra.score),
+                    rating_count: count(ra.id, :distinct),
+                    topic_id: su.topic_id,
+                    comment_count: count(co.id, :distinct)
+                  }
+
+    user_submission_stats = from u in "users",
+                            join: su_stat in subquery(per_submission_stats),
+                            on: u.id == su_stat.user_id,
+                            group_by: [u.id, su_stat.section_id],
+                            select: %{
+                              user_id: u.id,
+                              section_id: su_stat.section_id,
+                              count: count(su_stat.id, :distinct),
+                              topic_count: count(su_stat.topic_id, :distinct),
+                              comment_count: sum(su_stat.comment_count),
+                              avg_rating_count: avg(su_stat.rating_count),
+                              sum_rating_count: sum(su_stat.rating_count),
+                              avg_rating_score: avg(su_stat.avg_rating)
+                            }
+
+    user_comment_stats = from u in "users",
+                          join: co in "comments",
+                          on: u.id == co.user_id,
+                          left_join: su in "submissions",
+                          on: co.submission_id == su.id,
+                          left_join: t in "topics",
+                          on: su.topic_id == t.id,
+                          group_by: [u.id, t.section_id],
+                          select: %{
+                            user_id: u.id,
+                            section_id: t.section_id,
+                            count: count(co.id, :distinct),
+                            submission_count: count(co.submission_id, :distinct),
+                            total_length: sum(fragment("char_length(?)", co.description))
+                          }
+
+    user_rating_stats = from u in "users",
+                          join: ra in "ratings",
+                          on: u.id == ra.user_id,
+                          left_join: su in "submissions",
+                          on: ra.submission_id == su.id,
+                          left_join: t in "topics",
+                          on: su.topic_id == t.id,
+                          group_by: [u.id, t.section_id],
+                          select: %{
+                            user_id: u.id,
+                            section_id: t.section_id,
+                            count: count(ra.id, :distinct),
+                            submission_count: count(ra.submission_id, :distinct)
+                          }
+
+    section_details = from s in "sections",
+                        left_join: c in "courses",
+                        on: s.course_id == c.id,
+                        group_by: s.id,
+                        select: %{
+                          id: s.id,
+                          title: s.title,
+                          course_id: s.course_id,
+                          course_name: max(c.name)
+                        }
+
+    user_section_roles = from sr in "section_roles",
+                          distinct: true,
+                          select: %{
+                            user_id: sr.user_id,
+                            section_id: sr.section_id
+                          }
+
+
+    query = from u in "users",
+            join: sr in subquery(user_section_roles),
+            on: u.id == sr.user_id,
+            join: s in subquery(section_details), as: :sections,
+            on: sr.section_id == s.id,
+            left_join: sub_stat in subquery(user_submission_stats),
+            on: u.id == sub_stat.user_id and s.id == sub_stat.section_id,
+            left_join: com_stat in subquery(user_comment_stats),
+            on: u.id == com_stat.user_id and s.id == com_stat.section_id,
+            left_join: rat_stat in subquery(user_rating_stats),
+            on: u.id == rat_stat.user_id and s.id == rat_stat.section_id,
+            order_by: u.net_id,
+            where: ^filter_course_or_section,
+            order_by: [asc: s.title, desc: u.display_name],
+            select: [s.course_name,
+                      s.title,
+                      u.display_name,
+                      u.net_id,
+                      u.email,
+                      sub_stat.count,
+                      com_stat.count,
+                      rat_stat.count,
+                      sub_stat.topic_count,
+                      com_stat.submission_count,
+                      rat_stat.submission_count,
+                      sub_stat.avg_rating_score,
+                      sub_stat.avg_rating_count,
+                      sub_stat.sum_rating_count,
+                      com_stat.total_length
+                    ]
+
+    Repo.all(query)
   end
 end

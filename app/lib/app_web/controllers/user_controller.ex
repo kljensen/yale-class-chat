@@ -52,7 +52,7 @@ defmodule AppWeb.UserController do
         |> put_flash(:success, "Successfully refreshed user data")
         |> redirect(to: Routes.user_path(conn, :show, user))
 
-      {:error, message} -> render_error(conn, "forbidden")
+      {:error, message} -> render_error(conn, message)
       end
   end
 

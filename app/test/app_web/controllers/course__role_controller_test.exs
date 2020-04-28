@@ -4,8 +4,8 @@ defmodule AppWeb.Course_RoleControllerTest do
 
   alias App.Accounts
 
-  @create_attrs %{role: "administrator", valid_from: "2010-04-17T14:00:00Z", valid_to: "2010-04-17T14:00:00Z"}
-  @update_attrs %{role: "some updated role", valid_from: "2011-05-18T15:01:01Z", valid_to: "2011-05-18T15:01:01Z"}
+  @create_attrs %{role: "administrator", valid_from: "2010-04-17T14:00", valid_to: "2010-04-17T14:00"}
+  @update_attrs %{role: "some updated role", valid_from: "2011-05-18T15:01", valid_to: "2011-05-18T15:01"}
   @invalid_attrs %{role: nil, valid_from: nil, valid_to: nil}
 
   setup [:create_course_and_student]
@@ -25,37 +25,38 @@ defmodule AppWeb.Course_RoleControllerTest do
     end
   end
 
-  describe "new course__role" do
+  describe "bulk new course__role" do
     test "renders form", %{conn: conn, course: course} do
       conn = conn
         |> init_test_session(uid: "faculty net id")
-        |> get(Routes.course_course__role_path(conn, :new, course))
-      assert html_response(conn, 200) =~ "New Course  role"
+        |> get(Routes.course_course__role_path(conn, :bulk_new, course))
+      assert html_response(conn, 200) =~ "Add Course Roles"
     end
   end
 
-  describe "create course__role" do
+  describe "bulk create course__role" do
     test "redirects to show when data is valid", %{conn: conn, course: course} do
-      current_user = Accounts.get_user_by!("faculty net id")
-      attrs = Map.merge(@create_attrs, %{user_id: current_user.id})
+      _current_user = Accounts.get_user_by!("faculty net id")
+      attrs = Map.merge(@create_attrs, %{"user_id_list" => "abc123, abc234"})
       conn = conn
         |> init_test_session(uid: "faculty net id")
-        |> post(Routes.course_course__role_path(conn, :create, course), course__role: attrs)
+        |> post(Routes.course_course__role_path(conn, :bulk_create, course), course__role: attrs)
 
-      assert %{id: id} = redirected_params(conn)
-      assert redirected_to(conn) == Routes.course_course__role_path(conn, :show, course, id)
+      assert %{course_id: course_id} = redirected_params(conn)
+      assert redirected_to(conn) == Routes.course_course__role_path(conn, :index, course)
 
-      conn = get(conn, Routes.course_course__role_path(conn, :show, course, id))
-      assert html_response(conn, 200) =~ "Show Course  role"
+      conn = get(conn, Routes.course_course__role_path(conn, :index, course))
+      assert html_response(conn, 200) =~ "abc123"
+      assert html_response(conn, 200) =~ "abc234"
     end
 
     test "renders errors when data is invalid", %{conn: conn, course: course} do
-      current_user = Accounts.get_user_by!("faculty net id")
-      attrs = Map.merge(@invalid_attrs, %{user_id: current_user.id})
+      _current_user = Accounts.get_user_by!("faculty net id")
+      attrs = Map.merge(@invalid_attrs, %{"user_id_list" => "abc123, abc234"})
       conn = conn
         |> init_test_session(uid: "faculty net id")
-        |> post(Routes.course_course__role_path(conn, :create, course), course__role: attrs)
-      assert html_response(conn, 200) =~ "New Course  role"
+        |> post(Routes.course_course__role_path(conn, :bulk_create, course), course__role: attrs)
+      assert html_response(conn, 200) =~ "Add Course Roles"
     end
   end
 
